@@ -1,0 +1,17 @@
+experiment: segformer_b0_cityscapes
+seed: 42
+model:
+  checkpoint: nvidia/mit-b0
+  num_labels: 19
+  pretrained: true
+data:
+  train_manifest: data/manifests/cityscapes_train.csv
+  val_manifest: data/manifests/cityscapes_val.csv
+  image_size: [512, 512]
+train:
+  batch_size: 4
+  num_workers: 2
+  epochs: 30
+  max_steps: null
+  lr: 0.00006
+output_dir: outputs/segformer_b0_cityscapes

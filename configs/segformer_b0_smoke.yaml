@@ -1,0 +1,20 @@
+experiment: smoke
+seed: 42
+model:
+  checkpoint: null
+  num_labels: 19
+  hidden_sizes: [16, 32, 64, 128]
+  depths: [1, 1, 1, 1]
+  decoder_hidden_size: 32
+  pretrained: false
+data:
+  train_manifest: data/manifests/synthetic_train.csv
+  val_manifest: data/manifests/synthetic_val.csv
+  image_size: [64, 64]
+train:
+  batch_size: 2
+  num_workers: 0
+  epochs: 1
+  max_steps: 2
+  lr: 0.0001
+output_dir: outputs/smoke
