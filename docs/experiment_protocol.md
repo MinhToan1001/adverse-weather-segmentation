@@ -2,12 +2,12 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft for Gate A review** (frozen as v1.0 only after @MinhToan1001 approves) |
-| Owner / author | @khangcules10 |
+| Status | **Frozen as v1.0 by the Leader**; overall Gate A sign-off remains pending |
+| Owner / author | @MinhToan1001 (Person 1 — Leader) |
 | Approver | @MinhToan1001 |
-| Version / date | 1.0-draft / 2026-10-26 |
+| Version / date | 1.0 / 2026-10-26 |
 | Applies to | Phase 1 baseline (SegFormer-B0) and Phase 2 controlled extension |
-| Related | `docs/DATA_CONTRACT.md`, `docs/RISKS.md`, `docs/ROADMAP_30_DAYS.md`, `docs/issues_backlog.csv` |
+| Related | `docs/DATA_CONTRACT.md`, `docs/RISKS.md`, `docs/ROADMAP_30_DAYS.md`, task A01 in `docs/issues_backlog.csv` |
 
 ## Tóm tắt
 
@@ -16,6 +16,8 @@ Mục tiêu của giai đoạn này là đo mức suy giảm độ chính xác c
 ## 1. Objective, scope and research questions
 
 **Objective.** Establish a reproducible, leakage-free measurement of cross-domain generalization for 19-class road-scene semantic segmentation: train on clear-weather Cityscapes, select the model on Cityscapes validation, then report performance on the adverse-weather ACDC validation set. The same frozen protocol is the reference for exactly one controlled extension in Phase 2.
+
+**Leader decision (2026-10-26).** The project will use the DG setup below as its binding Phase 1 protocol: SegFormer-B0 is trained only with Cityscapes train, checkpoint and hyperparameter selection use only Cityscapes val, and the frozen checkpoint is evaluated once on ACDC val. The project will not use ACDC data for training or selection. VLTSeg is the first candidate for a DG paper baseline, subject to code, checkpoint, licence and compute feasibility review; HRDA and Refign are UDA references for design ideas and are not direct DG score comparisons in their original setups. If VLTSeg cannot be reproduced or evaluated under a compatible protocol, record the blocker and do not substitute incomparable published numbers.
 
 **Research questions.**
 
@@ -169,7 +171,7 @@ Each gate is a GitHub milestone; a gate closes only when its exit criteria are c
 
 | Version | Date | Change | Reason | Approved by |
 |---|---|---|---|---|
-| 1.0-draft | 2026-10-26 | Initial DG protocol, deliverables, gates | Gate A deliverable | pending |
+| 1.0 | 2026-10-26 | Initial DG protocol, scope, deliverables and gates frozen by the Leader | Gate A deliverable | @MinhToan1001 |
 
 ## 8. Acceptance checklist (Gate A)
 
@@ -179,7 +181,8 @@ Each gate is a GitHub milestone; a gate closes only when its exit criteria are c
 - [x] Repository structure covers `src/ configs/ scripts/ tests/ docs/ research/ results/` (Section 4)
 - [x] 40 tasks mapped to Gates A–E, owners and milestones (GitHub issues + `docs/issues_backlog.csv`)
 - [x] Risk register with at least one mitigation per risk (`docs/RISKS.md`)
-- [ ] Reviewer approval by @MinhToan1001 (Gate A sign-off)
+- [x] Leader decision recorded for protocol v1.0 (@MinhToan1001)
+- [ ] Overall Gate A sign-off by @MinhToan1001 after the remaining gate artifacts are reviewed
 
 ## References
 
