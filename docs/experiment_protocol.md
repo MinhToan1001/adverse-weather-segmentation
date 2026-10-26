@@ -3,8 +3,9 @@
 | Field | Value |
 |---|---|
 | Status | **Frozen as v1.0 by the Leader**; overall Gate A sign-off remains pending |
-| Owner / author | @MinhToan1001 (Person 1 — Leader) |
-| Approver | @MinhToan1001 |
+| Owner / author | @khangcules10 (Person 1 — Leader) |
+| Reviewer | @MinhToan1001 (Person 2 — Dataset & Evaluation) |
+| Approver | @khangcules10 (Person 1 — Leader) |
 | Version / date | 1.0 / 2026-10-26 |
 | Applies to | Phase 1 baseline (SegFormer-B0) and Phase 2 controlled extension |
 | Related | `docs/DATA_CONTRACT.md`, `docs/RISKS.md`, `docs/ROADMAP_30_DAYS.md`, task A01 in `docs/issues_backlog.csv` |
@@ -17,13 +18,13 @@ Mục tiêu của giai đoạn này là đo mức suy giảm độ chính xác c
 
 **Objective.** Establish a reproducible, leakage-free measurement of cross-domain generalization for 19-class road-scene semantic segmentation: train on clear-weather Cityscapes, select the model on Cityscapes validation, then report performance on the adverse-weather ACDC validation set. The same frozen protocol is the reference for exactly one controlled extension in Phase 2.
 
-**Leader decision (2026-10-26).** The project will use the DG setup below as its binding Phase 1 protocol: SegFormer-B0 is trained only with Cityscapes train, checkpoint and hyperparameter selection use only Cityscapes val, and the frozen checkpoint is evaluated once on ACDC val. The project will not use ACDC data for training or selection. VLTSeg is the first candidate for a DG paper baseline, subject to code, checkpoint, licence and compute feasibility review; HRDA and Refign are UDA references for design ideas and are not direct DG score comparisons in their original setups. If VLTSeg cannot be reproduced or evaluated under a compatible protocol, record the blocker and do not substitute incomparable published numbers.
+**Leader decision (2026-10-26).** @khangcules10 sets the binding Phase 1 protocol: SegFormer-B0 is trained only with Cityscapes train, checkpoint and hyperparameter selection use only Cityscapes val, and each preregistered model (baseline and, later, the approved extension) gets one ACDC val inference pass after it is frozen. The project will not use ACDC data for training or selection. Bootstrap intervals resample per-image confusion matrices collected during that pass. VLTSeg is the first candidate for a DG paper baseline, subject to code, checkpoint, licence and compute feasibility review; HRDA and Refign are UDA references for design ideas and are not direct DG score comparisons in their original setups. If VLTSeg cannot be reproduced or evaluated under a compatible protocol, record the blocker and do not substitute incomparable published numbers.
 
 **Research questions.**
 
 - **RQ1 — Generalization gap.** How large is the drop in 19-class mIoU when a Cityscapes-trained SegFormer-B0 is evaluated on ACDC rain, fog, snow and night, relative to Cityscapes val?
 - **RQ2 — Failure structure.** Which conditions and which classes dominate the degradation, and what visual/semantic failure modes explain it?
-- **RQ3 — Mitigation (Phase 2 only).** Does one pre-registered modification (e.g. weather-robust augmentation or test-time normalization) improve mean ACDC mIoU over the frozen baseline without materially reducing Cityscapes val mIoU, under the same budget and seeds?
+- **RQ3 — Mitigation (Phase 2 only).** Does one modification selected without using ACDC results improve mean ACDC mIoU over the frozen baseline without materially reducing Cityscapes val mIoU, under the same budget and seeds? If it is selected after ACDC failure analysis, the extension result is exploratory and cannot support a confirmatory DG improvement claim.
 
 **In scope**
 
@@ -41,15 +42,15 @@ Mục tiêu của giai đoạn này là đo mức suy giảm độ chính xác c
 
 ## 2. Domain generalization protocol
 
-**Definition used here.** Domain generalization (DG) means: the model never sees the target domain — no ACDC image, label, statistic or feedback of any kind — during training, model selection or tuning. ACDC val is a **held-out target domain** evaluated once, after the model is frozen. This is *not* domain adaptation, and results must not be described as adaptation.
+**Definition used here.** Domain generalization (DG) means the model is trained and selected without target-domain samples. Before the frozen evaluation pass, ACDC may be handled only through official documentation and file-level metadata needed to prepare the manifest; do not inspect/render its images or labels, calculate target metrics/class statistics, or use target feedback to choose methods or settings. Each preregistered model gets one ACDC val inference pass after it is frozen. This is *not* domain adaptation, and results must not be described as adaptation.
 
 | Rule | Requirement |
 |---|---|
 | **DG-1 Source only** | Training uses Cityscapes `train` (2,975 images) only. No ACDC image, crop, pseudo-label, statistic or augmentation derived from ACDC. |
 | **DG-2 Selection only on source val** | Checkpoint = epoch with best 19-class mIoU on Cityscapes `val` (500 images). Ties → earliest epoch. `last` and `best` are both kept, only `best` is reported. |
-| **DG-3 Target evaluated once** | ACDC `val` is evaluated **exactly once**, with the frozen `best` checkpoint, using the committed evaluation script and config. That run is the primary DG result. |
-| **DG-4 No target feedback** | No ACDC-driven change to LR, epochs, augmentation, threshold, post-processing, class weights or architecture. If any such change is made, it invalidates the one-shot run: restart from a fresh checkpoint and report every run. |
-| **DG-5 Exploratory work is labelled** | Any per-condition inspection, error analysis or sanity check on ACDC val after the one-shot run is marked **exploratory** in the run card and never replaces the primary number. |
+| **DG-3 Target evaluated once** | The frozen baseline gets one ACDC `val` inference pass using the committed script/config. An extension also gets one pass only if its method and settings were fixed without seeing ACDC results. If the extension is chosen after ACDC failure analysis, its result must be marked exploratory, not confirmatory DG evidence. |
+| **DG-4 No target feedback** | Do not use ACDC results to change LR, epochs, augmentation, thresholds, post-processing, class weights or architecture and then claim a confirmatory DG gain. Any target-informed extension is reported as exploratory; a new confirmatory claim requires a new untouched target evaluation set. |
+| **DG-5 Exploratory work is labelled** | Per-condition inspection and failure analysis after the baseline pass are descriptive. If they inform a proposed method, all subsequent ACDC results for that method are marked **exploratory** and never replace the primary baseline number. |
 | **DG-6 Same yardstick** | Baseline and extension use the same manifest, image size, ignore index, metric implementation and checkpoint-selection rule. Differences in any of these must be reported as a protocol deviation, not as a method gain. |
 | **DG-7 Hold-out hygiene** | ACDC `test` labels are withheld; they are never used. ACDC `train` (1,600 images) stays unused in Phase 1; using it later defines a separate adaptation protocol with its own label. |
 | **DG-8 Deviations are recorded** | Every deviation, failed run and environment change is logged with `docs/EXPERIMENT_LOG_TEMPLATE.md` and summarised in the report. No silent reruns. |
@@ -68,7 +69,7 @@ Mục tiêu của giai đoạn này là đo mức suy giảm độ chính xác c
 - Manifests: `data/manifests/cityscapes_train.csv`, `cityscapes_val.csv`, `acdc_val.csv` with columns `image,mask,domain,split`. Paths are relative to the repository root.
 - Versioning: record dataset release/version, download date, file count and manifest SHA-256 in the data card. A split is frozen once Gate B closes.
 - ACDC ambiguity pixels are unlabeled in the official annotations; they are mapped to `255` and ignored, never filled by hand.
-- Leakage check: image-path and content-hash disjointness between Cityscapes train/val and ACDC val, and no duplicate across splits.
+- Leakage check before the target pass: verify path/split disjointness from the manifests without opening ACDC pixels or labels. Check Cityscapes train/val duplicates normally. Any ACDC duplicate or content-level audit is deferred until the frozen evaluation pass and reported without tuning.
 
 ### 2.2 Model and training
 
@@ -76,11 +77,11 @@ Mục tiêu của giai đoạn này là đo mức suy giảm độ chính xác c
 |---|---|
 | Architecture | `SegformerForSemanticSegmentation`, MiT-B0 encoder, 19 labels, `ignore_index=255` |
 | Initialisation | `nvidia/mit-b0` ImageNet weights (revision pinned in config/run card) |
-| Input | 512×512 random crop (train); resize to 512×512 for evaluation |
-| Augmentation | Random horizontal flip 0.5, random scale 0.5–2.0, random crop; colour jitter only if pre-registered |
-| Optimiser | AdamW, lr 6e-5, weight decay 0.01, poly decay power 1.0, warm-up 1,500 iters |
-| Batch / epochs | 4 (reduce or accumulate if VRAM < 12 GB), 30 epochs |
-| Precision | AMP fp16/bf16 if stable; fall back to fp32 and record it |
+| Input | 512×1024 canvas; aspect-preserving resize with padding. Training uses random scale and crop; evaluation uses deterministic fit/pad. |
+| Augmentation | Random horizontal flip 0.5, random scale 0.5–2.0, random crop/pad; colour jitter only if pre-registered |
+| Optimiser | AdamW, lr 6e-5, weight decay 0.01, poly decay power 1.0, warm-up 1,500 optimizer steps |
+| Batch / epochs | Effective batch 4 via micro-batch 1 and gradient accumulation 4; 30 epochs |
+| Precision | AMP fp16 on CUDA; fp32 when CUDA is unavailable or AMP is disabled, with the setting recorded |
 | Seed | 42 primary; 43/44 for the final baseline only if compute allows |
 | Selection | Best Cityscapes val mIoU, evaluated every epoch |
 | Budget | 1 GPU ≥ 8 GB; ≤ 20 GPU-hours per full run; smoke test ≤ 10 min CPU |
@@ -101,7 +102,7 @@ If data or compute does not arrive on schedule, the fallback is a documented sub
 
 **Inference settings.** Single scale, no TTA, no per-condition checkpoint selection, no test-time threshold tuning. Logits are bilinearly upsampled to the label resolution before argmax.
 
-**Artifacts.** `results/dg_eval/metrics.csv` (long format: `run_id,dataset,domain,class,iou,miou,n_images`), `results/tables/*.md`, `results/figures/*.png`. CSV is the source of truth; the report copies it.
+**Artifacts.** `results/dg_eval/metrics.csv` (long format with result status, run ID, dataset/domain/class, IoU/mIoU, image count, 95% CI for each domain mean, manifest/config/checkpoint SHA-256 and Git commit), `results/tables/*.md`, `results/figures/*.png`. CSV is the source of truth; the report copies it. Per-image confusion matrices are cached during the single inference pass and reused for bootstrap resampling.
 
 ## 3. Required deliverables
 
@@ -109,7 +110,7 @@ If data or compute does not arrive on schedule, the fallback is a documented sub
 |---|---|---|---|---|
 | D1 | Best Cityscapes-trained checkpoint + SHA-256 | local `outputs/`, release asset; **never committed** | A | C |
 | D2 | Metrics CSV: Cityscapes val + ACDC per condition/class + CI | `results/baseline/`, `results/dg_eval/` | B | C, D |
-| D3 | Ablation table: baseline vs one modification, same protocol | `results/ablation/` | A | D |
+| D3 | Ablation table: baseline vs one modification, same training/evaluation code; label target-informed extension results exploratory | `results/ablation/` | A | D |
 | D4 | Demo: CLI for image/folder → colour mask + overlay + metrics | `scripts/demo.py`, `results/demo/` | A + B | E |
 | D5 | Report: method, data, protocol, results, failure analysis, limitations | `docs/report.md` | B (A reviews) | E |
 | D6 | Slide deck (10–12 slides) for review | `docs/slides/` | B | E |
@@ -149,11 +150,11 @@ Each gate is a GitHub milestone; a gate closes only when its exit criteria are c
 
 | Gate | Name | Exit criteria | Due | Sign-off |
 |---|---|---|---|---|
-| **A** | Scope & protocol frozen | Protocol approved; repo skeleton + README; 40 issues with owner/label/milestone; risk register with mitigations | 2026-10-28 | @MinhToan1001 |
-| **B** | Data contract verified | Licences documented; Cityscapes + ACDC manifests validated (`--check-files --check-labels`); 20 images/domain audit; class frequencies; leakage check clean | 2026-10-31 | @MinhToan1001 |
-| **C** | Reproducible baseline | Smoke test green; config frozen; full Cityscapes run reproduced twice; checkpoint + metrics CSV + run card; CI green | 2026-11-08 | @MinhToan1001 |
-| **D** | DG evaluation + ablation | One-shot ACDC eval of frozen checkpoint; per-domain/per-class table with CI; failure analysis; one approved modification + controlled ablation | 2026-11-16 | @MinhToan1001 |
-| **E** | Deliverables & handoff | Demo, report, slides, README/results index, release tag v0.1 + artifact manifest; reproducibility check from a clean clone | 2026-11-24 | @MinhToan1001 |
+| **A** | Scope & protocol frozen | Protocol approved; repo skeleton + README; 40 issues with owner/label/milestone; risk register with mitigations | 2026-10-28 | @khangcules10 |
+| **B** | Data contract verified | Licences documented; Cityscapes manifests validated and visually audited; ACDC file pairing/split metadata checked without reading image or label pixels; source split leakage check clean | 2026-10-31 | @khangcules10 |
+| **C** | Reproducible baseline | Smoke test green; config frozen; full Cityscapes run reproduced twice; checkpoint + metrics CSV + run card; CI green | 2026-11-08 | @khangcules10 |
+| **D** | DG evaluation + ablation | One-shot ACDC eval for each preregistered frozen model; per-domain/per-class table with CI; failure analysis; one approved modification + controlled ablation | 2026-11-16 | @khangcules10 |
+| **E** | Deliverables & handoff | Demo, report, slides, README/results index, release tag v0.1 + artifact manifest; reproducibility check from a clean clone | 2026-11-24 | @khangcules10 |
 
 ## 6. Reproducibility and logging
 
@@ -165,13 +166,13 @@ Each gate is a GitHub milestone; a gate closes only when its exit criteria are c
 
 ## 7. Change control
 
-1. This file is versioned. Any change after Gate A requires a PR, an entry in the table below and approval from @MinhToan1001.
+1. This file is versioned. Any change after Gate A requires a PR, an entry in the table below and approval from @khangcules10.
 2. A protocol change made after seeing ACDC results is a new experiment, not an improvement to the old one.
 3. If a primary run is invalidated, keep its artifacts, mark it `invalid` in `results/`, and rerun from scratch.
 
 | Version | Date | Change | Reason | Approved by |
 |---|---|---|---|---|
-| 1.0 | 2026-10-26 | Initial DG protocol, scope, deliverables and gates frozen by the Leader | Gate A deliverable | @MinhToan1001 |
+| 1.0 | 2026-10-26 | Initial DG protocol, scope, deliverables and gates frozen by the Leader | Gate A deliverable | @khangcules10 |
 
 ## 8. Acceptance checklist (Gate A)
 
@@ -181,8 +182,8 @@ Each gate is a GitHub milestone; a gate closes only when its exit criteria are c
 - [x] Repository structure covers `src/ configs/ scripts/ tests/ docs/ research/ results/` (Section 4)
 - [x] 40 tasks mapped to Gates A–E, owners and milestones (GitHub issues + `docs/issues_backlog.csv`)
 - [x] Risk register with at least one mitigation per risk (`docs/RISKS.md`)
-- [x] Leader decision recorded for protocol v1.0 (@MinhToan1001)
-- [ ] Overall Gate A sign-off by @MinhToan1001 after the remaining gate artifacts are reviewed
+- [x] Leader decision recorded for protocol v1.0 (@khangcules10)
+- [ ] Overall Gate A sign-off by @khangcules10 after the remaining gate artifacts are reviewed
 
 ## References
 

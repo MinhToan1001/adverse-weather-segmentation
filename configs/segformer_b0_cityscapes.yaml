@@ -7,11 +7,21 @@ model:
 data:
   train_manifest: data/manifests/cityscapes_train.csv
   val_manifest: data/manifests/cityscapes_val.csv
-  image_size: [512, 512]
+  image_size: [512, 1024]
+  augment:
+    min_scale: 0.5
+    max_scale: 2.0
+    horizontal_flip: 0.5
 train:
-  batch_size: 4
+  batch_size: 1
+  gradient_accumulation_steps: 4
   num_workers: 2
   epochs: 30
   max_steps: null
   lr: 0.00006
+  weight_decay: 0.01
+  poly_power: 1.0
+  warmup_steps: 1500
+  amp: true
+  amp_dtype: float16
 output_dir: outputs/segformer_b0_cityscapes
