@@ -1,5 +1,9 @@
 # 30-day action plan (26 Oct–24 Nov 2026, ICT)
 
+**A / Leader: @khangcules10. B / Dataset & Evaluation: @MinhToan1001.**
+
+Because this schedule examines baseline ACDC failures before choosing a proposed change, any ACDC result for that target-informed extension is exploratory. To call an extension result confirmatory DG evidence, freeze the method before anyone examines baseline ACDC results.
+
 | Deadline | A (lead: training/research) | B (data/eval) | Exit check |
 |---|---|---|---|
 | 26 Oct | Create private GitHub repo, protect main, add B, initialize project/CI, open 8 issues | Install environment, review folder conventions, submit PR adding hardware note | PR/CI passes |

@@ -4,7 +4,7 @@
 2. Extract ZIP, open its root in VS Code; check `git status`.
 3. Create a **private** GitHub repo using GitHub website (without README/license because local repo already includes README), suggested `adverse-weather-segmentation`. Or with CLI: `gh repo create adverse-weather-segmentation --private --source . --remote origin --push` after a first commit.
 4. `git init -b main`, `git add .`, `git commit -m "chore: initialize research repository"`; then `gh repo create adverse-weather-segmentation --private --source . --remote origin --push`.
-5. Add Person B via GitHub Settings > Collaborators. Configure Rulesets / Branch protection for `main`: pull request required, 1 approval, status check `test`, prohibit force push, no direct pushes. On a 2-person private repo, check your plan supports chosen rules; if not, enforce process manually until available.
+5. Add Person B (@MinhToan1001) via GitHub Settings > Collaborators. Person A / Leader is @khangcules10. Configure Rulesets / Branch protection for `main`: pull request required, 1 approval, status check `test`, prohibit force push, no direct pushes. On a 2-person private repo, check your plan supports chosen rules; if not, enforce process manually until available.
 6. Both clone repo and work only in dedicated feature branches. A approves all PRs; B reviews A's PRs as additional peer review.
 
 ## First tickets

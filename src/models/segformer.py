@@ -4,10 +4,13 @@ def make_model(settings):
     cfg=settings['model']
     num_labels=int(cfg['num_labels'])
     if cfg.get('pretrained',False):
-        return SegformerForSemanticSegmentation.from_pretrained(
+        model = SegformerForSemanticSegmentation.from_pretrained(
             cfg['checkpoint'],num_labels=num_labels,ignore_mismatched_sizes=True)
+        model.config.semantic_loss_ignore_index = 255
+        return model
     model_cfg=SegformerConfig(
         num_labels=num_labels,
+        semantic_loss_ignore_index=255,
         hidden_sizes=cfg.get('hidden_sizes',[32,64,160,256]),
         depths=cfg.get('depths',[2,2,2,2]),
         decoder_hidden_size=cfg.get('decoder_hidden_size',256),
