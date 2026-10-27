@@ -7,7 +7,6 @@
 | Reviewer | @MinhToan1001 (Person 2 — Dataset & Evaluation) |
 | Approver | @MinhToan1001 (Person 2 — Dataset & Evaluation) |
 | Leader sign-off | @khangcules10 (Person 1 — Leader) |
-| Leader sign-off | @khangcules10 (Person 1 — Leader) |
 | Version / date | 1.0 / 2026-10-26 |
 | Applies to | Phase 1 baseline (SegFormer-B0) and Phase 2 controlled extension |
 | Related | `docs/DATA_CONTRACT.md`, `docs/RISKS.md`, `docs/ROADMAP_30_DAYS.md`, task A01 in `docs/issues_backlog.csv` |
