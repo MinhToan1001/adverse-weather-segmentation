@@ -18,3 +18,4 @@ mlruns/
 *.ckpt
 *.safetensors
 .DS_Store
+*.zip

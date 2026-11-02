@@ -1,0 +1,61 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.5, pytest-9.2.0, pluggy-1.7.0 -- D:\python\Project-CV\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\python\Project-CV
+configfile: pyproject.toml
+plugins: anyio-4.12.1
+collecting ... collected 50 items
+
+tests/test_data_task03.py::test_scale_crop_pad_and_flip_keep_image_and_mask_aligned[0.0-0.5] PASSED [  2%]
+tests/test_data_task03.py::test_scale_crop_pad_and_flip_keep_image_and_mask_aligned[0.0-1.0] PASSED [  4%]
+tests/test_data_task03.py::test_scale_crop_pad_and_flip_keep_image_and_mask_aligned[0.0-2.0] PASSED [  6%]
+tests/test_data_task03.py::test_scale_crop_pad_and_flip_keep_image_and_mask_aligned[1.0-0.5] PASSED [  8%]
+tests/test_data_task03.py::test_scale_crop_pad_and_flip_keep_image_and_mask_aligned[1.0-1.0] PASSED [ 10%]
+tests/test_data_task03.py::test_scale_crop_pad_and_flip_keep_image_and_mask_aligned[1.0-2.0] PASSED [ 12%]
+tests/test_data_task03.py::test_train_augmentation_repeats_with_same_seed PASSED [ 14%]
+tests/test_data_task03.py::test_eval_preserves_aspect_ratio_normalizes_and_uses_no_rng PASSED [ 16%]
+tests/test_data_task03.py::test_mask_nearest_resize_preserves_ids_zero_18_and_void PASSED [ 18%]
+tests/test_data_task03.py::test_mixed_native_sizes_collate_into_one_image_batch PASSED [ 20%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment0] PASSED [ 22%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment1] PASSED [ 24%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment2] PASSED [ 26%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment3] PASSED [ 28%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment4] PASSED [ 30%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment5] PASSED [ 32%]
+tests/test_data_task03.py::test_invalid_augmentation_fails_at_construction[augment6] PASSED [ 34%]
+tests/test_data_task03.py::test_training_rejects_validation_and_target_rows[cityscapes-val] PASSED [ 36%]
+tests/test_data_task03.py::test_training_rejects_validation_and_target_rows[fog-val] PASSED [ 38%]
+tests/test_data_task03.py::test_relative_csv_paths_use_repo_root_from_another_cwd PASSED [ 40%]
+tests/test_data_task03.py::test_color_and_palette_masks_rejected_by_validator_and_loader[RGB] PASSED [ 42%]
+tests/test_data_task03.py::test_color_and_palette_masks_rejected_by_validator_and_loader[P] PASSED [ 44%]
+tests/test_data_task03.py::test_invalid_original_labels_or_dimensions_rejected[shape0-19] PASSED [ 46%]
+tests/test_data_task03.py::test_invalid_original_labels_or_dimensions_rejected[shape1-256] PASSED [ 48%]
+tests/test_data_task03.py::test_invalid_original_labels_or_dimensions_rejected[shape2-0] PASSED [ 50%]
+tests/test_data_task03.py::test_duplicate_mask_is_rejected_even_with_different_images PASSED [ 52%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain\na.png,b.png,synthetic\n] PASSED [ 54%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain,split\na.png,,synthetic,val\n] PASSED [ 56%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain,split\na.png,b.png,synthetic,val,extra\n] PASSED [ 58%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain,split\n] PASSED [ 60%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain,split\na.png,b.png,unknown,val\n] PASSED [ 62%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain,split\na.png,b.png,fog,train\n] PASSED [ 64%]
+tests/test_data_task03.py::test_malformed_csv_and_unsupported_roles_fail[image,mask,domain,split\na.png,b.png,cityscapes,test\n] PASSED [ 66%]
+tests/test_data_task03.py::test_utf8_bom_is_accepted PASSED              [ 68%]
+tests/test_data_task03.py::test_manifest_sorted_separate_mask_root_and_byte_reproducible PASSED [ 70%]
+tests/test_data_task03.py::test_orphan_mask_fails_instead_of_silent_omission PASSED [ 72%]
+tests/test_data_task03.py::test_canonical_pair_identity_and_split_are_validated PASSED [ 74%]
+tests/test_data_task03.py::test_acdc_builder_and_file_validator_never_decode_pixels PASSED [ 76%]
+tests/test_data_task03.py::test_manifest_and_validator_cli_end_to_end PASSED [ 78%]
+tests/test_data_task03.py::test_cli_preflights_both_splits_before_writing PASSED [ 80%]
+tests/test_dataset.py::test_source_train_transforms_are_synchronized PASSED [ 82%]
+tests/test_dataset.py::test_native_evaluation_and_padding_removal PASSED [ 84%]
+tests/test_dataset.py::test_raw_mask_rejected_before_resizing PASSED     [ 86%]
+tests/test_dataset.py::test_validation_checks_labels_and_cross_split_duplicates PASSED [ 88%]
+tests/test_dataset.py::test_target_pixel_audit_blocked PASSED            [ 90%]
+tests/test_preparation.py::test_complete_cityscapes_mapping_and_void PASSED [ 92%]
+tests/test_preparation.py::test_conversion_refuses_rgb_and_in_place PASSED [ 94%]
+tests/test_preparation.py::test_cityscapes_pairs_require_converted_labels PASSED [ 96%]
+tests/test_preparation.py::test_acdc_manifest_uses_metadata_only PASSED  [ 98%]
+tests/test_preparation.py::test_zip_selection_and_traversal PASSED       [100%]
+
+---- generated xml file: D:\python\Project-CV\results\day03\data-tests.xml ----
+============================= 50 passed in 22.06s =============================

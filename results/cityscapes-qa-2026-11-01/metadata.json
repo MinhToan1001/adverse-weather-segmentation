@@ -1,0 +1,24 @@
+{
+  "root": "D:\\python\\Project-CV\\data\\raw\\cityscapes",
+  "version": "Not stated in supplied README; original archive hashes unavailable",
+  "split_metadata": {
+    "train": {
+      "pairs": 2975,
+      "image_bytes": 6946288257,
+      "dimensions": {
+        "(2048, 1024)": 2975
+      }
+    },
+    "val": {
+      "pairs": 500,
+      "image_bytes": 1181406339,
+      "dimensions": {
+        "(2048, 1024)": 500
+      }
+    }
+  },
+  "metadata_sha256": {
+    "README": "09b2dedebb5abff4ac106b012e5a870cd798bcd3336a160f25b6312e4abb9463",
+    "license.txt": "c4cf3ccce542938c6eeaa971a936e099be7f5146206640b515896313c65927d8"
+  }
+}

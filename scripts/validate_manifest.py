@@ -1,15 +1,23 @@
-import argparse,csv
+import argparse
 from pathlib import Path
-import numpy as np
-from PIL import Image
-p=argparse.ArgumentParser();p.add_argument('--manifest',required=True);p.add_argument('--check-files',action='store_true');p.add_argument('--check-labels',action='store_true');args=p.parse_args()
-with open(args.manifest,newline='',encoding='utf-8') as f:rows=list(csv.DictReader(f))
-assert rows and {'image','mask','domain','split'}.issubset(rows[0]),'Missing rows or CSV columns'
-for row in rows:
-    if args.check_files or args.check_labels:
-        for col in ['image','mask']:assert Path(row[col]).is_file(),f'Not found: {row[col]}'
-    if args.check_labels:
-        mask=np.asarray(Image.open(row['mask']))
-        assert mask.ndim==2,f'Mask must be single channel: {row["mask"]}'
-        assert np.isin(mask,[*range(19),255]).all(),f'Unmapped labels: {row["mask"]}'
-print(f'PASS manifest rows={len(rows)}; files={args.check_files}; labels={args.check_labels}')
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.data.validation import validate_manifests
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Validate pairs and cross-manifest path disjointness")
+    parser.add_argument("--manifest", required=True, nargs="+")
+    parser.add_argument("--check-files", action="store_true")
+    parser.add_argument("--check-labels", action="store_true")
+    args = parser.parse_args()
+    try:
+        count = validate_manifests(args.manifest, args.check_files, args.check_labels)
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
+    print(f"PASS manifest rows={count}; files={args.check_files}; labels={args.check_labels}")
+
+
+if __name__ == "__main__":
+    main()

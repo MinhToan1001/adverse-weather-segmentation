@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-02",
+  "status": "WARMUP_TECHNICALLY_ACCEPTED",
+  "full_run_started": false,
+  "frozen_config": "configs\\segformer_b0_cityscapes_v1.yaml",
+  "config_sha256": "5a4a80ccfa83256ac6b73d02636800a7dc7ddf652f82bfd39d442bcc45cb4fdc",
+  "planned_gpu_hours": 6,
+  "small_subset_projection_hours": 3.3824868208852834,
+  "original_protocol_upper_budget_gpu_hours": 20,
+  "budget_is_guaranteed_runtime": false,
+  "budget_enforcement": "monitor elapsed GPU runtime; trainer has no automatic wall-time cap",
+  "initialization": "fresh nvidia/mit-b0 encoder plus new 19-class head; do not resume warm-up",
+  "review_basis": [
+    "30 source train images / 20 source val images / 3 epochs",
+    "Tesla T4 CUDA AMP float16",
+    "Checkpoint safe tensor reload and finite CPU forward passed"
+  ],
+  "limitations": [
+    "Subset/source-code fingerprints not included in submitted ZIP",
+    "Estimate may underestimate cold reads or full validation cost",
+    "Warm-up is not a full baseline result",
+    "Gate sign-off and publication require separate review"
+  ]
+}

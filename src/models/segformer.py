@@ -5,7 +5,8 @@ def make_model(settings):
     num_labels=int(cfg['num_labels'])
     if cfg.get('pretrained',False):
         model = SegformerForSemanticSegmentation.from_pretrained(
-            cfg['checkpoint'],num_labels=num_labels,ignore_mismatched_sizes=True)
+            cfg['checkpoint'], num_labels=num_labels, ignore_mismatched_sizes=True,
+            revision=cfg.get('revision'), semantic_loss_ignore_index=255)
         model.config.semantic_loss_ignore_index = 255
         return model
     model_cfg=SegformerConfig(

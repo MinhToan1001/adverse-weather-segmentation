@@ -1,0 +1,30 @@
+{"epoch": 1, "train_loss": 2.9760345220565796, "val": {"by_domain": {"synthetic": {"miou": 0.646989070876695, "per_class_iou": [0.9324503311258279, 0.703125, 0.9523809523809523, null, null, null, null, null, null, null, null, 0.0, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}}, "miou": 0.646989070876695, "per_class_iou": [0.9324503311258279, 0.703125, 0.9523809523809523, null, null, null, null, null, null, null, null, 0.0, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}, "seed": 42, "device": "cpu", "amp_enabled": false, "amp_dtype": "float32", "learning_rate": 0.0006666666666666668}
+{"epoch": 2, "train_loss": 2.815536856651306, "val": {"by_domain": {"synthetic": {"miou": 0.8644062286646204, "per_class_iou": [0.8267762771579565, 0.7805049088359046, 0.9859375, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}}, "miou": 0.8644062286646204, "per_class_iou": [0.8267762771579565, 0.7805049088359046, 0.9859375, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}, "seed": 42, "device": "cpu", "amp_enabled": false, "amp_dtype": "float32", "learning_rate": 0.0003333333333333334}
+{"epoch": 3, "train_loss": 2.7751137018203735, "val": {"by_domain": {"synthetic": {"miou": 0.8928920648463247, "per_class_iou": [0.8559270516717326, 0.8274147727272727, 0.995334370139969, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}}, "miou": 0.8928920648463247, "per_class_iou": [0.8559270516717326, 0.8274147727272727, 0.995334370139969, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}, "seed": 42, "device": "cpu", "amp_enabled": false, "amp_dtype": "float32", "learning_rate": 0.0}
+Best checkpoint: D:\python\Project-CV\outputs\offline-audit-2026-11-01-r02\full\best
+{"epoch": 1, "train_loss": 2.9760345220565796, "val": {"by_domain": {"synthetic": {"miou": 0.646989070876695, "per_class_iou": [0.9324503311258279, 0.703125, 0.9523809523809523, null, null, null, null, null, null, null, null, 0.0, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}}, "miou": 0.646989070876695, "per_class_iou": [0.9324503311258279, 0.703125, 0.9523809523809523, null, null, null, null, null, null, null, null, 0.0, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}, "seed": 42, "device": "cpu", "amp_enabled": false, "amp_dtype": "float32", "learning_rate": 0.0006666666666666668}
+{"epoch": 2, "train_loss": 2.815536856651306, "val": {"by_domain": {"synthetic": {"miou": 0.8644062286646204, "per_class_iou": [0.8267762771579565, 0.7805049088359046, 0.9859375, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}}, "miou": 0.8644062286646204, "per_class_iou": [0.8267762771579565, 0.7805049088359046, 0.9859375, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}, "seed": 42, "device": "cpu", "amp_enabled": false, "amp_dtype": "float32", "learning_rate": 0.0003333333333333334}
+{"epoch": 3, "train_loss": 2.7751137018203735, "val": {"by_domain": {"synthetic": {"miou": 0.8928920648463247, "per_class_iou": [0.8559270516717326, 0.8274147727272727, 0.995334370139969, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}}, "miou": 0.8928920648463247, "per_class_iou": [0.8559270516717326, 0.8274147727272727, 0.995334370139969, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "excluded_classes": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], "n_images": 2, "miou_ci95": [null, null]}, "seed": 42, "device": "cpu", "amp_enabled": false, "amp_dtype": "float32", "learning_rate": 0.0}
+Best checkpoint: D:\python\Project-CV\outputs\offline-audit-2026-11-01-r02\resumed\best
+{
+  "status": "PASS",
+  "data": "synthetic only",
+  "epochs": 3,
+  "exact_weights_equal": true,
+  "exact_history_equal": true,
+  "scheduler_equal": true,
+  "changed_resume_config_rejected": true,
+  "partial_accumulation_verified": true,
+  "losses": [
+    2.9760345220565796,
+    2.815536856651306,
+    2.7751137018203735
+  ],
+  "elapsed_seconds": 1.6386083999968832,
+  "device": "cpu",
+  "amp_enabled": false,
+  "checkpoints": {
+    "full": "cff344dedf394dbcb4ce9094c1e5d13aae6c5669b96398863acf64ad070d2efc",
+    "resumed": "cff344dedf394dbcb4ce9094c1e5d13aae6c5669b96398863acf64ad070d2efc"
+  }
+}

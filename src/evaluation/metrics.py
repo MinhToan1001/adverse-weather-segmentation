@@ -12,6 +12,11 @@ def confusion_matrix(pred, target, num_classes=19, ignore_index=255):
 
 
 def scores(conf):
+    """Mean IoU over classes with nonzero union; absent in both -> None/NaN.
+
+    A class predicted in error contributes IoU=0 even if absent in GT.
+    Accumulate confusion matrices across the split before calling this function.
+    """
     conf = conf.to(torch.float64)
     true_positive = conf.diag()
     denominator = conf.sum(0) + conf.sum(1) - true_positive

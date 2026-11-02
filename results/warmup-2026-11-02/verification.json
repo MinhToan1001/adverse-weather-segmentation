@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "best_epoch": 3,
+  "head_classes": 19,
+  "ignore_index": 255,
+  "checkpoint_reload": "CPU forward finite 1x19x16x24",
+  "best_equals_last": true,
+  "optimizer_updates_reported": 24,
+  "peak_allocated_GiB": 0.9866700172424316,
+  "peak_reserved_GiB": 1.298828125,
+  "recorded_epoch_seconds": 28.009219565999956,
+  "loss_relative_reduction": 0.20235356451956155,
+  "limits": [
+    "training_state.pt retained but not unpickled; optimizer contents not independently verified",
+    "Subset manifests and exact source fingerprint absent from submitted ZIP",
+    "20-image source val only; not a full baseline result",
+    "Forecast is a small-subset extrapolation; data/cache/I/O/session effects remain"
+  ]
+}

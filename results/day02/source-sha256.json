@@ -1,0 +1,27 @@
+{
+  "recorded_at": "2026-10-31T23:51:35.141902+07:00",
+  "files": {
+    ".github/workflows/ci.yml": "9a72c8a0ad664f6b396706acbbe8fb9f886a144eff5a13eb13c283f14563626e",
+    "configs/segformer_b0_cityscapes.yaml": "253244216f643ec649b011a9aad38a8ca746d6514440fee2f8badd0fe4140ffd",
+    "configs/segformer_b0_smoke.yaml": "1419c42e8be4b0f0b963892bd4fcfd8eb80e2382295ac663a1df12ad44ba15e6",
+    "pyproject.toml": "305a51ded82710bad2ad0865add6b8f1531a8510a1e6fea1eeb4411ae034e1c5",
+    "requirements.txt": "790ddbb4bc93ef348a1146db085f96bde3a9d7ec94ec3cbece8a437a0039fd79",
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/data/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/data/dataset.py": "147428ed63cff8284ded92cdbf16062cc9cd3a953a35266c3417670a168f14d5",
+    "src/data/preparation.py": "3292ef0ed0b88aa339fea87964997650831dfb5e4dac0df04c8610eb116f5754",
+    "src/data/validation.py": "3123637c50b759cd08fed0f97751c8dcfad62595b7cef93ece5f6cdee2de1ee0",
+    "src/evaluation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/evaluation/evaluate.py": "10eed33f0a32005a6251f9ef9dcdc69dc69eb6fdcc3e95d5f9c9e5e542e47ff8",
+    "src/evaluation/metrics.py": "cd071faaf74853ebf6288c5a3a1548135ac383ebc00552e156fe5e06997a9d75",
+    "src/models/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/models/segformer.py": "ba1ca4d7abc07888edd5443493a3328273d4ecbeceee365db6b555f178ba5669",
+    "src/training/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/training/train.py": "7cdc74ec6b8fbaae0ebbffbfea25ebae98012c075ab7f0b2c6914eaf15d17d54",
+    "tests/test_backlog.py": "2739d97899e3f019c8226e53539b1eac17b219902cefc66f2314674b4478c627",
+    "tests/test_dataset.py": "5159305f44d9a6b4c44571a85f38011ad36e6c6a2e94de0563fb49d02eac9b59",
+    "tests/test_metrics.py": "5a631ecbe93ca7e51bce9c3d4c6e4de7409c6b9b38f7d1487d67b391c6c2c889",
+    "tests/test_preparation.py": "9aa9306edd4b50be520ae2e2ca0ea22ca2d2ac38871817be9a224cf38541f158",
+    "tests/test_pretrained_forward.py": "47ec67099903524b733b928bfaab6e016f297285bf67dcabd859dd82f3d3dd30"
+  }
+}

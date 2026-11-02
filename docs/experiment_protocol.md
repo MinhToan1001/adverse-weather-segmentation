@@ -91,7 +91,7 @@ If data or compute does not arrive on schedule, the fallback is a documented sub
 
 ### 2.3 Evaluation
 
-**Primary metric.** 19-class mean IoU (mIoU) with `ignore_index=255`, computed from a single confusion matrix accumulated over the whole split. Classes with zero ground-truth pixels are excluded and the excluded list is reported.
+**Primary metric.** 19-class mean IoU (mIoU) with `ignore_index=255`, computed from a single confusion matrix accumulated over the whole split. A class is excluded only when its union is zero (absent from both ground truth and predictions on valid pixels); the excluded list is reported. A missed class or a false-positive-only class contributes IoU = 0. This wording clarifies the existing metric implementation; it does not change computed scores.
 
 **Required reporting.**
 

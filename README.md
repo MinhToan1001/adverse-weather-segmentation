@@ -2,7 +2,20 @@
 
 **Goal:** Robust 19-class road-scene semantic segmentation across clear / rain / fog / snow / night domains. Phase 1: reproducible **SegFormer-B0 baseline**; Phase 2: research extensions after a baseline review.
 
-> Status: repository scaffold, frozen experiment protocol (pending Gate A approval) and executable **synthetic smoke test**. Not a trained baseline and not scientific results yet.
+> Status (2026-11-02): Cityscapes source QA and ACDC file-level preparation complete; GPU warm-up verified on Tesla T4. Full Cityscapes baseline and ACDC evaluation have not started. Project gate sign-off remains separate.
+
+GPU warm-up review: [`docs/WARMUP_REVIEW_2026-11-02.md`](docs/WARMUP_REVIEW_2026-11-02.md).
+Frozen full-run config: [`configs/segformer_b0_cityscapes_v1.yaml`](configs/segformer_b0_cityscapes_v1.yaml).
+Importable Kaggle notebooks: [`notebooks/`](notebooks/README.md).
+
+Day 02 checks completed locally: real pretrained MiT-B0 encoder, 19-class logits,
+ignore-255 loss and mIoU unit tests. See [`docs/DAY02_STATUS.md`](docs/DAY02_STATUS.md)
+for commands, dataset status and saved test evidence.
+
+Task03 data pipeline: synchronized preprocessing/augmentation, deterministic
+manifest generation and pair validation. See [`docs/DATA_PREPARATION.md`](docs/DATA_PREPARATION.md)
+for preparation commands and [`docs/DATASET_QA_REPORT.md`](docs/DATASET_QA_REPORT.md)
+for completed source QA and the metadata-only target checks.
 
 ## Protocol at a glance
 

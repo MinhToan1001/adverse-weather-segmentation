@@ -1,0 +1,5 @@
+{
+  "outputs\\kaggle\\project-code.zip": "650ad4a9fd941947e4fc5d57f3fc528b203a965279f5368bc1b8c1cdbd7f7424",
+  "notebooks\\01_kaggle_prepare_cityscapes.ipynb": "4a4317d81e09a065815083479f0922d984afc957fa308d9d7728abe17d068837",
+  "notebooks\\02_kaggle_train_segformer_b0.ipynb": "37ee771971ed589df9059993d679735163d4eae625ec4622d404a8e5c39cde35"
+}

@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import SegformerForSemanticSegmentation
 
-from src.data.dataset import ManifestSegmentationDataset
+from src.data.dataset import ManifestSegmentationDataset, evaluation_collate
 from src.training.train import evaluate_model, read_cfg
 
 
@@ -100,12 +100,13 @@ def main():
     manifest = str(manifest_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SegformerForSemanticSegmentation.from_pretrained(args.checkpoint).to(device)
-    dataset = ManifestSegmentationDataset(manifest, cfg["data"]["image_size"])
+    dataset = ManifestSegmentationDataset(manifest, cfg["data"]["image_size"], native_labels=True, preprocessing=cfg["data"].get("preprocessing"))
     loader = DataLoader(
         dataset,
         batch_size=int(cfg["train"]["batch_size"]),
         shuffle=False,
         num_workers=int(cfg["train"].get("num_workers", 0)),
+        collate_fn=evaluation_collate,
     )
     report = evaluate_model(
         model,
