@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "probes": [
+    {
+      "model": "segformer_b0",
+      "parameters": {
+        "total": 3719027,
+        "trainable": 3719027
+      },
+      "loss": "ce",
+      "two_epoch_stop_resume": true,
+      "scheduler_horizon": 20,
+      "raw_accuracy_claim": false
+    },
+    {
+      "model": "segformer_b2",
+      "parameters": {
+        "total": 27361235,
+        "trainable": 27361235
+      },
+      "loss": "weighted_ce",
+      "two_epoch_stop_resume": true,
+      "scheduler_horizon": 20,
+      "raw_accuracy_claim": false
+    },
+    {
+      "model": "deeplabv3plus_resnet50",
+      "parameters": {
+        "total": 26695619,
+        "trainable": 26695619
+      },
+      "loss": "ce_dice",
+      "two_epoch_stop_resume": true,
+      "scheduler_horizon": 20,
+      "raw_accuracy_claim": false,
+      "continuous_and_resumed_weights_bitwise_equal": true
+    }
+  ],
+  "scope": "Random initialization,4real-fit/2monitor images,64x96,2batches/epoch. Plumbing/serialization QA only; not20epoch convergence or GPU quality."
+}

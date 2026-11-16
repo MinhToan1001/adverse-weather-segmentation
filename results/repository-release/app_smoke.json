@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "models": [
+    "segformer_b0",
+    "segformer_b2",
+    "deeplabv3plus_resnet50"
+  ],
+  "old_hardcoded_checkpoints": false
+}

@@ -9,6 +9,9 @@ __pycache__/
 data/raw/
 data/processed/
 data/external/
+data/manifests/*
+!data/manifests/.gitkeep
+!data/manifests/README.md
 outputs/*
 !outputs/.gitkeep
 wandb/
@@ -19,3 +22,4 @@ mlruns/
 *.safetensors
 .DS_Store
 *.zip
+*.partial.zip

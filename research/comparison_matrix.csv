@@ -1,4 +1,9 @@
-title,year,venue,backbone,source_data,target_data,protocol,metric,license,code_url,checkpoint_url,limitations,reproducibility_status,notes
-HRDA,2022,ECCV,MiT-B5 + DAFormer multiresolution head,GTA or SYNTHIA labeled source; Cityscapes source in adverse UDA configs,Unlabeled target Cityscapes or ACDC,UDA original; DG is a separate branch,mIoU; match 16 vs 19 classes and val vs test,Apache-2.0; third-party exceptions in LICENSES.md,https://github.com/lhoyer/HRDA,https://github.com/lhoyer/HRDA#checkpoints,Uses target images; original UDA scores cannot benchmark our DG setting,not_run,Official config and README checked 2026-11-01; DG branch not reproduced
-Refign,2023,WACV,MiT-B5; HRDA or DAFormer with UAWarpC alignment,Cityscapes labeled source and corresponding target/reference images,ACDC or Dark Zurich,UDA,mIoU; README reports target test scores,MIT code; audit weights and dependencies separately,https://github.com/brdav/refign,https://github.com/brdav/refign#trained-models-and-results,Uses target images and correspondences; not a direct DG comparator,not_run,Official README checked 2026-11-01; configs and trained-model links available
-VLTSeg,2024,ACCV,CLIP/EVA-02 visual encoder; variants differ,GTA5/SYNTHIA or Cityscapes depending checkpoint,Unseen driving domains including ACDC,DG; verify exact source and checkpoint,mIoU; single-scale project vs published test TTA differ,Reimplementation MIT code; checkpoints CC-BY-NC-4.0,https://github.com/VLTSeg/VLTSeg,https://zenodo.org/records/14766160,Unofficial reimplementation; avoid ACDC-trained or Mapillary+Cityscapes weights for source-only baseline,feasibility_pending,Author page https://vltseg.github.io/ checked 2026-11-01; CUDA environment not available locally
+method,role,target_labels,current_training_status,primary_source
+SegFormer-B0,project baseline,supervised,source20 then adapt20 pending,https://arxiv.org/abs/2105.15203
+SegFormer-B2,project transformer,supervised,source20 then adapt20 pending,https://arxiv.org/abs/2105.15203
+DeepLabV3+R50,project CNN variant,supervised,source20 then adapt20 pending,https://arxiv.org/abs/1802.02611
+Kalb-Beyerer2023,forgetting and normalization background,supervised,related work with a different incremental task sequence,https://arxiv.org/abs/2303.14115
+Focal,loss idea,project uses fit labels,isolated ablation planned,https://arxiv.org/abs/1708.02002
+V-Net-Dice,overlap objective idea,project uses fit labels,adapted multiclass reduction implemented,https://arxiv.org/abs/1606.04797
+HRDA,UDA related work,no target labels,not a matched project reproduction,https://github.com/lhoyer/HRDA
+Refign,UDA related work,no target labels,not a matched project reproduction,https://github.com/brdav/refign

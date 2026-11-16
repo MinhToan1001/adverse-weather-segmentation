@@ -1,9 +1,0 @@
-{
-  "notebooks": {
-    "notebooks\\01_kaggle_prepare_cityscapes.ipynb": "1fad91608ff49fe920184d9c8fabeab9ea75e58b44ba519fb397733215a5e7e1",
-    "notebooks\\02_kaggle_train_segformer_b0.ipynb": "ec9d7e09b3a36e962679135315fae9a03dc6391867f51339f51348e769488982"
-  },
-  "source_zip_sha256": "4b23214b58152cfb1977cfcaded179e0a2990101594a2d34bdbfcfa92c8e1ac8",
-  "python_cells": "AST validated",
-  "kaggle_execution": "pending"
-}

@@ -1,0 +1,2 @@
+name: weighted_ce
+# The runner fits these weights from the actual fit manifests, never val IoU.

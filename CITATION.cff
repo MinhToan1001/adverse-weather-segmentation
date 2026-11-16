@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Cite this software repository; the research manuscript is an unpublished draft."
+title: "Project-CV: Robust Semantic Segmentation under Adverse Weather"
+type: software
+authors:
+  - name: "Project-CV contributors"
+repository-code: "https://github.com/MinhToan1001/adverse-weather-segmentation"
+url: "https://github.com/MinhToan1001/adverse-weather-segmentation"
+abstract: >-
+  Research code for shared data processing, controlled training strategies,
+  architecture comparisons and audited road-scene segmentation experiments
+  using Cityscapes and ACDC. This is ongoing exploratory research.
+keywords:
+  - semantic segmentation
+  - adverse weather
+  - reproducibility
+  - Cityscapes
+  - ACDC

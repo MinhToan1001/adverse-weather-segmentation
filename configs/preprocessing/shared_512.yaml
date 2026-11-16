@@ -1,0 +1,9 @@
+# Common input/label contract. Training augmentation is configured by a recipe.
+image_size: [512, 1024]
+preprocessing:
+  keep_aspect_ratio: true
+  image_interpolation: bilinear
+  mask_interpolation: nearest
+  mask_padding: 255
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]

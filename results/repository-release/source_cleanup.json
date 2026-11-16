@@ -1,0 +1,11 @@
+{
+  "original_files_archived": 613,
+  "additional_archived_files": [
+    "tests/test_kaggle_bootstrap.py",
+    "environments/vltseg-requirements.txt"
+  ],
+  "original_archive_hashes_verified": true,
+  "current_notebooks": 3,
+  "current_scripts": 14,
+  "legacy_code_outside_git": true
+}

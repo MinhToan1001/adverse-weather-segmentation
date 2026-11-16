@@ -1,116 +1,127 @@
-# Adverse Weather Semantic Segmentation | NCKH CV
+![Project-CV](docs/assets/project_banner.svg)
 
-**Goal:** Robust 19-class road-scene semantic segmentation across clear / rain / fog / snow / night domains. Phase 1: reproducible **SegFormer-B0 baseline**; Phase 2: research extensions after a baseline review.
+# Robust Semantic Segmentation under Adverse Weather
 
-> Status (2026-11-02): Cityscapes source QA and ACDC file-level preparation complete; GPU warm-up verified on Tesla T4. Full Cityscapes baseline and ACDC evaluation have not started. Project gate sign-off remains separate.
+**Cityscapes → ACDC · B0 baseline · So sánh B2 và DeepLab · Chung quy trình huấn luyện**
 
-GPU warm-up review: [`docs/WARMUP_REVIEW_2026-11-02.md`](docs/WARMUP_REVIEW_2026-11-02.md).
-Frozen full-run config: [`configs/segformer_b0_cityscapes_v1.yaml`](configs/segformer_b0_cityscapes_v1.yaml).
-Importable Kaggle notebooks: [`notebooks/`](notebooks/README.md).
+[Chạy và khôi phục training](docs/TRAINING_GUIDE.md) · [Phương pháp](docs/RESEARCH_FRAMEWORK.md) · [Thuyết trình code](docs/PRESENT_TO_LECTURER.md) · [Bản thảo nghiên cứu](docs/paper/README.md) · [Chứng cứ kiểm thử](results/README.md)
 
-Day 02 checks completed locally: real pretrained MiT-B0 encoder, 19-class logits,
-ignore-255 loss and mIoU unit tests. See [`docs/DAY02_STATUS.md`](docs/DAY02_STATUS.md)
-for commands, dataset status and saved test evidence.
+## Tóm tắt
 
-Task03 data pipeline: synchronized preprocessing/augmentation, deterministic
-manifest generation and pair validation. See [`docs/DATA_PREPARATION.md`](docs/DATA_PREPARATION.md)
-for preparation commands and [`docs/DATASET_QA_REPORT.md`](docs/DATASET_QA_REPORT.md)
-for completed source QA and the metadata-only target checks.
+Project-CV nghiên cứu phân đoạn ảnh đường phố trong sương mù, ban đêm, mưa và tuyết. Mục tiêu là cải thiện các lớp dự đoán yếu trên ACDC, đồng thời hạn chế mất kiến thức đã học từ Cityscapes. Kiến trúc model được tách khỏi xử lý dữ liệu, loss, training và evaluation để kiểm tra từng giả thuyết trong cùng điều kiện.
 
-## Protocol at a glance
+Cả ba model bắt đầu từ encoder pretrained trên ImageNet và đầu phân đoạn mới. Bảng so sánh hiện hành không sử dụng checkpoint hay điểm số của các lần thử cũ. **Kết quả GPU mới đang chờ đo**; unit test và CPU probe chỉ xác nhận hoạt động của phần mềm.
 
-- **Train** on Cityscapes `train` only. **Select the checkpoint** on Cityscapes `val`. The baseline gets one ACDC `val` pass after it is frozen. If ACDC results inform the proposed method, report that extension's ACDC score as exploratory, not confirmatory DG evidence.
-- No ACDC image, label or statistic may influence training, checkpoint selection, hyper-parameters or post-processing. This is **domain generalization**, not domain adaptation.
-- Full rules, metrics and gates: [`docs/experiment_protocol.md`](docs/experiment_protocol.md). Risks: [`docs/RISKS.md`](docs/RISKS.md). Data contract: [`docs/DATA_CONTRACT.md`](docs/DATA_CONTRACT.md).
+## 1. Các model
 
-| Gate | Milestone | Due | Exit evidence |
-|---|---|---|---|
-| **A** | Scope & protocol frozen | 2026-10-28 | Protocol approved, repo skeleton, 40 issues, risk register |
-| **B** | Data contract verified | 2026-10-31 | Licences, source data audit, ACDC file-level manifest QA without viewing target pixels |
-| **C** | Reproducible baseline | 2026-11-08 | Smoke + full Cityscapes run reproduced twice, checkpoint + metrics CSV |
-| **D** | DG evaluation + ablation | 2026-11-16 | One-shot ACDC val, per-domain table + CI, failure analysis, controlled ablation |
-| **E** | Deliverables & handoff | 2026-11-24 | Demo, report, slides, results index, release v0.1 |
+| Model | Vai trò | Số tham số | GFLOPs được đếm¹ | File kiến trúc |
+| --- | --- | ---: | ---: | --- |
+| SegFormer-B0 | Baseline | 3,719,027 | 35.51 | [segformer_b0.py](src/models/segformer_b0.py) |
+| SegFormer-B2 | Transformer chính | 27,361,235 | 258.33 | [segformer_b2.py](src/models/segformer_b2.py) |
+| DeepLabV3+ ResNet50 | CNN đối chứng | 26,695,619 | 150.71 | [deeplabv3plus_resnet50.py](src/models/deeplabv3plus_resnet50.py) |
 
-Task tracking: GitHub Issues (40 tasks) and the versioned backlog [`docs/issues_backlog.csv`](docs/issues_backlog.csv).
+¹ Forward với batch 1, ảnh 512 × 1024; đếm các phép conv/matmul được PyTorch hỗ trợ, quy ước 2 FLOPs cho một phép nhân-cộng. DeepLab ít hơn B2 khoảng 2.43% tham số và 41.7% lượng tính toán được đếm. Đây là đối chứng gần về số tham số; tốc độ GPU và VRAM vẫn cần đo thực tế.
 
-## Teams & ownership
+Kiến trúc dựa trên [SegFormer](https://arxiv.org/abs/2105.15203) và [DeepLabV3+](https://arxiv.org/abs/1802.02611). DeepLab trong repo dùng ASPP và decoder với separable convolution. Xem [ghi nhận nguồn](THIRD_PARTY_NOTICES.md).
 
-- **Lead / Person A (@khangcules10):** GitHub administrator, protocol and split decisions, model/training code, baseline run, proposed method, PR review and final acceptance.
-- **Person B (@MinhToan1001):** dataset terms and preparation, label mapping and audits, manifests, metrics, per-weather evaluation, literature matrix, plots and demo support.
-- No modification to `main` without an approved Pull Request by A. See `docs/OWNERSHIP.md`, `docs/ROADMAP_30_DAYS.md`.
+## 2. Quy trình dùng chung
 
-## Repository map
-
-```text
-├── .github/        CI workflow + PR template
-├── configs/        frozen experiment configs (smoke, Cityscapes baseline)
-├── data/
-│   ├── manifests/  committed CSV manifests (no images)
-│   └── raw/        local datasets only, git-ignored
-├── docs/           protocol, data contract, risks, ownership, roadmap, report
-├── outputs/        local run outputs, git-ignored
-├── research/       literature matrix, paper reviews, proposal, gap analysis
-├── results/        committed metrics, tables, figures, demo artifacts
-├── scripts/        data prep, validation, demo, GitHub automation
-├── src/            data / models / training / evaluation packages
-└── tests/          unit tests
+```mermaid
+flowchart LR
+    D[Cityscapes / ACDC] --> P[Chia nhóm dữ liệu / đồng bộ ảnh-mask]
+    P --> A[Tăng cường dữ liệu / normalization]
+    A --> M{Model registry}
+    M --> B0[B0]
+    M --> B2[B2]
+    M --> DL[DeepLab R50]
+    B0 --> L[19 lớp / shared loss]
+    B2 --> L
+    DL --> L
+    L --> T[Shared trainer / checkpoint]
+    T --> E[mIoU / calibration / trực quan lỗi]
 ```
 
-`results/` is the only place for committed experiment evidence; see [`results/README.md`](results/README.md) for naming and size rules.
+| Thành phần | Code |
+| --- | --- |
+| Dataset, chia dữ liệu, resize/crop/flip đồng bộ, ignore 255 | [dataset.py](src/data/dataset.py), [partitions.py](src/data/partitions.py) |
+| Giữ tỷ lệ ảnh, khung 512 × 1024, ImageNet normalization | [shared_512.yaml](configs/preprocessing/shared_512.yaml) |
+| CE, weighted CE theo tập fit, Focal, CE + Dice | [losses.py](src/training/losses.py) |
+| Chọn model và ghép cấu hình thí nghiệm | [registry.py](src/models/registry.py), [config.py](src/experiments/config.py) |
+| Optimizer, AMP, tích lũy gradient, best/last, resume | [train.py](src/training/train.py), [checkpoints.py](src/training/checkpoints.py) |
+| Đánh giá ở kích thước gốc, ECE, bản đồ độ tin cậy và lỗi | [runner.py](src/evaluation/runner.py) |
 
-## Required deliverables
+Chạy đối chứng CE trước. Sau đó kiểm tra riêng ảnh hưởng của loss và class-aware crop; điểm IoU thấp không tự động đồng nghĩa với thiếu mẫu của lớp đó. [Công thức và ma trận thí nghiệm](docs/RESEARCH_FRAMEWORK.md).
 
-| # | Artifact | Where |
-|---|---|---|
-| 1 | Best Cityscapes-trained checkpoint + SHA-256 | local `outputs/` + release asset (never committed) |
-| 2 | Metrics CSV: Cityscapes val and ACDC per condition/class + bootstrap CI | `results/baseline/`, `results/dg_eval/` |
-| 3 | Ablation table (baseline vs one modification, same protocol) | `results/ablation/` |
-| 4 | Demo CLI: image/folder → colour mask + overlay | `scripts/demo.py`, `results/demo/` |
-| 5 | Report (method, data, metrics, results, limits) | `docs/report.md` |
-| 6 | Slide deck | `docs/slides/` |
-| 7 | Reproducibility pack (env, commands, hashes, run cards) | `docs/reproducibility.md` |
+## 3. Kaggle: ba lượt chạy riêng
 
-## Quick start (Windows PowerShell or Linux)
+| Lượt | Notebook | Hai giai đoạn |
+| --- | --- | --- |
+| 1 | [Train B0](notebooks/01_train_segformer_b0.ipynb) | Cityscapes 20 epoch → ACDC 20 epoch |
+| 2 | [Train B2](notebooks/02_train_segformer_b2.ipynb) | Cityscapes 20 epoch → ACDC 20 epoch |
+| 3 | [Train DeepLab](notebooks/03_train_deeplabv3plus_resnet50.ipynb) | Cityscapes 20 epoch → ACDC 20 epoch |
+
+Mỗi notebook chạy một model và tự chuyển từ source sang adaptation, tổng cộng **40 epoch/model**. Một lượt có thể cần nhiều phiên Kaggle. Input cho lượt mới: **project-code.zip mới + Cityscapes + ACDC**, bật GPU và Internet. Notebook tự tìm dataset theo cấu trúc; có thể khai báo đường dẫn cụ thể nếu có nhiều bản trùng nhau. Chọn **Save Version → Save & Run All**. Xem [hướng dẫn đầy đủ](docs/TRAINING_GUIDE.md).
+
+Checkpoint và ZIP kết quả cập nhật sau mỗi epoch hoàn thành. Các thế hệ checkpoint trước được giữ để khôi phục khi file mới hỏng. Resume dùng ZIP riêng của model và bản source đã đóng băng; epoch đang chạy dở sẽ được chạy lại. Cần lưu output trên Kaggle hoặc tải ZIP về giữa các phiên.
+
+## 4. Cài đặt local và CLI
 
 ```bash
 python -m venv .venv
-# Windows: .venv\Scripts\Activate.ps1
+# Windows: .venv/Scripts/Activate.ps1
 # Linux: source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python -m pytest -q
-python scripts/make_synthetic_dataset.py
-python scripts/validate_manifest.py --manifest data/manifests/synthetic_train.csv
-python -m src.training.train --config configs/segformer_b0_smoke.yaml
-python -m src.evaluation.evaluate --config configs/segformer_b0_smoke.yaml --checkpoint outputs/smoke/best
+python -m scripts.build_kaggle_notebooks
+# Upload outputs/kaggle/project-code.zip cùng notebook của model cần chạy.
 ```
 
-Smoke mode uses an **offline random initialization**, small synthetic segmentation images, 2 training batches, **no model downloads**. It validates only the pipeline, not model quality. Training smoke takes CPU time.
+```bash
+python -m scripts.prepare_research_data --city /datasets/Cityscape --acdc /datasets/ACDC --out outputs/data
+python -m scripts.run_research_campaign --models segformer_b2 --data outputs/data/data.json --root outputs/runs/segformer_b2 --archive outputs/segformer_b2_seed42.zip
+python -m scripts.verify_pipeline --data outputs/data/data.json --out outputs/cpu_probe
+```
 
-## Real baseline (after dataset/licence approval)
+Đổi model được hỗ trợ bằng `--models`; dữ liệu, loss, trainer và evaluator được tái sử dụng. Các thí nghiệm ablation về sau dùng `scripts.run_research --model ... --stage adapt --loss focal ...` cùng checkpoint source mới của chính model đó.
 
-1. Download official datasets separately. Raw images/labels/checkpoints are **not committed**; follow `docs/RISKS.md` R2/R3.
-2. Make CSV manifests with `image,mask,domain,split` relative to repository root or absolute paths; mask MUST be a single-channel integer image with contiguous Cityscapes train IDs `0..18`, and `255` for void. **Do not pass RGB/palette masks or raw labelIds**.
-3. Set `configs/segformer_b0_cityscapes.yaml`: manifest paths, GPU batch size, epochs, pretrained checkpoint. Dataset-specific remapping for ACDC/Cityscapes must be audited.
-4. Run `python scripts/validate_manifest.py --manifest ... --check-files --check-labels`.
-5. Train and select the checkpoint on Cityscapes val. The config uses an aspect-preserving 512×1024 padded input, batch size 1 with gradient accumulation 4, poly learning-rate decay, warm-up and CUDA AMP. Resume an interrupted run with `python -m src.training.train --config configs/segformer_b0_cityscapes.yaml --resume outputs/segformer_b0_cityscapes/last`.
-6. After freezing the checkpoint and config, evaluate the ACDC validation manifest in one inference pass: `python -m src.evaluation.evaluate --config configs/segformer_b0_cityscapes.yaml --checkpoint outputs/segformer_b0_cityscapes/best --manifest data/manifests/acdc_val.csv --run-id b0-seed42 --result-status confirmatory --output-csv results/dg_eval/metrics.csv --output-json results/dg_eval/metrics.json`. The evaluator requires a clean committed code tree.
-7. Report seed, device, dataset version, classes, split, mIoU by weather and per class. The bootstrap interval resamples cached per-image confusion matrices and does not rerun inference.
+Chạy demo sau khi có checkpoint:
 
-Train a new 19-class head starting from an encoder pretrained on ImageNet: `nvidia/mit-b0` (SegFormer family). The Hugging Face implementation supports `SegformerForSemanticSegmentation` and `ignore_index=255`. For serious experiments, use a validated CUDA PyTorch installation and pin dependencies after smoke.
+```bash
+python -m pip install -r requirements-demo.txt
+python -m streamlit run app.py
+```
 
-## Evaluation protocol (summary)
+Chọn model và thư mục checkpoint `best/` tương ứng trong giao diện.
 
-- Primary metric: 19-class mIoU, `255` ignored; per-class IoU and per-condition breakdown are mandatory.
-- ACDC val = 406 images (fog 100, night 106, rain 100, snow 100); before the baseline is frozen, verify only file-level metadata and pairing. Do not rerun the baseline for tuning. A target-informed proposed model may be evaluated once but its result is exploratory.
-- Report bootstrap 95% CI over images, result status, exact command, manifest/config hashes, checkpoint SHA-256 and commit hash.
-- Test-set tuning, per-condition checkpoint selection and TTA in the primary result are prohibited.
+## 5. Thiết lập thí nghiệm
 
-## References
+| Thiết lập | Source | Adaptation có nhãn |
+| --- | --- | --- |
+| Dữ liệu train | Cityscapes: 2,787 ảnh fit | ACDC: 1,198 ảnh fit + source replay tỷ lệ 1:1 |
+| Chọn checkpoint | Cityscapes: 188 ảnh monitor | ACDC: 402 ảnh dev; mức giảm source ≤ 1 điểm phần trăm |
+| Số epoch / early stopping | 20 / tắt | 20 / tắt |
+| Batch / tích lũy gradient | 2 / 4; `drop_last` | 1 / 8 |
+| BatchNorm: thống kê / affine | Cập nhật / học | Đóng băng / học |
+| AdamW: LR encoder / hệ số LR head | 6e-5 / 10 | 1e-5 / 1 |
+| Weight decay / warm-up / poly power | 0.01 / 20 bước cập nhật / 1 | Tương tự |
+| GPU / precision | Một GPU / FP16 AMP | Tương tự |
 
-- https://huggingface.co/docs/transformers/model_doc/segformer
-- https://www.cityscapes-dataset.com/
-- https://acdc.vision.ee.ethz.ch/
+Nhánh pooled BatchNorm của DeepLab cần batch source thực tế ≥ 2; tích lũy gradient không gộp thống kê BatchNorm. Encoder SegFormer dùng LayerNorm. Cityscapes val 500 và ACDC val 406 chỉ được đánh giá sau khi chốt checkpoint. Do các tập này từng được xem trong giai đoạn phát triển trước, chúng chưa phải bằng chứng test độc lập. Kết quả UDA và supervised có quyền truy cập nhãn khác nhau, cần trình bày riêng khi đối chiếu bài báo.
 
-## Research integrity
+## 6. Bản đồ repository
 
-No test-set tuning, no fabricated results, no comparison across different label maps/splits. Record failed experiments. The enhancement module remains a proposal until literature review and ablation.
+```text
+src/data/          # Dataset, chia dữ liệu, augmentation, trọng số lớp, replay
+src/models/        # File riêng cho B0, B2, DeepLab; registry và loader
+src/training/      # Loss, optimizer, BatchNorm, trainer và checkpoint dùng chung
+src/evaluation/    # Metrics, calibration, trực quan kết quả
+src/experiments/   # Ghép cấu hình và đóng gói workspace
+scripts/           # Chuẩn bị → train/resume → vẽ biểu đồ → đánh giá → đóng gói
+configs/           # Preprocessing, recipe theo giai đoạn, loss preset
+notebooks/         # Ba notebook hiện hành, mỗi model một notebook
+research/          # Kế hoạch thí nghiệm và ghi chú bài báo
+results/           # Chứng cứ kiểm thử gọn nhẹ; chờ kết quả GPU mới
+outputs/           # Checkpoint, ZIP, CPU probe, archive local; Git bỏ qua
+```
+
+[Hướng dẫn thành viên](docs/CONTRIBUTING.md) · [Mục lục tài liệu](docs/README.md) · [Trích dẫn phần mềm](CITATION.cff).

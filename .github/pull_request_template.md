@@ -10,4 +10,4 @@ Closes #
 - [ ] No dataset/weights/secrets checked in
 - [ ] No unsupported performance claims
 ## Review requested from
-@lead
+A team member

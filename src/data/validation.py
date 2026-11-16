@@ -7,14 +7,14 @@ from PIL import Image
 from src.data.preparation import FIELDS, TARGET_DOMAINS, resolve_data_path
 
 
-def _check_pair_metadata(row):
+def _check_pair_metadata(row, allow_target_train=False):
     image, mask = (resolve_data_path(row[field]) for field in ("image", "mask"))
     domain, split = row["domain"], row["split"]
     if domain not in {"cityscapes", "synthetic", *TARGET_DOMAINS}:
         raise ValueError(f"Unknown domain: {domain}")
     if split not in {"train", "val"}:
         raise ValueError(f"Unsupported split: {split}")
-    if domain in TARGET_DOMAINS and split != "val":
+    if domain in TARGET_DOMAINS and split != "val" and not allow_target_train:
         raise ValueError("ACDC is evaluation-only")
     if image == mask:
         raise ValueError("Image and mask must be different files")
@@ -41,7 +41,7 @@ def _check_pair_metadata(row):
     return image, mask
 
 
-def read_manifest(manifest):
+def read_manifest(manifest, allow_target_train=False):
     """Read BOM-tolerant CSV and fail on malformed or contradictory metadata."""
     with open(manifest, newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
@@ -54,7 +54,7 @@ def read_manifest(manifest):
             if None in row or not all(isinstance(row.get(field), str) and row[field].strip() for field in FIELDS):
                 raise ValueError(f"Empty field or malformed CSV: {manifest}, row {number}")
             row = {field: row[field].strip() for field in FIELDS}
-            paths = _check_pair_metadata(row)
+            paths = _check_pair_metadata(row, allow_target_train=allow_target_train)
             if any(path in seen for path in paths):
                 raise ValueError(f"Duplicate image or mask: {manifest}, row {number}")
             seen.update(paths)
@@ -64,12 +64,15 @@ def read_manifest(manifest):
     return rows
 
 
-def validate_manifests(manifests, check_files=False, check_labels=False):
+def validate_manifests(manifests, check_files=False, check_labels=False, allow_target_train=False):
     seen = set()
-    rows = [row for manifest in manifests for row in read_manifest(manifest)]
+    rows = [row for manifest in manifests for row in read_manifest(manifest, allow_target_train=allow_target_train)]
     if not rows:
         raise ValueError("At least one nonempty manifest is required")
-    if check_labels and any(row["domain"] in TARGET_DOMAINS for row in rows):
+    if check_labels and any(
+        row["domain"] in TARGET_DOMAINS and not (allow_target_train and row["split"] == "train")
+        for row in rows
+    ):
         raise ValueError("ACDC labels stay unopened until the frozen evaluation pass")
     for row in rows:
         paths = [resolve_data_path(row[field]) for field in ("image", "mask")]

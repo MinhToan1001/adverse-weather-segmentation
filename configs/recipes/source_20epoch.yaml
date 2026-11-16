@@ -1,0 +1,16 @@
+protocol: source_only
+train:
+  epochs: 20
+  batch_size: 2
+  gradient_accumulation_steps: 4
+  drop_last: true
+  num_workers: 2
+  lr: 0.00006
+  weight_decay: 0.01
+  head_lr_multiplier: 10.0
+  poly_power: 1.0
+  warmup_steps: 20
+  amp: true
+  amp_dtype: float16
+  max_steps: null
+  freeze_batch_norm_stats: false

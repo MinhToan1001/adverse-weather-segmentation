@@ -17,8 +17,9 @@ from src.models.segformer import make_model
 
 @pytest.fixture(scope="module")
 def baseline_settings():
-    path = Path(__file__).resolve().parents[1] / "configs/segformer_b0_cityscapes.yaml"
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+    from src.models.registry import ENCODERS
+    repository,revision,_=ENCODERS['b0']
+    return {'model':dict(num_labels=19,variant='b0',pretrained=True,checkpoint=repository,revision=revision)}
 
 
 def test_offline_b0_forward(baseline_settings):

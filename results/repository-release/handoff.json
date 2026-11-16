@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "notebooks": {
+    "01_train_segformer_b0.ipynb": "2e557094cca559908b46fb336b6170e08612418c1d47abe8c52ff8c29a4e706c",
+    "02_train_segformer_b2.ipynb": "46596f7d09f9f53fceeadd81d5b587f7b21a80a13e3e3560d64b1c863a980d60",
+    "03_train_deeplabv3plus_resnet50.ipynb": "b6b89a217f761931df7a0b72e6305dd155aecb7102084cbbab334c183c1fe8b8"
+  },
+  "code_zip_sha256": "4971dce1c4b99efe2f973d93f0de390bb154ac4fac2cc2ec617ee31b083607d3",
+  "code_zip_bytes": 84672,
+  "bundled_files": 66,
+  "byte_matches_checkout": true,
+  "empty_notebook_outputs": true,
+  "docs_links": "PASS",
+  "per_model_workspace_and_zip": true,
+  "scope": "Software handoff verification; GPU training is pending"
+}
