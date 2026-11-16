@@ -1,0 +1,164 @@
+{
+  "status": "PASS",
+  "archive_sha256": "4617a590ec3c53ef08e7ba927c6048b3c87f62e687072243450c9740a164bac2",
+  "archive_bytes": 408632945,
+  "zip_crc": "PASS",
+  "checkpoint_file_hashes": "24/24 PASS",
+  "source_snapshot_hashes": "PASS",
+  "manifest_hashes": "PASS",
+  "epoch_sequences": "20 source + 20 adapt, no duplicates/gaps",
+  "configuration": {
+    "model": "segformer_b0",
+    "seed": 42,
+    "loss": "ce",
+    "initialization": "ImageNet encoder + new segmentation head",
+    "image_size": [
+      512,
+      1024
+    ],
+    "source_fit": 2787,
+    "source_monitor": 188,
+    "acdc_fit": 1198,
+    "acdc_dev": 402
+  },
+  "checkpoints": [
+    {
+      "stage": "source",
+      "generation": "best",
+      "epoch": 19,
+      "best_epoch": 19,
+      "sha256": "ee6437ba84eb27bf2456c8c657a0179a7c19ffb932e0d9ff866a3f66dfb028c2"
+    },
+    {
+      "stage": "source",
+      "generation": "last",
+      "epoch": 20,
+      "best_epoch": 19,
+      "sha256": "f523d1473302838af23f4044b9f0f3104fbea924f9085c5e05ab56d4bc1ce290"
+    },
+    {
+      "stage": "source",
+      "generation": "best.previous",
+      "epoch": 18,
+      "best_epoch": 18,
+      "sha256": "fd38153278e7e99738448d4914b3735249e8e0f9e42c1fdc6d2d06279894b5b0"
+    },
+    {
+      "stage": "source",
+      "generation": "last.previous",
+      "epoch": 19,
+      "best_epoch": 19,
+      "sha256": "ee6437ba84eb27bf2456c8c657a0179a7c19ffb932e0d9ff866a3f66dfb028c2"
+    },
+    {
+      "stage": "adapt",
+      "generation": "best",
+      "epoch": 20,
+      "best_epoch": 20,
+      "sha256": "203ee8ed9d3aacd87f970e4bbfb7ce9c40cdbedeb7af329d575ef956d4ba3adf"
+    },
+    {
+      "stage": "adapt",
+      "generation": "last",
+      "epoch": 20,
+      "best_epoch": 20,
+      "sha256": "203ee8ed9d3aacd87f970e4bbfb7ce9c40cdbedeb7af329d575ef956d4ba3adf"
+    },
+    {
+      "stage": "adapt",
+      "generation": "best.previous",
+      "epoch": 18,
+      "best_epoch": 18,
+      "sha256": "93b9e4f9ab5d32fe8e5eca0aa0189d72108c91532f7c95ba2925c6d62dc1e3b8"
+    },
+    {
+      "stage": "adapt",
+      "generation": "last.previous",
+      "epoch": 19,
+      "best_epoch": 18,
+      "sha256": "73651ee3df029a1c0aaa5b925bf7a470944fdaa686f568c9750e9cbb5ad1b81a"
+    }
+  ],
+  "source_differences_from_checkout": [],
+  "metrics": {
+    "scope": "Internal monitor/dev selection only; official validation pending",
+    "source_best_epoch": 19,
+    "source_best_monitor_miou": 0.6513266347218142,
+    "acdc_dev_before": 0.3783586988842383,
+    "acdc_dev_after": 0.5165156787141129,
+    "acdc_delta_pp": 13.815697982987457,
+    "adapt_best_epoch": 20,
+    "source_monitor_after": 0.6516319719788266,
+    "source_delta_pp": 0.030530999460276487,
+    "source_gate_pass": true,
+    "domains": {
+      "fog": {
+        "n_images": 81,
+        "before_miou": 0.40980463885640445,
+        "after_miou": 0.49502080086466005
+      },
+      "night": {
+        "n_images": 93,
+        "before_miou": 0.16889524881916537,
+        "after_miou": 0.3420370350767666
+      },
+      "rain": {
+        "n_images": 154,
+        "before_miou": 0.4207007352466244,
+        "after_miou": 0.5492070071889371
+      },
+      "snow": {
+        "n_images": 74,
+        "before_miou": 0.40823446501576655,
+        "after_miou": 0.5083834982283677
+      }
+    }
+  },
+  "runtime": {
+    "invocation_seconds": 15810.561310999,
+    "snapshots_written": 40,
+    "epoch_seconds": {
+      "source": {
+        "median": 318.62842652149993,
+        "sum": 6552.593179191999
+      },
+      "adapt": {
+        "median": 344.26543247549944,
+        "sum": 7085.475937652996
+      }
+    }
+  },
+  "limitations": [
+    "One seed only; no statistical superiority claim.",
+    "Best epoch selected using internal monitor/dev. Official validation has not been evaluated.",
+    "Monitor/dev curves show no sustained deterioration; they do not prove absence of overfitting.",
+    "Train-eval probes are only 16 source / 8 replay images and are not representative generalization evidence.",
+    "Training logs indicate reduced gains toward the end; keep the fixed 20-epoch comparison for B2/DeepLab."
+  ],
+  "checkpoint_loading_smoke": [
+    {
+      "stage": "source",
+      "status": "PASS",
+      "strict_complete_weights": true,
+      "output_shape": [
+        1,
+        19,
+        16,
+        24
+      ],
+      "scope": "CPU synthetic-shape loading smoke; not accuracy"
+    },
+    {
+      "stage": "adapt",
+      "status": "PASS",
+      "strict_complete_weights": true,
+      "output_shape": [
+        1,
+        19,
+        16,
+        24
+      ],
+      "scope": "CPU synthetic-shape loading smoke; not accuracy"
+    }
+  ]
+}

@@ -10,7 +10,7 @@
 
 Project-CV nghiên cứu phân đoạn ảnh đường phố trong sương mù, ban đêm, mưa và tuyết. Mục tiêu là cải thiện các lớp dự đoán yếu trên ACDC, đồng thời hạn chế mất kiến thức đã học từ Cityscapes. Kiến trúc model được tách khỏi xử lý dữ liệu, loss, training và evaluation để kiểm tra từng giả thuyết trong cùng điều kiện.
 
-Cả ba model bắt đầu từ encoder pretrained trên ImageNet và đầu phân đoạn mới. Bảng so sánh hiện hành không sử dụng checkpoint hay điểm số của các lần thử cũ. **Kết quả GPU mới đang chờ đo**; unit test và CPU probe chỉ xác nhận hoạt động của phần mềm.
+Cả ba model bắt đầu từ encoder pretrained trên ImageNet và đầu phân đoạn mới. Bảng so sánh hiện hành không sử dụng checkpoint hay điểm số của các lần thử cũ. **B0 đã hoàn thành training**: ACDC dev nội bộ tăng từ 37.84% lên 51.65% mIoU; [báo cáo và giới hạn](results/segformer_b0_seed42/README.md). B2, DeepLab và kết quả official validation còn chờ thực hiện. Unit test và CPU probe chỉ xác nhận hoạt động của phần mềm.
 
 ## 1. Các model
 
