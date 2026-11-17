@@ -6,15 +6,15 @@
 
 Chọn notebook riêng của B0, B2 hoặc DeepLab. Model khởi tạo encoder từ ImageNet, đầu phân đoạn 19 lớp mới; train Cityscapes 20 epoch rồi tự dùng checkpoint source tốt nhất để train ACDC với source replay thêm 20 epoch. Mỗi model có workspace, bản source đóng băng và ZIP kết quả riêng.
 
-| Model | Notebook | Thời gian dự trù trên một T4 |
+| Model | Notebook | Thời gian trên một T4 |
 | --- | --- | --- |
-| B0 | [01](../notebooks/01_train_segformer_b0.ipynb) | 4–6 giờ |
-| B2 | [02](../notebooks/02_train_segformer_b2.ipynb) | 16–24 giờ |
+| B0 | [01](../notebooks/01_train_segformer_b0.ipynb) | Đã ghi nhận 4,39 giờ cho lượt seed 42 |
+| B2 | [02](../notebooks/02_train_segformer_b2.ipynb) | Đã ghi nhận 7,77 giờ cho lượt seed 42 |
 | DeepLabV3+ ResNet50 | [03](../notebooks/03_train_deeplabv3plus_resnet50.ipynb) | 12–24 giờ; chưa có đo GPU trực tiếp |
 
-Các khoảng trên tính cho **40 epoch/model**, gồm hai giai đoạn 20 epoch, và chỉ dùng để dự trù. B0 trước đây khoảng 6 phút/epoch; profile B2 cũ gợi ý khoảng 26 phút/epoch adaptation. Batch source, số ảnh validation và việc đóng gói checkpoint hiện đã thay đổi. Khoảng DeepLab là ước lượng sơ bộ, chưa phải kết quả đo tốc độ. [Chứng cứ thời gian](../results/repository-release/runtime_budget.json).
+Các số trên tính cho **40 epoch/model**, gồm hai giai đoạn 20 epoch. Thời gian B0/B2 lấy từ training invocation thực tế, gồm validation và nén kết quả trong lượt chạy; chưa tính cài dependencies và chuẩn bị dữ liệu. B2 có median khoảng 8,36 phút/epoch source và 10,24 phút/epoch adaptation, nhanh hơn dự trù bảo thủ 16–24 giờ trước đây. Đây không phải cam kết thời gian cho mọi phiên Kaggle. [Báo cáo B0](../results/segformer_b0_seed42/README.md), [báo cáo B2](../results/segformer_b2_seed42/README.md). DeepLab vẫn là ước lượng sơ bộ, chưa đo GPU trực tiếp; [dự trù ban đầu](../results/repository-release/runtime_budget.json).
 
-Sau những epoch đầu, log và `status.json` cập nhật ETA từ thời gian thực tế của **giai đoạn đang chạy**. Cần cộng thêm thời gian setup, nén ZIP và giai đoạn sau chưa đo. Notebook dùng cửa sổ phiên 10 giờ; B2 và DeepLab thường cần nhiều phiên. Trainer hiện dùng một GPU, kể cả khi giao diện chọn T4 × 2.
+Sau những epoch đầu, log và `status.json` cập nhật ETA từ thời gian thực tế của **giai đoạn đang chạy**. Cần cộng thêm thời gian setup, nén ZIP và giai đoạn sau chưa đo. Notebook dùng cửa sổ phiên 10 giờ. B0/B2 đã hoàn thành trong một invocation ở các lượt ghi nhận, nhưng vẫn cần giữ checkpoint để tiếp tục nếu phiên khác chậm hơn; DeepLab có thể cần nhiều phiên. Trainer hiện dùng một GPU, kể cả khi giao diện chọn T4 × 2.
 
 ## Bắt đầu một lượt mới
 

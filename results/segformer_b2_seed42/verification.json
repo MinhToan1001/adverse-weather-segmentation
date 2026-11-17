@@ -1,0 +1,242 @@
+{
+  "status": "PASS",
+  "archive_sha256": "44fb7addb7d21719d74601a77ceaf2b954a7e57a5082d36eefcb916b7664e691",
+  "archive_bytes": 2684861396,
+  "zip_crc": "PASS",
+  "checkpoint_file_hashes": "24/24 PASS",
+  "source_snapshot_hashes": "PASS",
+  "manifest_hashes": "PASS",
+  "epoch_sequences": "20 source + 20 adapt, no duplicates/gaps",
+  "configuration": {
+    "model": "segformer_b2",
+    "parameters": 27361235,
+    "seed": 42,
+    "loss": "ce",
+    "initialization": "ImageNet encoder + new segmentation head",
+    "image_size": [
+      512,
+      1024
+    ],
+    "source_fit": 2787,
+    "source_monitor": 188,
+    "acdc_fit": 1198,
+    "acdc_dev": 402
+  },
+  "checkpoints": [
+    {
+      "stage": "source",
+      "generation": "best",
+      "epoch": 18,
+      "best_epoch": 18,
+      "sha256": "852461e60e789a7ccbf234f5edde2036347fa54ebb1a50cdc3265e2629dc2028"
+    },
+    {
+      "stage": "source",
+      "generation": "last",
+      "epoch": 20,
+      "best_epoch": 18,
+      "sha256": "ecc611c7e01846def9e63564ef04b9fb20b706fc2d8ef520eaf6a6396acbbfb6"
+    },
+    {
+      "stage": "source",
+      "generation": "best.previous",
+      "epoch": 16,
+      "best_epoch": 16,
+      "sha256": "c1a503cff54bfcee522c65a9af5bf32b11c2fd52d007b3f4c4909c973c47f9fd"
+    },
+    {
+      "stage": "source",
+      "generation": "last.previous",
+      "epoch": 19,
+      "best_epoch": 18,
+      "sha256": "da2c1c3f29200012f5d8f5ca7a26b8b8a5e716cac1976a5bf7c126c8b1ec9db9"
+    },
+    {
+      "stage": "adapt",
+      "generation": "best",
+      "epoch": 20,
+      "best_epoch": 20,
+      "sha256": "c358c015590ea6130e65a302dd4b49d744e0959e79036174468eec4efddf5a74"
+    },
+    {
+      "stage": "adapt",
+      "generation": "last",
+      "epoch": 20,
+      "best_epoch": 20,
+      "sha256": "c358c015590ea6130e65a302dd4b49d744e0959e79036174468eec4efddf5a74"
+    },
+    {
+      "stage": "adapt",
+      "generation": "best.previous",
+      "epoch": 19,
+      "best_epoch": 19,
+      "sha256": "9f64a5676b005769aab3ea1c18bf4010ed252295050ce78083e6cd4da8762b43"
+    },
+    {
+      "stage": "adapt",
+      "generation": "last.previous",
+      "epoch": 19,
+      "best_epoch": 19,
+      "sha256": "9f64a5676b005769aab3ea1c18bf4010ed252295050ce78083e6cd4da8762b43"
+    }
+  ],
+  "source_differences_from_checkout": [],
+  "comparability_with_b0": {
+    "frozen_code_identical": true,
+    "same_stage_policy": {
+      "source": {
+        "protocol": true,
+        "training_policy": true,
+        "seed": true,
+        "train": true,
+        "data": true,
+        "loss": true,
+        "monitoring": true,
+        "selection": true,
+        "checkpointing": true,
+        "loss_provenance": true
+      },
+      "adapt": {
+        "protocol": true,
+        "training_policy": true,
+        "seed": true,
+        "train": true,
+        "data": true,
+        "loss": true,
+        "monitoring": true,
+        "selection": true,
+        "checkpointing": true,
+        "loss_provenance": true
+      }
+    },
+    "manifests": {
+      "source_train_eval.csv": {
+        "rows": 16,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "city_train.csv": {
+        "rows": 2975,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "replay_train_eval.csv": {
+        "rows": 8,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "source/cityscapes_monitor.csv": {
+        "rows": 188,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "source/cityscapes_fit.csv": {
+        "rows": 2787,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "target/acdc_train_fit.csv": {
+        "rows": 1198,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "target/acdc_train_dev.csv": {
+        "rows": 402,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "target/acdc_train_all.csv": {
+        "rows": 1600,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      },
+      "target/acdc_train_unlabeled_references.csv": {
+        "rows": 1600,
+        "same_ordered_rows_as_b0_after_workspace_normalization": true
+      }
+    },
+    "converted_city_mask_files_identical": 2975,
+    "note": "Workspace directory/model name normalized only; encoder architecture and corresponding ImageNet weights differ. Same recipe, not matched training compute."
+  },
+  "metrics": {
+    "scope": "Internal monitor/dev selection only; official validation pending",
+    "source_best_epoch": 18,
+    "source_best_monitor_miou": 0.7474063275291032,
+    "acdc_dev_before": 0.48438580482258936,
+    "acdc_dev_after": 0.6302206742199905,
+    "acdc_delta_pp": 14.583486939740114,
+    "adapt_best_epoch": 20,
+    "source_monitor_after": 0.7453362143343949,
+    "source_delta_pp": -0.2070070016109926,
+    "source_gate_pass": true,
+    "domains": {
+      "fog": {
+        "n_images": 81,
+        "before_miou": 0.5424868551290981,
+        "after_miou": 0.6148066041322089
+      },
+      "night": {
+        "n_images": 93,
+        "before_miou": 0.22849761843695282,
+        "after_miou": 0.4429028894334881
+      },
+      "rain": {
+        "n_images": 154,
+        "before_miou": 0.5358814861918004,
+        "after_miou": 0.6787961281811107
+      },
+      "snow": {
+        "n_images": 74,
+        "before_miou": 0.5175353429206668,
+        "after_miou": 0.6234045918069882
+      }
+    },
+    "b2_minus_b0_acdc_dev_pp": 11.370499550587764,
+    "b2_minus_b0_source_best_monitor_pp": 9.6079692807289
+  },
+  "runtime": {
+    "invocation_seconds": 27974.079304843,
+    "snapshots_written": 40,
+    "gpu_names": [
+      "Tesla T4"
+    ],
+    "epoch_seconds": {
+      "source": {
+        "median": 501.6364223129999,
+        "sum": 10041.371610233999
+      },
+      "adapt": {
+        "median": 614.249546458499,
+        "sum": 12299.388338038987
+      }
+    },
+    "peak_allocated_bytes": 5587140608,
+    "peak_reserved_bytes": 6394216448
+  },
+  "limitations": [
+    "Single seed, selected checkpoints on internal sets; no statistical or published-paper superiority claim.",
+    "Official validation has not been evaluated.",
+    "No sustained dev deterioration; not proof that overfitting is absent.",
+    "Train-eval monitoring uses small nonrepresentative probes.",
+    "B2 vs B0 changes architecture/capacity and encoder pretrained weights; training compute differs."
+  ],
+  "checkpoint_loading_smoke": [
+    {
+      "stage": "source",
+      "status": "PASS",
+      "strict_complete_weights": true,
+      "output_shape": [
+        1,
+        19,
+        16,
+        24
+      ],
+      "scope": "CPU synthetic loading/forward smoke, not accuracy"
+    },
+    {
+      "stage": "adapt",
+      "status": "PASS",
+      "strict_complete_weights": true,
+      "output_shape": [
+        1,
+        19,
+        16,
+        24
+      ],
+      "scope": "CPU synthetic loading/forward smoke, not accuracy"
+    }
+  ],
+  "finite_primary_metrics": "PASS"
+}
