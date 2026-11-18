@@ -13,7 +13,7 @@ def build():
             for path in sorted((ROOT/folder).rglob('*')):
                 if path.is_file() and path.suffix in {'.py','.yaml','.yml','.json'}:
                     archive.write(path,path.relative_to(ROOT).as_posix())
-        for name in ('requirements.txt','requirements-demo.txt','pyproject.toml','app.py','THIRD_PARTY_NOTICES.md','third_party/transformers/LICENSE'):
+        for name in ('requirements.txt','requirements-demo.txt','pyproject.toml','THIRD_PARTY_NOTICES.md','third_party/transformers/LICENSE'):
             archive.write(ROOT/name,name)
     print('Created',len(notebooks),'notebooks;source ZIP:',destination)
     return notebooks,destination

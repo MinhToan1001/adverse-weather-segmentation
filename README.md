@@ -84,14 +84,14 @@ python -m scripts.verify_pipeline --data outputs/data/data.json --out outputs/cp
 
 Đổi model được hỗ trợ bằng `--models`; dữ liệu, loss, trainer và evaluator được tái sử dụng. Các thí nghiệm ablation về sau dùng `scripts.run_research --model ... --stage adapt --loss focal ...` cùng checkpoint source mới của chính model đó.
 
-Chạy demo sau khi có checkpoint:
+Chạy **WeatherLens Studio** bằng Node.js sau khi có checkpoint:
 
 ```bash
-python -m pip install -r requirements-demo.txt
-python -m streamlit run app.py
+npm start
+# Mở http://127.0.0.1:3000
 ```
 
-Chọn model và thư mục checkpoint `best/` tương ứng trong giao diện.
+Giao diện có upload/kéo thả ảnh, ảnh mẫu theo thời tiết, chọn B0/B2 và checkpoint source/adapt, mask với độ đậm tùy chỉnh, so sánh hai model trên cùng ảnh và tải PNG. API Node.js gọi worker PyTorch local bằng CPU; không cần GPU hoặc Streamlit. Studio tự nhận các checkpoint đã nghiệm thu trong `outputs/reviews/`; thành viên khác cần cài weights riêng. [Cài đặt, checkpoint và kiểm thử](web/README.md).
 
 ## 5. Thiết lập thí nghiệm
 
@@ -119,6 +119,7 @@ src/experiments/   # Ghép cấu hình và đóng gói workspace
 scripts/           # Chuẩn bị → train/resume → vẽ biểu đồ → đánh giá → đóng gói
 configs/           # Preprocessing, recipe theo giai đoạn, loss preset
 notebooks/         # Ba notebook hiện hành, mỗi model một notebook
+web/               # Node.js server, giao diện và worker inference CPU
 research/          # Kế hoạch thí nghiệm và ghi chú bài báo
 results/           # Chứng cứ kiểm thử gọn nhẹ; chờ kết quả GPU mới
 outputs/           # Checkpoint, ZIP, CPU probe, archive local; Git bỏ qua

@@ -12,6 +12,7 @@ Tạo môi trường ảo, cài `requirements.txt`, rồi chạy `python -m pyte
 - Ghép cấu hình thí nghiệm: `src/experiments/` và `configs/`.
 - Đánh giá và độ tin cậy: `src/evaluation/`.
 - Notebook: sửa generator chung, rồi tạo lại cả ba notebook. Trainer được tái sử dụng từ module chung.
+- Giao diện Node.js và API: `web/`; chạy `npm test`. Kiểm thử trình duyệt bằng `npm run test:e2e` khi có checkpoint và dataset local, xem `web/README.md`.
 
 ## Trước khi commit hoặc tạo PR
 

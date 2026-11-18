@@ -1,0 +1,19 @@
+{
+  "name": "project-cv-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Node.js studio for trained adverse-weather segmentation models",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node web/server.mjs",
+    "dev": "node --watch web/server.mjs",
+    "test": "node --test web/tests/*.test.mjs",
+    "test:e2e": "playwright test --config web/playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}

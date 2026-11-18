@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "python_tests": {
+    "tests": 143,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0
+  },
+  "node_api_tests": {
+    "status": "PASS",
+    "scope": "Static allowlist, origin, malformed JSON, oversized body, error propagation and sample caching"
+  },
+  "browser": {
+    "status": "PASS",
+    "actualLocalCheckpoints": [
+      "segformer_b0",
+      "segformer_b2"
+    ],
+    "realSampleInputs": [
+      "clear",
+      "night",
+      "fog"
+    ],
+    "modelComparison": true,
+    "uploadAndInvalidFile": true,
+    "stageInvalidation": true,
+    "sourceInference": true,
+    "maskDownload": true,
+    "colorAndOpacityOverlayDownloads": true,
+    "mobileViewport": 390,
+    "browserErrors": [],
+    "accuracyClaims": false
+  },
+  "exports": {
+    "native_size": [
+      2048,
+      1024
+    ],
+    "labels_mode": "L",
+    "train_ids": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      13
+    ],
+    "color_mask_exactly_matches_palette": true,
+    "overlay_mode": "RGBA",
+    "overlay_fully_opaque": true,
+    "all_three_png_downloads": true
+  },
+  "device": "cpu",
+  "browser_checked_checkpoints": [
+    "B0 adapted",
+    "B2 adapted",
+    "B2 source"
+  ],
+  "resident_models_limit": 1,
+  "training_policy_changed": false,
+  "accuracy_evaluation": false,
+  "screenshots_and_raw_images_committed": false,
+  "scope": "Local software/UI verification; no new model accuracy or benchmark claim",
+  "git_hygiene": {
+    "no_raw_data_weights_or_screenshots": true,
+    "training_src_and_configs_unchanged": true,
+    "current_notebooks_clean": true,
+    "training_bundle_without_streamlit_app": true
+  }
+}

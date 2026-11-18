@@ -1,2 +1,2 @@
 -r requirements.txt
-streamlit==1.52.1
+# The web studio uses Node.js; no additional Python UI dependency.

@@ -21,5 +21,9 @@ mlruns/
 *.ckpt
 *.safetensors
 .DS_Store
+node_modules/
+playwright-report/
+test-results/
+npm-debug.log*
 *.zip
 *.partial.zip
