@@ -122,7 +122,10 @@ def test_dg_queue_exports_then_resumes_only_unfinished_epochs(tmp_path,monkeypat
         for slot in ['last','best']:
             (run/slot).mkdir(exist_ok=True)
             (run/slot/'checkpoint.json').write_text(json.dumps(dict(epoch=epoch)))
+            (run/slot/'config.json').write_text('{}')
             (run/slot/'model.safetensors').write_bytes(b'unit orchestration fixture, not model weights')
+        (run/'config.json').write_text('{}')
+        (run/'initialization.json').write_text('{}')
         with (run/'resources.jsonl').open('a') as f:f.write(json.dumps(dict(epoch=epoch,epoch_seconds=1))+'\n')
     (root/'dg_plan.json').write_text('{}')
     monkeypatch.setattr(run_dg.subprocess,'run',trainer)
@@ -138,7 +141,9 @@ def test_dg_queue_exports_then_resumes_only_unfinished_epochs(tmp_path,monkeypat
     assert frozen['target_training'] is False and frozen['selected_by']=='Cityscapes val500 only'
 
 
-def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path):
+@pytest.mark.parametrize('model',['segformer_b2','deeplabv3plus_resnet50'])
+@pytest.mark.parametrize('arm',['baseline','aug','consistency'])
+def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path,model,arm):
     import os
     import sys
     import shutil
@@ -154,11 +159,13 @@ def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path):
     extract_safe(previous/'source.zip',previous/'source')
     (previous/'source.zip').unlink()  # Simulate Kaggle expanding the nested source archive.
     (previous/'dg_plan.json').write_text(json.dumps(dict(experiment_protocol=DG_PROTOCOL,
-        source_hashes=hashes,city_root=str(city))))
-    work,repo=tmp_path/'work',tmp_path/'repo'
-    setup=''.join(json.loads(build().read_text(encoding='utf-8'))['cells'][1]['source'])
-    for old,new in [('/kaggle/input',inputs),('/kaggle/working/dg_b2_baseline',work),
-                    ('/kaggle/working/project_dg',repo)]:
+        source_hashes=hashes,city_root=str(city),model=model,arm=arm,seed=42,
+        pair_probability=0. if arm=='baseline' else .5,consistency_weight=.1 if arm=='consistency' else 0.)))
+    work=tmp_path/f'working/dg_{model}_{arm}_seed42'
+    repo=tmp_path/f'working/project_{model}_{arm}'
+    setup=''.join(json.loads(build(model).read_text(encoding='utf-8'))['cells'][1]['source'])
+    setup=setup.replace("ARM='baseline'",f'ARM={arm!r}')
+    for old,new in [('/kaggle/input',inputs),('/kaggle/working',tmp_path/'working')]:
         setup=setup.replace(f'Path({old!r})',f'Path({str(new)!r})')
     setup=setup.replace('RESUME_INPUT=None',f'RESUME_INPUT=Path({str(previous)!r})')
     cwd=Path.cwd();paths=list(sys.path);environment=dict(os.environ)

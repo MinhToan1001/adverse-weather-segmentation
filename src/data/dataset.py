@@ -18,7 +18,7 @@ class ManifestSegmentationDataset(Dataset):
 
     def __init__(
         self, manifest, image_size=(512, 1024), training=False, augment=None,
-        native_labels=False, preprocessing=None, seed=0, allow_target_train=False,
+        native_labels=False, preprocessing=None, seed=0, allow_target_train=False, paired_style=None,
     ):
         self.items = read_manifest(manifest, allow_target_train=allow_target_train)
         self.preprocessor = ImagePreprocessor(image_size, preprocessing)
@@ -29,6 +29,12 @@ class ManifestSegmentationDataset(Dataset):
             raise ValueError("Training requires Cityscapes train (or synthetic train for smoke)")
         self.size = self.preprocessor.size
         self.training = training
+        self.source_style = None
+        if paired_style is not None:
+            from src.data.augmentations.source_style import SourceStyle
+            if not training or any(r['domain'] != 'cityscapes' or r['split'] != 'train' for r in self.items):
+                raise ValueError('Paired style requires Cityscapes train only')
+            self.source_style = SourceStyle(paired_style)
         self.augment = augment or {}
         unknown = set(self.augment) - {"min_scale", "max_scale", "horizontal_flip", "gamma_darkening", "photometric", "class_aware_crop"}
         if unknown:
@@ -133,6 +139,11 @@ class ManifestSegmentationDataset(Dataset):
             "labels": torch.from_numpy(labels.copy()).long(),
             "domain": row.get("domain", "unknown"),
         }
+        if self.source_style is not None:
+            # The clean PIL image already underwent the final crop/pad/flip.
+            # RGB-only styling cannot change geometry or the shared mask.
+            styled = self.source_style.apply(image, self.seed, self.epoch, idx)
+            result['styled_pixel_values'] = self.preprocessor.to_tensor(styled)
         if self.training and self.class_crop:
             result['crop_class_id'] = crop_info.get('class_id', -1)
             result['crop_constraint_met'] = crop_info.get('met', False)

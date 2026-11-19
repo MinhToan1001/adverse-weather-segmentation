@@ -1,0 +1,131 @@
+{
+  "date": "2026-11-19",
+  "python_tests": {
+    "passed": 173,
+    "failures": 0,
+    "pretrained_cached_checks": true
+  },
+  "cpu_qa": {
+    "status": "PASS",
+    "scope": "CPU only; random initialization,4 Cityscapes train/2val,64x96,2batches/epoch; not GPU validation or quality results",
+    "reports": [
+      {
+        "model": "segformer_b2",
+        "status": "PASS",
+        "two_epoch_interruption_resume": true,
+        "continuous_and_resumed_weights_bitwise_equal": true,
+        "all_arm_initial_hashes": {
+          "consistency": "6bb0feb6e3925a8376e1cdfdbb04c0429b44d74af695090f73285a76af9a6aca",
+          "baseline": "6bb0feb6e3925a8376e1cdfdbb04c0429b44d74af695090f73285a76af9a6aca",
+          "aug": "6bb0feb6e3925a8376e1cdfdbb04c0429b44d74af695090f73285a76af9a6aca"
+        },
+        "optimizer_updates": [
+          1,
+          1
+        ],
+        "random_weights_changed": true,
+        "loss_and_kl_finite": true,
+        "accuracy_claim": false
+      },
+      {
+        "model": "deeplabv3plus_resnet50",
+        "status": "PASS",
+        "two_epoch_interruption_resume": true,
+        "continuous_and_resumed_weights_bitwise_equal": true,
+        "all_arm_initial_hashes": {
+          "consistency": "4693c036b7a01579677d78412ff061c7bc0ab8950caa71324f3ae44c937fcc58",
+          "baseline": "4693c036b7a01579677d78412ff061c7bc0ab8950caa71324f3ae44c937fcc58",
+          "aug": "4693c036b7a01579677d78412ff061c7bc0ab8950caa71324f3ae44c937fcc58"
+        },
+        "optimizer_updates": [
+          1,
+          1
+        ],
+        "random_weights_changed": true,
+        "loss_and_kl_finite": true,
+        "accuracy_claim": false
+      }
+    ],
+    "target_data_access": "none",
+    "candidate_pair_probability": 0.5,
+    "probe_pair_probability": 1.0
+  },
+  "full_source_config_preflight": {
+    "status": "PASS",
+    "data_access": "Cityscapes only",
+    "checks": [
+      {
+        "model": "segformer_b2",
+        "arm": "baseline",
+        "source_only": true,
+        "train": 2975,
+        "val": 500,
+        "pair_probability": 0.0,
+        "consistency_weight": 0.0
+      },
+      {
+        "model": "segformer_b2",
+        "arm": "aug",
+        "source_only": true,
+        "train": 2975,
+        "val": 500,
+        "pair_probability": 0.5,
+        "consistency_weight": 0.0
+      },
+      {
+        "model": "segformer_b2",
+        "arm": "consistency",
+        "source_only": true,
+        "train": 2975,
+        "val": 500,
+        "pair_probability": 0.5,
+        "consistency_weight": 0.1
+      },
+      {
+        "model": "deeplabv3plus_resnet50",
+        "arm": "baseline",
+        "source_only": true,
+        "train": 2975,
+        "val": 500,
+        "pair_probability": 0.0,
+        "consistency_weight": 0.0
+      },
+      {
+        "model": "deeplabv3plus_resnet50",
+        "arm": "aug",
+        "source_only": true,
+        "train": 2975,
+        "val": 500,
+        "pair_probability": 0.5,
+        "consistency_weight": 0.0
+      },
+      {
+        "model": "deeplabv3plus_resnet50",
+        "arm": "consistency",
+        "source_only": true,
+        "train": 2975,
+        "val": 500,
+        "pair_probability": 0.5,
+        "consistency_weight": 0.1
+      }
+    ],
+    "gpu_training": false
+  },
+  "gpu_profile": "implemented, not executed; CUDA unavailable in this verification",
+  "gpu_training": false,
+  "new_dg_accuracy_claim": false,
+  "evaluation_guard": "All5primary candidates must be sealed before the DG evaluator can open target data",
+  "notebooks": [
+    "01_dg_segformer_b2_baseline.ipynb",
+    "02_dg_deeplabv3plus_resnet50.ipynb"
+  ],
+  "defaults": {
+    "pair_probability": 0.5,
+    "consistency_weight": 0.1,
+    "status": "candidate settings; no full GPU quality validation"
+  },
+  "artifacts_local_only": [
+    "outputs/dg-implementation/cpu-qa/paired_source_preview.png",
+    "outputs/dg-implementation/python-tests-final.xml"
+  ]
+}

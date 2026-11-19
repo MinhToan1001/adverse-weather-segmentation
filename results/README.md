@@ -1,3 +1,5 @@
+[DG implementation: 173 tests + real CPU QA](dg-implementation/README.md) · GPU results pending.
+
 [DG recovery verification](dg-recovery/README.md) · [Current protocol](../research/DG_RECOVERY_PLAN.md)
 
 > **DG protocol restored:** chưa có kết quả GPU cho baseline DG mới. Các bảng dưới là lịch sử source/adapt. Đặc biệt B2 adapted63,02% đã dùng ACDC train/dev, **không là DG**. Xem [recovery plan](../research/DG_RECOVERY_PLAN.md).

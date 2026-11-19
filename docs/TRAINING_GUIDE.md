@@ -1,35 +1,52 @@
-# Train và khôi phục baseline DG B2
+# Chạy các arm DG trên Kaggle
 
-[Protocol khôi phục](../research/DG_RECOVERY_PLAN.md) · [Notebook](../notebooks/01_dg_segformer_b2_baseline.ipynb)
+[Phương pháp chính xác](DG_METHOD.md) · [Ma trận5lượt/30giờ](../research/PROJECT_COMPLETION_PLAN.md)
 
-## Quy tắc
+## Chuẩn bị
 
-Chỉ Cityscapes train 2.975 ảnh để học, Cityscapes val500 để chọn best; **không ACDC input**. Encoder ImageNet được pin, head mới, 20 epoch, CE, không early stopping. Giữ recipe source chung: khung512×1024 giữ tỷ lệ, scale0,5–2/crop/flip đồng bộ, batch2/accum4, AdamW encoder6e-5/head×10, weight_decay0,01, warm-up20updates/poly1, FP16AMP. Đây là baseline mới, chưa có module DG proposed hoặc kết quả GPU.
+`python -m scripts.build_kaggle_notebooks` sinh code ZIP `outputs/kaggle/project-code.zip` và hai notebook:
 
-## Kaggle
+- [B2](../notebooks/01_dg_segformer_b2_baseline.ipynb): tên file giữ để không phá liên kết cũ, hỗ trợ đủ ba ARM.
+- [DeepLabV3+ ResNet50](../notebooks/02_dg_deeplabv3plus_resnet50.ipynb).
 
-1. Chạy `python -m scripts.build_kaggle_notebooks` để sinh notebook DG và code ZIP mới.
-2. Upload `outputs/kaggle/project-code.zip`; import notebook DG; gắn Cityscapes có cả train/val. Bật GPU/Internet. Không thêm ACDC cho training.
-3. `CODE_INPUT` trỏ tới code mới; `CITYSCAPES_ROOT=None` tự tìm theo cấu trúc, hoặc đặt cụ thể khi có nhiều bản. `RESUME_INPUT=None` là lượt mới.
-4. Chạy setup kiểm tra, rồi Save Version → Save & Run All. Nó chỉ chạy một stage Cityscapes, **không tự học ACDC**.
-5. Giữ ZIP `dg_b2_baseline_seed42.zip` và output. Chỉ sau khi khóa phương pháp/checkpoint mới lập lượt đánh giá ACDC riêng.
+Mỗi Saved Version chạy **một model/arm**,20epoch. Gắn code ZIP mới và Cityscapes có train/val; không gắn ACDC vào training. Giữ đúng cùng code ZIP cho5lượt. Không dùng các notebook source→ACDC trong archive.
 
-## Resume
+## Khi GPU hồi
 
-Sau mỗi epoch hoàn thành, trainer lưu weights/config/optimizer/scheduler/scaler/RNG, best/last và thế hệ previous; launcher cập nhật ZIP. Epoch dở chạy lại. Cửa sổ phiên tối đa10giờ, không tổng cap. Nếu bị Kaggle hard-kill, `finally` không được bảo đảm chạy, nên giữ bản ZIP hoàn chỉnh gần nhất và raw checkpoint nếu có.
+1. Bật GPU/Internet, import notebook đúng model. `CODE_INPUT` đặt rõ dataset code nếu auto-find có nhiều bản; `CITYSCAPES_ROOT=None` tự tìm theo leftImg8bit/gtFine train/val.
+2. Giữ `PROFILE_ONLY=True` ở lần GPU đầu. Notebook chỉ chuẩn bị nguồn và đo batch/VRAM cho C0/C1/C2 của kiến trúc đó; bỏ weights pilot. Chạy một lần cho B2, một lần cho DeepLab.
+3. Đọc `gpu_profile.json`. ETA là extrapolation nhỏ, **chưa tính checkpoint/ZIP/setup**. Chốt p_pair/λ/style và ngân sách trước lượt chính; không suy ra GPU ETA từ CPU QA.
+4. Để train chính, đặt `PROFILE_ONLY=False`, `ARM='baseline'`, `'aug'` hoặc `'consistency'`. Mỗi arm khởi tạo độc lập từ ImageNet; không nạp best baseline để học thêm20epoch.
+5. Matrix: B2baseline → DeepLabbaseline → B2aug → B2consistency → DeepLabconsistency. Sau khi chốt thiết kế, không thay recipe giữa các arm hoặc tune theo ACDC.
+6. Save Version → Save & Run All. ZIP riêng có tên `dg_<model>_<arm>_seed42.zip`. Cần giữ output/ZIP khi kết thúc phiên.
 
-Phiên mới: cùng dataset/mount, `RESUME_INPUT` trỏ kết quả DG; notebook khôi phục code snapshot và kiểm hash. Không dùng ZIP source→ACDC cũ, không thay recipe giữa lượt. Không mở lại workspace cũ để chạy từ đầu; tạo workspace mới.
+Mặc định ứng viên: p_pair0,5; λ0,1 chỉ có hiệu lực ở consistency. Các giá trị này chưa có bằng chứng tối ưu chất lượng. Nếu thay, phải áp cùng giữa các arm tương ứng và giữ nguyên khi resume.
 
-## CLI và chuẩn bị trên CPU
+## Resume đúng lượt
+
+Phiên mới: cùng dataset version/mount, cùng notebook MODEL/ARM/SEED; `RESUME_INPUT` trỏ ZIP đầy đủ hoặc workspace đã giải nén. Notebook khôi phục source snapshot, kiểm hash, model/arm/seed và settings. Kaggle tự giải nén source.zip vẫn được hỗ trợ bằng tái đóng gói từ file đã xác minh.
+
+Có thể resume ZIP profiling để bắt đầu train **cùng model/arm** bằng PROFILE_ONLY=False; pilot không có checkpoint train, nên model thật vẫn khởi tạo mới. Không dùng ZIP baseline để resume aug/consistency. Muốn arm mới: phiên/workspace mới, RESUME_INPUT=None.
+
+Sau mỗi epoch hoàn thành: best/last/previous, optimizer/scheduler/scaler/RNG và ZIP. Ngắt giữa epoch sẽ chạy lại epoch đó; hard-kill không bảo đảm finally chạy nên giữ ZIP hoàn chỉnh gần nhất. Trainer dùng một GPU. Cửa sổ phiên10giờ khác tổng quota30giờ.
+
+## CLI và CPU QA
 
 ```powershell
-python -m scripts.run_dg --city data/raw/cityscapes --root outputs/dg/b2 --archive outputs/dg_b2_seed42.zip --prepare-only
-# Khi có GPU, cùng lệnh bỏ --prepare-only để train/resume:
-python -m scripts.run_dg --city data/raw/cityscapes --root outputs/dg/b2 --archive outputs/dg_b2_seed42.zip
+python -m scripts.run_dg --city data/raw/cityscapes --model segformer_b2 --arm consistency --root outputs/dg/b2_consistency --archive outputs/dg_b2_consistency.zip --prepare-only
+# Bỏ --prepare-only khi đã có GPU để train/resume cùng workspace.
+python -m scripts.verify_dg --data-root outputs/dg/b2_consistency/data --out outputs/my_dg_cpu_qa
 ```
 
-`--prepare-only` chuyển nhãn và tạo manifest/config, không train hoặc mở dữ liệu ACDC. `dg_plan.json` ghi split, source/hash/seed; `frozen_candidate.json` chỉ sinh sau khi đủ20epoch, ghi hash best và quy tắc selection. Launcher không evaluate ACDC tự động.
+verify_dg chỉ probe2epoch nhỏ bằng random weights, không là benchmark. Full DG guard không được nới để chạy QA subset.
 
-## Lịch sử
+## Đánh giá sau khi khóa cohort
 
-Các notebook B2/DeepLab source20→adapt20 đã chuyển sang [archive](../research/archive/notebooks). `scripts.run_research_campaign` và stage adapt yêu cầu `--allow-supervised-acdc`, để người chạy xác nhận đó là supervised ngoài DG. Resume lịch sử phải dùng code snapshot tương ứng, không sửa weights hoặc nhãn protocol của run cũ.
+Sau khi có5workspace hoàn chỉnh, đưa chúng vào cùng môi trường đánh giá, giữ đường dẫn đúng rồi seal:
+
+```powershell
+python -m scripts.evaluate_dg freeze --workspaces <B2-C0> <B2-C1> <B2-C2> <DL-C0> <DL-C2> --out outputs/dg_cohort.json
+python -m scripts.evaluate_dg evaluate --cohort outputs/dg_cohort.json --run-id segformer_b2:consistency --manifest <ACDC_val406.csv> --scope official-acdc --out outputs/evaluation/b2_consistency
+```
+
+Manifest evaluation được tạo riêng từ official val bằng script manifest hiện có; không dùng ACDC dev402 lịch sử. Evaluator chỉ nhận checkpoint thuộc cohort, kiểm hash/model/arm/split/init/code và đủ20epoch. Không mở target để chọn best/hyperparameter. Số ACDC đã xem trong lịch sử không phải test độc lập mới.

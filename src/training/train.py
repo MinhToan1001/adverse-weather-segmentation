@@ -245,6 +245,12 @@ def main():
         raise ValueError("Unknown training protocol")
     replay = protocol == "supervised_acdc_replay"
     target_training = protocol in {"supervised_acdc", "supervised_acdc_replay"}
+    dg_settings = cfg.get('dg')
+    if dg_settings is not None:
+        from src.training.dg import validate_settings, paired_batch, backward_batch
+        validate_settings(dg_settings)
+        if protocol != 'source_only' or cfg.get('loss') != {'name': 'ce'}:
+            raise ValueError('DG paired arms require source-only CE training')
     freeze_bn = cfg['train'].get('freeze_batch_norm_stats', False)
     if not isinstance(freeze_bn, bool):
         raise ValueError('train.freeze_batch_norm_stats must be a boolean')
@@ -281,6 +287,7 @@ def main():
         preprocessing=cfg["data"].get("preprocessing"),
         seed=seed,
         allow_target_train=target_training,
+        paired_style=dg_settings['source_style'] if dg_settings else None,
     )
     val = ManifestSegmentationDataset(
         cfg["data"]["val_manifest"],
@@ -399,6 +406,11 @@ def main():
     if cfg['model'].get('name') and not args.resume:
         from src.models.registry import parameter_report
         model.save_pretrained(output_dir / 'initial')
+        from src.utils.artifacts import sha256_file, write_json
+        write_json(output_dir / 'initialization.json', dict(model=cfg['model']['name'], seed=seed,
+            initialization=cfg['model'].get('initialization'),
+            weights_sha256=sha256_file(output_dir / 'initial/model.safetensors'),
+            target_data_access='none' if not target_training else 'supervised'))
         (output_dir / 'model_report.json').write_text(json.dumps(dict(
             name=cfg['model']['name'], initialization=cfg['model'].get('initialization', 'random'),
             parameters=parameter_report(model), torch=torch.__version__,
@@ -476,6 +488,9 @@ def main():
         step_started = global_step
         set_training_mode(model, freeze_bn)
         losses = []
+        dg_batches = []
+        dg_source_presentations = 0
+        dg_styled_presentations = 0
         target_losses, source_losses = [], []
         crop_exposure = dict(selected=[0] * 19, met=[0] * 19, pixels=[0] * 19)
         optimizer.zero_grad(set_to_none=True)
@@ -492,21 +507,31 @@ def main():
                         crop_exposure['pixels'][chosen] += pixels
             group_start = (step // accumulation) * accumulation
             group_size = min(accumulation, epoch_batches - group_start)
-            context = torch.autocast(device_type="cuda", dtype=amp_dtype) if amp_enabled else nullcontext()
-            with context:
-                if criterion is None:
-                    # Preserve historical models' exact built-in loss path.
-                    result = model(pixel_values=batch['pixel_values'].to(device), labels=batch['labels'].to(device))
-                    loss = result.loss
-                else:
-                    result = model(pixel_values=batch['pixel_values'].to(device))
-                    loss = criterion(result.logits, batch['labels'].to(device))
-            if not torch.isfinite(loss):
-                raise RuntimeError("Non-finite loss; check labels, all-ignore crops and AMP before resuming")
-            losses.append(float(loss.detach()))
-            if replay:
-                (source_losses if batch["domain"][0] == "cityscapes" else target_losses).append(float(loss.detach()))
-            scaler.scale(loss / group_size).backward()
+            if dg_settings is not None:
+                paired = paired_batch(dg_settings, seed, epoch, step)
+                info = backward_batch(model, batch, criterion, scaler, group_size, device,
+                    paired=paired, consistency_weight=dg_settings['consistency_weight'],
+                    amp_enabled=amp_enabled, amp_dtype=amp_dtype)
+                losses.append(info['objective'])
+                dg_batches.append(info)
+                dg_source_presentations += len(batch['labels'])
+                dg_styled_presentations += len(batch['labels']) if paired else 0
+            else:
+                context = torch.autocast(device_type="cuda", dtype=amp_dtype) if amp_enabled else nullcontext()
+                with context:
+                    if criterion is None:
+                        # Preserve historical models' exact built-in loss path.
+                        result = model(pixel_values=batch['pixel_values'].to(device), labels=batch['labels'].to(device))
+                        loss = result.loss
+                    else:
+                        result = model(pixel_values=batch['pixel_values'].to(device))
+                        loss = criterion(result.logits, batch['labels'].to(device))
+                if not torch.isfinite(loss):
+                    raise RuntimeError("Non-finite loss; check labels, all-ignore crops and AMP before resuming")
+                losses.append(float(loss.detach()))
+                if replay:
+                    (source_losses if batch["domain"][0] == "cityscapes" else target_losses).append(float(loss.detach()))
+                scaler.scale(loss / group_size).backward()
             is_update = (step + 1) % accumulation == 0 or step + 1 == epoch_batches
             if is_update:
                 previous_scale = scaler.get_scale()
@@ -539,6 +564,16 @@ def main():
             "learning_rate": optimizer.param_groups[0]["lr"],
         }
         current_rank = None
+        if dg_settings is not None:
+            paired_rows = [r for r in dg_batches if r['paired']]
+            record['dg_train'] = dict(arm=dg_settings['arm'], paired_batches=len(paired_rows),
+                total_batches=len(dg_batches),
+                clean_ce=float(np.mean([r['clean_ce'] for r in dg_batches])) if dg_batches else None,
+                styled_ce=float(np.mean([r['styled_ce'] for r in paired_rows])) if paired_rows else None,
+                consistency_kl=float(np.mean([r['consistency_kl'] for r in paired_rows])) if paired_rows else None,
+                consistency_weight=dg_settings['consistency_weight'],
+                source_presentations=dg_source_presentations, styled_presentations=dg_styled_presentations,
+                forward_calls=len(dg_batches)+len(paired_rows))
         if criterion is not None:
             record['training_loss_spec'] = cfg['loss']
         if sum(crop_exposure['selected']):
@@ -607,6 +642,8 @@ def main():
         if replay:
             resources.update(target_train_images=target_train_count, source_pool_images=len(train.source),
                              source_replay_images_per_epoch=target_train_count, source_monitor_images=len(source_monitor))
+        if dg_settings is not None:
+            resources['dg'] = record['dg_train']
         with (output_dir / "resources.jsonl").open("a", encoding="utf-8") as log:
             log.write(json.dumps(resources, allow_nan=False) + "\n")
         if stopping:

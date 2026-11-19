@@ -28,9 +28,19 @@ def require_training_permission(cfg, allow_supervised_acdc=False):
             if len(rows) != count or any(row['split'] != split for row in rows):
                 raise ValueError(f'DG v1 requires Cityscapes {split}: {count} images')
     if dg:
+        allowed_data={'train_manifest','val_manifest','image_size','preprocessing','augment'}
+        if set(cfg['data'])-allowed_data:
+            raise ValueError('Unexpected data strategy outside the source-only DG recipe')
+        if cfg.get('dg') is not None:
+            from src.training.dg import validate_settings
+            validate_settings(cfg['dg'])
+            if cfg.get('loss') != {'name': 'ce'}:
+                raise ValueError('DG arms use the declared CE control')
         if set(manifests) != {'train_manifest', 'val_manifest'}:
             raise ValueError('DG requires both Cityscapes train and val')
         model = cfg['model']
+        if model.get('name')=='deeplabv3plus_resnet50' and cfg['train'].get('batch_size',2)<2:
+            raise ValueError('DeepLab training BatchNorm requires a real batch of at least2')
         if model.get('initialization') != 'imagenet_encoder' or model.get('checkpoint'):
             raise ValueError('DG v1 starts from the pinned ImageNet encoder, never an ACDC-adapted checkpoint')
         if cfg['train']['epochs'] != 20 or cfg.get('early_stopping'):

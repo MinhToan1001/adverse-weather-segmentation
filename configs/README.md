@@ -1,3 +1,5 @@
+[DG method đã triển khai và kiểm thử CPU](../docs/DG_METHOD.md) · baseline / aug / consistency dùng chung B2 và DeepLab. Full GPU results pending.
+
 # Shared experiment configuration
 
 | Component | Location |

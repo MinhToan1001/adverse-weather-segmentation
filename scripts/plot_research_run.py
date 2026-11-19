@@ -22,10 +22,20 @@ def plot(run):
     out.mkdir(exist_ok=True)
     x = [r['epoch'] for r in rows]
     fig, axes = plt.subplots(2, 2, figsize=(11, 7))
+    dg = any('dg_train' in r for r in rows)
+    selection = 'Cityscapes val (selection)' if dg else 'Dev'
     specs = [('train_loss', 'Training objective (loss preset)'),
              ('dev_ce', 'Dev unweighted CE (diagnostic)'),
-             ('dev_miou', 'Dev mIoU (%)'), ('source', 'Source retention (pp)')]
+             ('dev_miou', selection+' mIoU (%)'),
+             ('dg_components' if dg else 'source', 'DG training components' if dg else 'Source retention (pp)')]
     for ax, (key, title) in zip(axes.flat, specs):
+        if key=='dg_components':
+            for component in ['clean_ce','styled_ce','consistency_kl']:
+                y=[r.get('dg_train',{}).get(component) for r in rows]
+                y=[np.nan if value is None else value for value in y]
+                if np.isfinite(y).any():ax.plot(x,y,marker='.',label=component)
+            ax.legend();ax.set(title=title,xlabel='Epoch');ax.grid(alpha=.2)
+            continue
         if key == 'train_loss': y = [r['train_loss'] for r in rows]
         elif key == 'dev_ce': y = [r['val'].get('cross_entropy', np.nan) for r in rows]
         elif key == 'dev_miou': y = [100 * r['val']['miou'] for r in rows]
@@ -41,6 +51,7 @@ def plot(run):
         if key == 'source' and np.isfinite(np.asarray(y, dtype=float)).any():
             ax.axhline(-1., color='tab:red', linestyle='--', label='Source gate -1pp')
             ax.legend()
+        if dg:title=title.replace('Dev unweighted CE',selection+' unweighted CE')
         ax.set_title(title); ax.set_xlabel('Epoch'); ax.grid(alpha=.2)
     fig.tight_layout(); fig.savefig(out / 'learning_curves.png', dpi=140); plt.close(fig)
     values = np.array([[np.nan if v is None else v for v in r['val']['per_class_iou']] for r in rows])

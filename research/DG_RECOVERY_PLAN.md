@@ -46,7 +46,7 @@ Tạo hai view **cùng một ảnh Cityscapes và cùng hình học**: một vie
 | C1 | CE trung bình trên view thường và view đổi style | Đối chứng augmentation và chi phí hai forward |
 | C2 | C1 + consistency loss giữa hai dự đoán, nhánh tham chiếu stop-gradient | Proposed candidate; so C2/C1 để tách hiệu quả consistency |
 
-Consistency nói nôm na: cùng một con đường, dù đổi màu/độ sáng thì model nên dự đoán cùng lớp. Công thức dự kiến: 0,5 CE(clean,y) + 0,5 CE(styled,y) + λ KL(stopgrad(p_clean) || p_styled), chỉ trên pixel nhãn hợp lệ. Đây là **đề xuất chưa triển khai/chưa chứng minh**, không được nhận là phương pháp hoàn toàn mới. Kiểm tra văn liệu consistency cụ thể, chốt λ/mức augmentation bằng dữ liệu nguồn, rồi đóng băng thiết kế trước khi train C1/C2.
+Consistency nói nôm na: cùng một con đường, dù đổi màu/độ sáng thì model nên dự đoán cùng lớp. Công thức dự kiến: 0,5 CE(clean,y) + 0,5 CE(styled,y) + λ KL(stopgrad(p_clean) || p_styled), chỉ trên pixel nhãn hợp lệ. Đã triển khai và kiểm tra CPU, **chưa được chứng minh bằng full GPU benchmark**, không được nhận là phương pháp hoàn toàn mới. Kiểm tra văn liệu consistency cụ thể, chốt λ/mức augmentation bằng dữ liệu nguồn, rồi đóng băng thiết kế trước khi train C1/C2.
 
 Giữ cùng ImageNet init, split, seed, resolution, source-image sampling và 20 epoch. C1/C2 có hai forward; C0 một forward nên phải báo compute riêng. Không quy mọi chênh lệch C0/C2 cho module consistency. C2 so C1 là ablation chính. Không tăng epoch/LR hoặc đổi loss theo điểm ACDC trong quá trình thử.
 
@@ -55,7 +55,7 @@ Giữ cùng ImageNet init, split, seed, resolution, source-image sampling và 20
 1. Chặn launcher supervised mặc định; tách notebook/kết quả lịch sử, sửa nhãn demo. **Đã triển khai.**
 2. Chuẩn bị DG baseline Cityscapes train2975/val500; xác minh dataset/config/checkpoint policy trên CPU. Notebook và launcher source-only đã tạo; chưa có kết quả GPU.
 3. Khi có GPU, chạy C0 20 epoch với checkpoint/resume. Chốt best bằng Cityscapes val; không tự evaluate ACDC mỗi epoch.
-4. Hoàn thiện nguồn tham khảo consistency, chốt config và test semantics của C1/C2, sau đó chạy ablation cùng protocol. C1/C2 hiện chưa có code training hoàn chỉnh.
+4. Hoàn thiện nguồn tham khảo consistency, chốt config và test semantics của C1/C2, sau đó chạy ablation cùng protocol. C1/C2 và cả hai model đã có code/CPU QA; full GPU run còn chờ.
 5. Khóa danh sách candidate/config/hash, sau đó evaluate cùng ACDC val406: mIoU tổng, fog/night/rain/snow, per-class, latency/params và ảnh lỗi. Không dùng kết quả này để quay lại chọn candidate hoặc tune vòng tiếp.
 6. Đối chứng VLTSeg checkpoint đúng source nếu khả thi; nếu không, ghi blocker và số công bố ở bảng riêng. Không điền số paper như kết quả project tự chạy.
 

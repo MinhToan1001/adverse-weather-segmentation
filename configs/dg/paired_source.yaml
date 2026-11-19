@@ -1,0 +1,10 @@
+# Candidate recipe; lambda/severity have not been validated by a full GPU run.
+pair_probability: 0.5
+consistency_weight: 0.1
+source_style:
+  brightness: [0.6, 1.4]
+  contrast: [0.6, 1.4]
+  saturation: [0.5, 1.5]
+  gamma: [0.6, 1.8]
+  blur_radius: [0.0, 1.0]
+  noise_std: [0.0, 0.015]

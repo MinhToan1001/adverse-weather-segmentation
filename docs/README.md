@@ -1,3 +1,5 @@
+[DG method đã triển khai và kiểm thử CPU](DG_METHOD.md) · baseline / aug / consistency dùng chung B2 và DeepLab. Full GPU results pending.
+
 # Tài liệu hiện hành
 
 **Giao thức chính là DG:** chỉ Cityscapes để học/chọn model; ACDC evaluate sau freeze. Các tài liệu supervised đã được đánh dấu lịch sử, không dùng làm hướng dẫn DG.

@@ -1,4 +1,4 @@
-"""Cityscapes-only B2 baseline: train2975, select on val500, no target input."""
+"""Cityscapes-only DG arms for B2/DeepLab: train2975, select val500, no target input."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -12,7 +12,9 @@ import yaml
 from scripts.run_research import committed_state, fingerprints, fits_session, snapshot_source
 from src.data.preparation import create_manifest, write_manifest, convert_label_ids
 from src.data.validation import validate_manifests
-from src.experiments.config import compose_experiment
+from src.experiments.dg import compose_dg
+from src.models.registry import MODEL_NAMES
+from src.training.dg import ARMS
 from src.experiments.packaging import export_workspace
 from src.experiments.protocol import DG_PROTOCOL, require_training_permission
 from src.utils.artifacts import sha256_file, records, write_json
@@ -44,12 +46,17 @@ def prepare_cityscapes(city, output):
     return paths
 
 
-def prepare(city, root, seed=42):
+def prepare(city, root, seed=42, model='segformer_b2', arm='baseline', pair_probability=.5, consistency_weight=.1):
     root, city = Path(root).resolve(), Path(city).resolve()
+    # Validate run choices before converting thousands of source masks.
+    compose_dg(model,arm,dict(source_train_manifest='',source_monitor_manifest=''),
+               root/'run',seed,pair_probability,consistency_weight)
     plan_path = root / 'dg_plan.json'
     identity = dict(experiment_protocol=DG_PROTOCOL, city_root=str(city), seed=seed,
                     source_hashes=fingerprints(), target_data_access='none', epochs=20,
-                    model='segformer_b2', method='source_ce_baseline')
+                    model=model, arm=arm, method='source_ce_baseline' if arm == 'baseline' else 'source_paired_style_v1',
+                    pair_probability=0. if arm == 'baseline' else pair_probability,
+                    consistency_weight=consistency_weight if arm == 'consistency' else 0.)
     if plan_path.exists():
         plan = json.loads(plan_path.read_text())
         if any(plan.get(k) != v for k, v in identity.items()):
@@ -68,8 +75,7 @@ def prepare(city, root, seed=42):
         raise ValueError('Preserve existing outputs; choose a fresh DG workspace')
     root.mkdir(parents=True, exist_ok=True)
     paths = prepare_cityscapes(city, root / 'data')
-    cfg = compose_experiment('segformer_b2', 'source', paths, root / 'run', seed=seed)
-    cfg.update(experiment_protocol=DG_PROTOCOL, experiment=f'dg-b2-source-ce-seed{seed}')
+    cfg = compose_dg(model, arm, paths, root / 'run', seed, pair_probability, consistency_weight)
     require_training_permission(cfg)
     validate_manifests(list(paths.values()), check_files=True)
     (root / 'train.yaml').write_text(yaml.safe_dump(cfg, sort_keys=False), encoding='utf-8')
@@ -82,14 +88,15 @@ def prepare(city, root, seed=42):
     return cfg
 
 
-def run(city, root, archive, seed=42, session_hours=10., prepare_only=False):
+def run(city, root, archive, seed=42, session_hours=10., prepare_only=False,
+        model='segformer_b2', arm='baseline', pair_probability=.5, consistency_weight=.1):
     if not 0 < session_hours <= 10:
         raise ValueError('Session window must be in (0,10] hours')
     root, archive = Path(root).resolve(), Path(archive).resolve()
     if archive.is_relative_to(root):
         raise ValueError('Save result ZIP outside the DG workspace')
     started = time.monotonic()
-    cfg = prepare(city, root, seed)
+    cfg = prepare(city, root, seed, model, arm, pair_probability, consistency_weight)
     if prepare_only:
         print('DG config prepared; no training or target data accessed:', root / 'train.yaml')
         export_workspace(root, archive)
@@ -119,6 +126,8 @@ def run(city, root, archive, seed=42, session_hours=10., prepare_only=False):
                 command += ['--resume', str(run_dir / 'last')]
             subprocess.run(command, check=True)
             committed_state(run_dir, epoch)
+            from scripts.plot_research_run import plot
+            plot(run_dir)
             write_json(root / 'status.json', dict(protocol=DG_PROTOCOL, status='running', completed_epochs=epoch))
             export_workspace(root, archive)
             print('DG checkpoint ZIP ready:', archive, flush=True)
@@ -127,6 +136,10 @@ def run(city, root, archive, seed=42, session_hours=10., prepare_only=False):
             status = 'training_complete'
             write_json(root / 'frozen_candidate.json', dict(protocol=DG_PROTOCOL, selected_by='Cityscapes val500 only',
                 checkpoint='run/best', weights_sha256=sha256_file(run_dir / 'best/model.safetensors'),
+                model_config_sha256=sha256_file(run_dir / 'best/config.json'),
+                training_config_sha256=sha256_file(run_dir / 'config.json'),
+                initialization=json.loads((run_dir / 'initialization.json').read_text()),
+                model=model, arm=arm, completed_epochs=20,
                 plan_sha256=sha256_file(root / 'dg_plan.json'), target_training=False,
                 target_evaluation='not run by this launcher'))
     except Exception:
@@ -145,5 +158,10 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--session-hours', type=float, default=10.)
     parser.add_argument('--prepare-only', action='store_true')
+    parser.add_argument('--model', choices=MODEL_NAMES, default='segformer_b2')
+    parser.add_argument('--arm', choices=ARMS, default='baseline')
+    parser.add_argument('--pair-probability', type=float, default=.5)
+    parser.add_argument('--consistency-weight', type=float, default=.1)
     a = parser.parse_args()
-    run(a.city, a.root, a.archive, a.seed, a.session_hours, a.prepare_only)
+    run(a.city, a.root, a.archive, a.seed, a.session_hours, a.prepare_only,
+        a.model, a.arm, a.pair_probability, a.consistency_weight)

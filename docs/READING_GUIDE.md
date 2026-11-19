@@ -16,7 +16,7 @@ DG launcher chuẩn bị toàn Cityscapes train2975/val500. Các module [partiti
 
 [run_dg.py](../scripts/run_dg.py) là entrypoint hiện hành: chuẩn bị Cityscapes, khóa config/manifest/source, chạy20epoch và xuất ZIP. [train.py](../src/training/train.py) dùng chung: forward → CE → backward → optimizer → Cityscapes val → best/last. [optim.py](../src/training/optim.py), [strategies.py](../src/training/strategies.py), [checkpoints.py](../src/training/checkpoints.py) tách optimizer, BatchNorm và lưu/khôi phục. [Notebook DG](../notebooks/README.md) chỉ gọi các phần đó.
 
-Baseline chưa có module DG cải tiến. Gamma/photometric/class-aware crop/loss nâng cao trong source là tùy chọn, không nhận là đã cải thiện. Hướng style+consistency và ablation C0/C1/C2 nằm trong DG plan, chưa triển khai hoàn chỉnh.
+Ba arm đã cài trong [dg.py](../src/training/dg.py), [SourceStyle](../src/data/augmentations/source_style.py) và [DG composer](../src/experiments/dg.py). C0=baseline, C1=aug, C2=consistency. Xem [phương pháp chính xác và kiểm thử](DG_METHOD.md); CPU QA đã qua, full GPU còn chờ. Các loss/class crop khác không bật trong DG controls.
 
 ## 4. Đánh giá và sử dụng
 

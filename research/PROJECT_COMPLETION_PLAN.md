@@ -57,7 +57,7 @@ Mục tiêu đợt30giờ: **5lượt đầu**. Bốn lượt C0/C2 tạo bảng
 
 Giữ riêng file model B2 và DeepLab hiện có. Viết augmentation source-only, paired-view dataset/collate, CE/KL, checkpoint và report dùng chung. Config chọn `model`, `arm`, seed và output; không copy trainer vào từng model.
 
-Hiện run_dg và notebook mới chỉ chạy B2-C0. Việc hỗ trợ DeepLab và C1/C2 là phần **cần triển khai**, chưa được nhận là sẵn sàng. Chuẩn bị hai notebook cố định model, mỗi lượt chọn ARM; mỗi run có tên/archive riêng, không dùng source→ACDC notebook lịch sử. Resume cần model/arm/protocol/config/source/hash trùng nhau.
+Cập nhật triển khai CPU ngày19/11: run_dg và hai notebook đã hỗ trợ B2/DeepLab, đủ baseline/aug/consistency. CPU QA đã qua, chưa có full GPU run. Xem [phương pháp](../docs/DG_METHOD.md). Chuẩn bị hai notebook cố định model, mỗi lượt chọn ARM; mỗi run có tên/archive riêng, không dùng source→ACDC notebook lịch sử. Resume cần model/arm/protocol/config/source/hash trùng nhau.
 
 DeepLab có BatchNorm, khác LayerNorm ở encoder B2. Giữ batch thật tối thiểu2 cho nhánh pooled BN, cùng chính sách BN và thứ tự clean/styled giữa C1/C2. Gradient accumulation không biến batch1 thành batch2 cho BN. Mọi thống kê chỉ lấy từ Cityscapes/view nguồn; inference eval(), không cập nhật theo ACDC. Không đổi BN thành GN chỉ ở một arm rồi quy chênh lệch cho DG.
 
