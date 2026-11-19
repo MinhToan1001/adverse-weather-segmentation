@@ -36,7 +36,7 @@ z
     <text style="font-size: 16px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #c9dcfb" x="30.34305" y="95.3496" transform="rotate(-0 30.34305 95.3496)">Robust semantic segmentation under adverse weather</text>
    </g>
    <g id="text_3">
-    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #96b8e7" x="30.34305" y="126.396" transform="rotate(-0 30.34305 126.396)">Shared processing  /  Controlled training  /  Model comparison  /  Audited evidence</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #96b8e7" x="30.34305" y="126.396" transform="rotate(-0 30.34305 126.396)">SegFormer-B2  /  Supervised adaptation  /  Before-after evaluation  /  Node.js UI</text>
    </g>
    <g id="text_4">
     <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #8ce0d9" x="855.7785" y="54.324" transform="rotate(-0 855.7785 54.324)">19 CLASSES</text>
@@ -45,7 +45,7 @@ z
     <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #ffffff" x="855.7785" y="92.0232" transform="rotate(-0 855.7785 92.0232)">CITYSCAPES  +  ACDC</text>
    </g>
    <g id="text_6">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #96b8e7" x="855.7785" y="124.1784" transform="rotate(-0 855.7785 124.1784)">RESEARCH REPOSITORY</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #96b8e7" x="855.7785" y="124.1784" transform="rotate(-0 855.7785 124.1784)">APPLICATION PROJECT</text>
    </g>
   </g>
  </g>

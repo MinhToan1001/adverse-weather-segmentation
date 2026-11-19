@@ -56,6 +56,8 @@ def fits_session(now, deadline, recent_epoch_seconds):
 
 
 def prepare(args):
+    if args.model not in MODEL_NAMES:
+        raise ValueError('Retired model: use segformer_b2 or the optional DeepLab model for new runs')
     root = Path(args.output).resolve()
     hashes = fingerprints()
     if (root / 'experiment.json').exists():

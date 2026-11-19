@@ -1,4 +1,4 @@
-"""Fresh B0/B2/DeepLab controls: six ordered jobs, per-epoch export and resumable queue."""
+"""Active B2/optional DeepLab jobs, per-epoch export and resumable queue."""
 import argparse
 import json
 from pathlib import Path
@@ -13,7 +13,7 @@ from src.models.registry import MODEL_NAMES
 from src.utils.artifacts import sha256_file, write_json, records
 
 
-SCHEMA = 'three_models_fresh_ce_20e_v1'
+SCHEMA = 'active_models_fresh_ce_20e_v2'
 SELECTED_SCHEMA = 'selected_models_fresh_ce_20e_v1'
 
 

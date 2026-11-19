@@ -2,14 +2,16 @@
 import json
 from pathlib import Path
 
-from src.models import segformer_b0, segformer_b2
+from src.models import segformer_b2
+from src.models.legacy import segformer_b0
 from src.models.deeplabv3plus_resnet50 import DeepLabV3PlusResNet50
 from src.models.segformer import load_segformer_checkpoint, make_model as build_segformer
 from src.data.labels import CLASS_NAMES
 
 
-MODEL_NAMES = ('segformer_b0', 'segformer_b2', 'deeplabv3plus_resnet50')
-ROLES = dict(segformer_b0='baseline', segformer_b2='main', deeplabv3plus_resnet50='matched_size_cnn')
+MODEL_NAMES = ('segformer_b2', 'deeplabv3plus_resnet50')
+COMPATIBLE_MODEL_NAMES = ('segformer_b0', *MODEL_NAMES)
+ROLES = dict(segformer_b0='retired', segformer_b2='main', deeplabv3plus_resnet50='optional_cnn')
 ENCODERS = {
     'b0': ('nvidia/mit-b0', '80983a413c30d36a39c20203974ae7807835e2b4',
            '4af8348c2a802bf76115d34797ff5ce1d9f110bb8593c22d9b66d8bd7fa227fc'),
@@ -23,7 +25,7 @@ def build_model(settings):
     if cfg.get('num_labels', 19) != 19:
         raise ValueError('The research data contract has19 classes')
     name = cfg['name']
-    if name not in MODEL_NAMES:
+    if name not in COMPATIBLE_MODEL_NAMES:
         raise ValueError(f'Unknown training model: {name}; choose {MODEL_NAMES}')
     initialization = cfg.get('initialization', 'random')
     if initialization == 'checkpoint':
@@ -62,7 +64,7 @@ def load_checkpoint(directory, name=None):
         return DeepLabV3PlusResNet50.from_pretrained(directory)
     if name == 'deeplabv3plus_resnet50':
         raise ValueError('DeepLab requires its own complete19-class checkpoint')
-    variant = name.rsplit('_', 1)[1] if name in MODEL_NAMES[:2] else None
+    variant = name.rsplit('_', 1)[1] if name in ('segformer_b0', 'segformer_b2') else None
     model, info = load_segformer_checkpoint(directory, variant=variant, local_files_only=True, output_loading_info=True)
     if info['missing_keys'] or info['unexpected_keys'] or info.get('mismatched_keys'):
         raise ValueError('Checkpoint loading mismatch')

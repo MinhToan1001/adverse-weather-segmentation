@@ -1,13 +1,18 @@
-# Documentation
+# Tài liệu Project-CV
 
-| Need | Read |
+Repo được trình bày theo **đồ án ứng dụng phân đoạn đường phố trong thời tiết xấu**. B2 là model chính; DeepLab là tùy chọn; B0 chỉ còn trong lịch sử.
+
+| Bạn cần | Tài liệu |
 | --- | --- |
-| Run three models,estimate time,resume |[Training guide](TRAINING_GUIDE.md)|
-| Method,loss formulas,ablations,limitations |[Research framework](RESEARCH_FRAMEWORK.md)|
-| Explain each code file to a lecturer |[Code walkthrough](PRESENT_TO_LECTURER.md)|
-| Label/split/processing contract |[Data contract](DATA_CONTRACT.md)|
-| Research manuscript |[Paper draft](paper/README.md)|
-| Team Git workflow and verification |[Contributing](CONTRIBUTING.md)|
-| Node.js demo,uploads,comparison and local checkpoints |[WeatherLens Studio](../web/README.md)|
+| Hiểu bài toán, phương pháp và trạng thái | [README gốc](../README.md) |
+| Đọc code từ đầu tới cuối | [Lộ trình đọc repo](READING_GUIDE.md) |
+| Chính xác recipe nào đang chạy, chia dữ liệu ra sao | [Phương pháp hiện hành](RESEARCH_FRAMEWORK.md) |
+| Định dạng nhãn, manifest, ảnh–mask | [Data contract](DATA_CONTRACT.md) |
+| Kaggle, checkpoint và resume | [Training guide](TRAINING_GUIDE.md) |
+| Giao diện Node.js và weights local | [Web guide](../web/README.md) |
+| Chuẩn bị thuyết trình | [Walkthrough giảng viên](PRESENT_TO_LECTURER.md) |
+| Sửa code, chạy test, làm việc nhóm | [Contributing](CONTRIBUTING.md) |
+| Xem bằng chứng và giới hạn của điểm số | [Results index](../results/README.md) |
+| Tìm hiểu nguồn khoa học và kế hoạch chưa triển khai | [Research index](../research/README.md) |
 
-The active study retrains all three models. Old task-by-task notebooks/reports are retained only in a local git-ignored archive;they are not current instructions or result baselines.
+Bản thảo nghiên cứu cũ nằm ở [research/archive](../research/archive/README.md); không dùng nó làm hướng dẫn vận hành hay báo cáo trạng thái mới nhất.

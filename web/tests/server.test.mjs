@@ -35,7 +35,7 @@ test('HTTP boundary validates uploads, origin and static paths; inference errors
   assert.equal((await get('/api/predict', post('{}'))).status, 400);
   const crossSite = post('{}'); crossSite.headers.Origin = 'https://example.com';
   assert.equal((await get('/api/predict', crossSite)).status, 403);
-  const error = await get('/api/predict', post(JSON.stringify({ image: 'invalid', model: 'segformer_b0' })));
+  const error = await get('/api/predict', post(JSON.stringify({ image: 'invalid', model: 'segformer_b2' })));
   assert.equal(error.status, 422);
   assert.equal((await error.json()).error, 'Tệp ảnh không hợp lệ.');
   assert.equal(calls.at(-1).stage, 'adapt');

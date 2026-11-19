@@ -7,7 +7,7 @@ flowchart LR
     UI[Browser / HTML CSS JavaScript] --> API[Node.js HTTP API]
     API -->|JSON lines / stdin| W[Python CPU worker]
     W --> I[Shared SegmentationPredictor]
-    I --> M[B0 / B2 accepted checkpoints]
+    I --> M[B2 source / adapted checkpoints]
     W -->|Masks / class area / timing| API
     API --> UI
 ```
@@ -25,10 +25,10 @@ Open **http://127.0.0.1:3000**. Runtime uses Node built-ins, so `npm install` is
 
 ## Checkpoints and sample images
 
-Default checkpoint layout, for B0 and B2:
+Default checkpoint layout, for B2:
 
 ```text
-outputs/reviews/segformer_b0_seed42/
+outputs/reviews/segformer_b2_seed42/
   source/config.json          # Run config, including preprocessing
   source/best/config.json     # Model config
   source/best/model.safetensors
@@ -37,11 +37,9 @@ outputs/reviews/segformer_b0_seed42/
   adapt/best/model.safetensors
 ```
 
-For another machine, extract the corresponding `jobs/segformer_b0_source/run/` and `jobs/segformer_b0_adapt/run/` folders from the received result ZIP into the default layout above, or point environment variables to their `best/` folders:
+For another machine, extract the corresponding `jobs/segformer_b2_source/run/` and `jobs/segformer_b2_adapt/run/` folders from the received result ZIP into the default layout above, or point environment variables to their `best/` folders:
 
 ```powershell
-$env:SEGFORMER_B0_CHECKPOINT='D:/models/B0/adapt/best'
-$env:SEGFORMER_B0_SOURCE_CHECKPOINT='D:/models/B0/source/best'
 $env:SEGFORMER_B2_CHECKPOINT='D:/models/B2/adapt/best'
 $env:SEGFORMER_B2_SOURCE_CHECKPOINT='D:/models/B2/source/best'
 $env:PYTHON_BIN='D:/python/Project-CV/.venv/Scripts/python.exe'
@@ -55,14 +53,14 @@ Sample images are discovered from `data/raw/cityscapes/leftImg8bit/val` and `dat
 ## Use
 
 1. Pick a sample or upload/drop a PNG, JPG, WebP or BMP (up to 10 MB / 8 million pixels).
-2. Select B0/B2 and the source-only or ACDC-adapted checkpoint. Run segmentation.
+2. Select B2 and the source-only or ACDC-adapted checkpoint. Run segmentation.
 3. Switch between original, color mask and overlay; adjust mask opacity.
-4. Use model comparison to run both on the same input. The selected model controls the class-area legend and downloads.
+4. Use before/after comparison to run both B2 checkpoint stages on the same input. The selected model controls the class-area legend and downloads.
 5. Download native-sized trainId PNG (0–18), color mask or the overlay at the selected opacity.
 
-Class percentages are **predicted pixel coverage**, not confidence or accuracy. Displayed ACDC dev mIoUs describe the internal 402-image set, not the uploaded image. No image-level accuracy is claimed without ground truth. CPU time reports include image preparation and output creation but exclude model load; cold-load status is shown separately. Comparison is sequential and reuses results for the same image/stage.
+Class percentages are **predicted pixel coverage**, not confidence or accuracy. Displayed ACDC dev mIoUs describe the internal 402-image set, not the uploaded image. No image-level accuracy is claimed without ground truth. CPU time reports include image preparation and output creation but exclude model load; cold-load status is shown separately. Comparison is sequential and caches results per image/model/stage.
 
-Uploads are handled in memory, not stored in an upload history. One resident model and a bounded request queue limit memory/concurrency. Changing the image or checkpoint stage invalidates previous outputs. Dataset samples, weights, screenshots and browser traces stay Git-ignored under `outputs/`; do not publish dataset images with the source.
+Uploads are handled in memory, not stored in an upload history. One resident model and a bounded request queue limit memory/concurrency. Changing the image invalidates previous outputs; changing stage selects the cached result for that exact model/stage if available. Dataset samples, weights, screenshots and browser traces stay Git-ignored under `outputs/`; do not publish dataset images with the source.
 
 ## Code map
 
@@ -85,6 +83,6 @@ npm install
 npm run test:e2e
 ```
 
-Browser tests use installed Chrome by default (`PLAYWRIGHT_CHANNEL=chrome`). They exercise real local B0/B2 inference, same-image comparison, changing images/stages, invalid uploads, downloading label PNGs and a 390px mobile layout. Desktop/mobile screenshots are written to `outputs/web-studio/`. Tests require both accepted checkpoints and the five sample conditions; unit/API tests do not require weights or datasets.
+Browser tests use installed Chrome by default (`PLAYWRIGHT_CHANNEL=chrome`). They exercise real local B2 source/adapt inference, same-image comparison, changing images/stages, invalid uploads, downloading label PNGs and a 390px mobile layout. Desktop/mobile screenshots are written to `outputs/web-studio/`. Tests require both accepted checkpoints and the five sample conditions; unit/API tests do not require weights or datasets.
 
 This is a local research/demo server. It does not expose training controls or modify a run, and it has no hosted deployment or user-account system.

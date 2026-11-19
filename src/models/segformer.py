@@ -1,5 +1,6 @@
 from transformers import SegformerConfig, SegformerForSemanticSegmentation
-from src.models import segformer_b0, segformer_b2
+from src.models import segformer_b2
+from src.models.legacy import segformer_b0
 
 
 def model_class_for_config(config, variant=None):

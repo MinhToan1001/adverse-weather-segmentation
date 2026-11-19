@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from src.models.registry import MODEL_NAMES
+from src.models.registry import COMPATIBLE_MODEL_NAMES
 from src.training.losses import LOSS_NAMES
 from src.utils.artifacts import sha256_file
 
@@ -13,7 +13,7 @@ CONFIG_ROOT = Path(__file__).resolve().parents[2] / 'configs'
 
 def compose_experiment(name, stage, data, output, loss='ce', source_checkpoint=None,
                        initialization='imagenet_encoder', seed=42, class_crop=False):
-    if name not in MODEL_NAMES or stage not in ('source', 'adapt') or loss not in LOSS_NAMES:
+    if name not in COMPATIBLE_MODEL_NAMES or stage not in ('source', 'adapt') or loss not in LOSS_NAMES:
         raise ValueError('Unknown model, stage or loss preset')
     recipe = yaml.safe_load((CONFIG_ROOT / 'recipes' / (
         'source_20epoch.yaml' if stage == 'source' else 'adaptation_20epoch.yaml')).read_text())

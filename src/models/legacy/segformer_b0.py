@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # Modified for Project-CV: explicit B0 variant, architecture checks and teaching notes.
-"""SegFormer-B0: a separate, executable model definition.
+"""Retired SegFormer-B0 definition for historical checkpoint compatibility.
 
 Encoder: [32, 64, 160, 256] channels, [2, 2, 2, 2] Transformer blocks.
 Decoder: project each stage to 256 channels, concatenate 1024, fuse to 256, classify 19.

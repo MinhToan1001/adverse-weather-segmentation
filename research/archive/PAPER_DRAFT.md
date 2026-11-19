@@ -1,10 +1,12 @@
+> Historical draft, superseded by the application scope. See [archive notice](README.md).
+
 # Class-Aware Adaptation for Adverse-Weather Semantic Segmentation
 
 ### Shared Training and a Transformer–CNN Comparison
 
 **Research draft — fresh GPU experiments pending**
 
-[Code](../../README.md) · [Exact method](../RESEARCH_FRAMEWORK.md) · [Execution](../TRAINING_GUIDE.md) · [Bibliography](references.bib)
+[Code](../../README.md) · [Current method](../../docs/RESEARCH_FRAMEWORK.md) · [Execution](../../docs/TRAINING_GUIDE.md) · [Bibliography](references.bib)
 
 ## Abstract
 
@@ -34,7 +36,7 @@ Parameters are3.72M/27.36M/26.70M. Counted forward conv/matmul work at batch1,51
 
 Source:ImageNet encoder/new head,batch2/accum4,AdamW encoderLR6e-5/head×10,BN stats updating. Adaptation:its own new source best,source/target1:1,batch1/accum8,LR1e-5,BN stats fixed and affine trainable. Both use20epochs,no early stopping,weight decay0.01,warm-up20updates,poly power1 and GPUFP16AMP. Real batch2 is needed for DeepLab pooled BN;accumulation does not merge BN moments. SegFormer encoder LayerNorm differs from BN.
 
-CE controls are followed by isolated loss/crop ablations. Fit-weighted CE uses bounded inverse-square-root priors without dev/val IoU. Focal uses gamma2. CE+0.5Dice averages overlap over GT-present minibatch classes. Optional crop selects an available class and attempts to retain64pixels;exposure successes/failures are logged. Exact formulas,void reductions and limitations are in [the method](../RESEARCH_FRAMEWORK.md).
+CE controls are followed by isolated loss/crop ablations. Fit-weighted CE uses bounded inverse-square-root priors without dev/val IoU. Focal uses gamma2. CE+0.5Dice averages overlap over GT-present minibatch classes. Optional crop selects an available class and attempts to retain64pixels;exposure successes/failures are logged. Exact formulas,void reductions and limitations are in [the method](../../docs/RESEARCH_FRAMEWORK.md).
 
 Source best maximizes monitor mIoU. Adaptation best maximizes target-dev mIoU subject to source decrease≤1pp;an ineligible fallback is reported as such. Checkpoints include optimizer/scheduler/scaler/RNG and previous generations. Interrupted epochs repeat;model-specific atomic ZIPs preserve completed progress across saved sessions.
 
@@ -54,4 +56,4 @@ Three independent notebooks first establish source/adaptCE controls,then B2 loss
 
 Shared recipes do not prove model-specific optimality. ImageNet recipes and compute differ;GPU memory/timing remain to be measured. Focal may emphasize noise,full-mask priors differ from crop exposure,and crop cannot reconstruct detail already lost by resizing. Historical feedback and small dev group counts constrain future conclusions. Fixed20epochs is a project design,not proof of convergence or an80%mIoU target.
 
-Each model notebook uses the same generated template and source code. Run-bound config/source/manifests are hashed;resume rejects mismatched code/data/model plans. Raw data/checkpoints/ZIPs are excluded from Git. [Team workflow](../CONTRIBUTING.md) · [Software citation](../../CITATION.cff).
+Each model notebook uses the same generated template and source code. Run-bound config/source/manifests are hashed;resume rejects mismatched code/data/model plans. Raw data/checkpoints/ZIPs are excluded from Git. [Team workflow](../../docs/CONTRIBUTING.md) · [Software citation](../../CITATION.cff).

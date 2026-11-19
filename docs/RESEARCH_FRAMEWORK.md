@@ -1,106 +1,77 @@
-# Research method: matched models and class-aware learning
+# Phương pháp hiện hành của đồ án
 
-[Project](../README.md) · [Code walkthrough](PRESENT_TO_LECTURER.md) · [Three notebooks](../notebooks/README.md)
+[Tổng quan](../README.md) · [Lộ trình đọc](READING_GUIDE.md) · [Training / resume](TRAINING_GUIDE.md)
 
-**Current execution:** [three separate model runs](TRAINING_GUIDE.md),each source20→adapt20 from an ImageNet encoder/new head. Old project checkpoints/scores are excluded. Transactional checkpoints retain previous generations;atomic resultZIP updates every epoch.
+Tên file được giữ để các liên kết cũ vẫn hoạt động. Nội dung này mô tả **code đang chạy**, tách khỏi [protocol public-checkpoint dự kiến](../research/BASELINE_PROTOCOL.md). Đồ án hiện tập trung ứng dụng B2 cho ảnh đường phố trong thời tiết xấu; không bắt buộc đề xuất kiến trúc mới.
 
-## Research question and evidence
+## 1. Dữ liệu và cách chia
 
-**Trong cùng pipeline và quyền dùng nhãn, học tốt các lớp yếu có tăng ACDC mIoU mà vẫn giữ Cityscapes không? Tác dụng có lặp trên Transformer và CNN gần nhau về số tham số không?**
-
-B0 là baseline; B2 là hướng chính. DeepLabV3+ResNet50 có26.695.619 tham số, B2 có27.361.235, chênh−2,43%. Bản project dựa trên [DeepLabV3+](https://arxiv.org/abs/1802.02611), không tái lập nguyên recipe/checkpoint của tác giả. Cặp B2/CNN và vấn đề forgetting được tham khảo [Kalb & Beyerer, CVPR2023](https://arxiv.org/abs/2303.14115); supervised replay gộp thời tiết của project khác thí nghiệm domain-incremental của paper.
-
-## Chẩn đoán trước khi đổi loss
-
-CE tính lỗi từng pixel; road/building có diện tích lớn có thể chi phối gradient. mIoU lại cho mỗi lớp trọng số tương đương. Vì vậy cần kiểm tra mất cân bằng, không suy ra CE yếu chỉ từ công thức đơn giản.
-
-| Quan sát | Giả thuyết cần đo | Can thiệp kiểm thử |
-| --- | --- | --- |
-| Ít fit pixels, ít crop chứa lớp | Mất cân bằng/đối tượng bị cắt | WeightedCE; class-aware crop |
-| Pixel đủ nhưng hay nhầm cùng lớp | Đặc trưng khó/thiếu ngữ cảnh | B2 vs CNN; confusion/panels |
-| Vật nhỏ biến mất sau resize | Giới hạn độ phân giải | Audit ảnh/nhãn sau geometry; giữ resolution chung ở controls |
-| Train tốt hơn, dev xấu đi | Overfit/domain shift | Dev CE,mIoU,source retention,best đã định trước |
-| Focal tập trung ranh giới tối | Hard pixel có thể là nhiễu | Xem error panels; không tự tăng gamma |
-
-Nhật ký `crop_exposure` ghi số lần chọn lớp, số crop đạt ngưỡng và số pixel giữ được. Đây là exposure, không là mIoU. Không phải lớp điểm thấp nào cũng ít xuất hiện.
-
-## Loss presets
-
-Model trả logits B×19×H×W: điểm dự đoán cho19lớp ở từng pixel. [losses.py](../src/training/losses.py) nội suy bilinear đến nhãn, tính FP32, bỏ void255.
-
-| Preset | Thiết kế | Nghĩa nôm na | Rủi ro |
+| Nguồn | Phần dùng để học | Phần dùng chọn checkpoint | Kiểm tra sau khi chốt |
 | --- | --- | --- | --- |
-|`ce`|−mean(log p_y)|Phạt pixel dự đoán sai|Lớp nhiều pixel chi phối|
-|`weighted_ce`|−Σw_y log p_y /Σw_y|Lớp ít xuất hiện được coi trọng hơn|Tăng cả nhiễu của lớp hiếm|
-|`focal`|−mean((1−p_y)^2 log p_y)|Bớt học pixel dễ, tập trung pixel khó|Hard không đồng nghĩa hữu ích|
-|`ce_dice`|CE+0.5×macro(1−Dice)|Vừa đúng pixel vừa khớp vùng từng lớp|Nhạy với lớp nhỏ/crop thiếu lớp|
+| Cityscapes official train 2.975 ảnh | 2.787 fit | 188 monitor, giữ lại theo nhóm city/sequence | Official val 500, chưa nghiệm thu cho lượt B2 hiện tại |
+| ACDC official train 1.600 ảnh | 1.198 fit | 402 dev, chia nhóm recording, có đủ bốn thời tiết | Official val 406, chưa nghiệm thu cho lượt B2 hiện tại |
 
-WeightedCE: trung bình priors pixel của các fit manifest (nguồn/đích1:1), inverse-square-root, chặn max/min≤5, chuẩn hóa trung bình lớp có mặt=1; lớp không có trong fit nhận0. Chỉ tính full fit masks, **không dùng IoU dev/val**. Không phải effective-number Class-Balanced Loss. Weights/manifest có SHA; full-mask priors chưa phản ánh đúng mọi crop.
+ACDC được dùng **có nhãn** khi học tiếp. Ảnh reference trời quang được kiểm kê nhưng chưa tham gia objective. Chia nhóm token giúp giảm trùng cảnh gần nhau, chưa chứng minh độc lập địa lý. Các official-val từng được xem trong lịch sử phát triển nên chưa được gọi là test độc lập.
 
-Dice: overlap xác suất/one-hot trên pixel hợp lệ, trung bình các lớp có GT trong minibatch, smoothing1e-6. Lớp vắng GT không tham gia Dice, CE vẫn phạt đoán sai vào lớp đó. Kế thừa ý tưởng overlap từ [V-Net](https://arxiv.org/abs/1606.04797), không tái lập công thức volumetric. Focal kế thừa giảm trọng số ví dụ dễ từ [Lin et al.](https://arxiv.org/abs/1708.02002), áp dụng multiclass segmentation; chưa chứng minh trên ACDC.
+Nhãn dùng 19 trainIds 0–18; ignore 255 bỏ khỏi loss/metrics. Cityscapes labelIds được chuyển rõ ràng, không đoán kiểu mã hóa từ giá trị pixel. [Data contract](DATA_CONTRACT.md), [partition code](../src/data/partitions.py).
 
-All-void batch trả loss0/gradient0 hữu hạn. Không trừ train Focal/Dice với dev CE để đo overfit vì khác objective.
+## 2. Xử lý và tăng cường dữ liệu
 
-## Class-aware crop and processing
+- Khung ảnh **512 × 1024**, giữ aspect ratio, padding thay vì kéo méo hình. ImageNet mean/std dùng chuẩn hóa RGB.
+- Train: random scale 0,5–2, crop/pad, lật ngang xác suất 0,5. Ảnh và mask dùng cùng biến đổi hình học; RGB bilinear, mask nearest, vùng mask padding là 255.
+- Dev/monitor/evaluation: fit ảnh vào khung theo cách xác định, không random augmentation. Logits được bỏ padding rồi nội suy về kích thước nhãn gốc.
+- Gamma/photometric, class-aware crop và sampling theo lớp có code, **không bật mặc định** trong kết quả CE hiện tại.
 
-Control: scale0.5–2, crop/pad512×1024, flip0.5; ảnh/mask cùng tọa độ, RGB bilinear/mask nearest; ImageNet mean/std. Dev/monitor không augment ngẫu nhiên.
+## 3. Model và training
 
-`--class-crop`: xác suất0.5 chọn lớp có trong mask theo inverse-square-root pixel count **của ảnh đó**; tối đa10 vị trí crop giữ≥64pixel lớp đã chọn. Nếu không đủ thì giữ crop tốt nhất và ghi `met=false`; không có lớp hợp lệ thì dùng crop control. Nhãn chỉ từ train. Crop không tạo lại thông tin đã mất khi downsample.
+B2 chính có khoảng 27,36M tham số; DeepLabV3+ ResNet50 tùy chọn khoảng 26,70M. Mỗi kiến trúc có file riêng, đầu ra cùng dạng logits B×19×H×W. Registry chọn model; trainer/data/evaluator dùng lại. B0 đã chuyển sang [legacy](../src/models/legacy/README.md).
 
-Photometric/gamma cũ vẫn có module nhưng không bật mặc định ở controls mới. CE+crop thử riêng trước khi ghép với loss thắng.
-
-## Data and fairness
-
-- Cityscapes official-train2.975 → grouped fit2.787/monitor188. Monitor không học trong source mới/replay.
-- ACDC official-train1.600 → recording/scene-token fit1.198/dev402. Clear-reference đã kiểm kê nhưng chưa dùng trong objective.
-- Official-val500City/406ACDC kiểm tra candidate đã khóa. Lịch sử feedback khiến đây chưa là independent test.
-- Source mới: ImageNet1k encoder, head19lớp mới, cùng20epochs Cityscapes. MiT pin revision+SHA; TorchVisionR50 `IMAGENET1K_V1` filename hash. Recipe ImageNet từng encoder vẫn khác.
-- Adapt dùng đúng source CE `best/` sau20epochs, đúng model và fit/monitor; mọi ablation cùng model cùng checkpoint.
-- Cùng epoch/updates không là cùng FLOPs/giờGPU. Counted forwardFLOPs batch1,512×1024: B035,51G,B2258,33G,DeepLab150,71G;đếm conv/matmul hỗ trợ bằng Torch FlopCounterMode. DeepLab−41,7% soB2,cùng bậc quy mô nhưng không compute-matched. VRAM/timing còn chờ GPU. Recipe chung có thể chưa tối ưu từng model;model-specific LR search cần nghiên cứu/budget riêng. [Profile](../results/repository-release/complexity.json).
-
-## Training policy
-
-| Setting | Source | Adapt |
+| Thiết lập | Source: Cityscapes | Adapt: ACDC có nhãn + replay |
 | --- | --- | --- |
-|Horizon / early stopping|20 /Off|20 /Off|
-|AdamW /weight decay|6e-5 /0.01|1e-5 /0.01|
-|Head LR multiplier|10|1|
-|Scheduler|Warm-up20updates,poly power1|Như source|
-|Batch /accumulation|2 /4,drop_last|1 /8|
-|BN running stats|Update|Frozen|
-|BN affine parameters|Learn|Learn|
-|Precision|GPU AMPfloat16|GPU AMPfloat16|
-|Execution|Single GPU|Single GPU|
+| Khởi tạo | Encoder ImageNet, head 19 lớp mới | Source CE `best/` của cùng model sau đủ 20 epoch |
+| Epoch / early stopping | 20 / tắt | 20 / tắt |
+| Bộ mẫu một epoch | Cityscapes fit | 1.198 ACDC + 1.198 lượt lấy mẫu Cityscapes |
+| Batch / gradient accumulation | 2 / 4, drop_last | 1 / 8 |
+| AdamW LR encoder / head | 6e-5 / 6e-4 | 1e-5 / 1e-5 |
+| Weight decay | 0,01 | 0,01 |
+| Scheduler | Warm-up 20 bước cập nhật, polynomial power 1 | Tương tự |
+| BatchNorm buffers / affine | Cập nhật / học | Đóng băng thống kê / vẫn học affine |
+| Precision / GPU | FP16 AMP, một GPU | Tương tự |
+| Chọn best | Cityscapes monitor mIoU | ACDC dev mIoU với source drop ≤ 1 điểm phần trăm |
 
-LayerNorm encoder SegFormer không có running mean/variance kiểu BN. Accumulation cộng gradient nhưng không gộp thống kê BN. DeepLab global pooling BN1×1 cần batch thật≥2. Source batch2 phải kiểm tra VRAM T4; chưa qua fullGPU run.
+Nếu không candidate nào qua source gate, code xếp hạng fallback theo mức giữ nguồn; phải đọc cờ gate thay vì mặc định best luôn đạt gate. Một epoch replay không có nghĩa đi qua toàn bộ ảnh Cityscapes; target đi đủ một vòng, source lấy mẫu xen kẽ. Cùng số epoch giữa model không đồng nghĩa cùng compute.
 
-Source head19lớp khởi tạo mới nên dùng LR6e-4,encoder6e-5: tỷ lệ×10 lấy từ [config SegFormerB2 chính thức](https://github.com/NVlabs/SegFormer/blob/master/local_configs/segformer/B2/segformer.b2.1024x1024.city.160k.py), cũng là hướng từng kiểm tra trên B0. Áp cùng tỷ lệ lên DeepLab là control thống nhất, chưa bảo đảm tối ưu CNN. Adapt dùng multiplier1 vì head đã học. Project giữ warm-up20updates,weight decay0.01 cả norm như controls cũ;khác warm-up1500/normalization-decay0 trong recipe nguồn của tác giả,không gọi là paper reproduction. Norm-decay0/warm-up fraction là ablation optimizer tiếp theo nếu source diagnostics cho thấy cần.
+SegFormer encoder dùng LayerNorm; head có BatchNorm. Tích lũy gradient tạo update từ nhiều microbatch, **không gộp thống kê BatchNorm**. Nhánh pooled BatchNorm của DeepLab cần batch source thực tế ≥ 2. Recipe dùng LR head ×10 nhưng khác warm-up/weight decay/resolution của bài SegFormer, vì vậy không gọi là tái lập nguyên paper.
 
-Source:1.393minibatches/epoch,349planned optimizer updates;20epochs=6.980. Adapt:2.396draws,300updates/epoch,6.000planned. Batch hữu hiệu cuối có thể nhỏ hơn8;AMP overflow có thể bỏ update, logs ghi số thực tế.
+Recipe thực tế: [source_20epoch.yaml](../configs/recipes/source_20epoch.yaml), [adaptation_20epoch.yaml](../configs/recipes/adaptation_20epoch.yaml). [config.py](../src/experiments/config.py) ghép chúng với model/data/loss.
 
-Lưu `initial/`, `best/`, `last/`;last cóoptimizer/scheduler/scaler/RNG/config. Best được chọn trong20epochs, không mặc định epoch20. Adapt source gate giảm≤1pp; nếu không epoch nào đạt thì best là fallback, phải báo failed gate.
+## 4. Loss và các tùy chọn chưa chứng minh hiệu quả
 
-Session controller: max3epoch gần nhất×1.5+15phút reserve,window10h. Stop giữa epoch,resume cùng source/config/mount. Thời gian bất thường vẫn có thể vượt;hard-kill không chạy ZIP finally. Runner chỉ nhận20epoch hoàn tất khi checkpoint/config/log commits khớp.
+[losses.py](../src/training/losses.py) nội suy logits đến nhãn, tính FP32, bỏ vùng 255. CE là control đang dùng. Low IoU không tự chứng minh lớp thiếu dữ liệu hoặc CE không phù hợp.
 
-## Predeclared experiment matrix
-
-| Phase | Jobs | Mục đích |
+| Loss | Cách hiểu | Thiết lập và giới hạn |
 | --- | --- | --- |
-|Baselines|B0/B2/DeepLab sourceCE20|B0 mốc nhỏ,source công bằng cho2model phát triển;không trộn B0 lịch sử30 vào bảng20|
-|Architecture control|B0/B2/DeepLab adaptCE20|Đo kiến trúc trước can thiệp loss|
-|Loss ablation|B2 weightedCE,Focal,CE+Dice,mỗi job20|So B2CE,cùngsource seed42|
-|Crop ablation|B2 CE+classcrop20|Tách tác dụng crop khỏi loss|
-|Combination|Dev audit trước,loss thắng+crop sau|Kiểm tra tương tác,không cộng gain giả định|
-|Transfer|DeepLab cùng can thiệp đã chọn|Kiểm tra không chỉ có tác dụng trênB2|
-|Repetition|Seeds43/44 cho control/candidate cả2model|Đo dao động;chưa tự xếp hàng toàn matrix|
-|Frozen evaluation|Cityval500+ACDCval406|19IoU,4thời tiết,retention,ECE,paired groupCI|
+| CE | Phạt dự đoán sai ở từng pixel | Trung bình cross-entropy pixel hợp lệ; vùng lớn có thể chi phối |
+| Weighted CE | Tăng chú ý lớp ít pixel | Inverse-square-root priors từ fit masks, chặn tỷ lệ max/min ≤ 5; không lấy trọng số từ điểm dev |
+| Focal | Giảm trọng số pixel dễ | Gamma 2; pixel khó có thể là nhãn nhiễu |
+| CE + Dice | Vừa đúng pixel vừa khớp vùng | CE + 0,5 × macro Dice loss trên lớp có GT trong batch; smoothing 1e-6 |
 
-Không chọn loss bằng official-val. Không sửa gamma/weights khi resume. Báo selected-best và cùng epoch20; không nhầm selected-best gain với cùng-training-time gain.
+All-void batch trả loss/gradient 0 hữu hạn. Không dùng train Focal trừ dev CE để đo overfit vì khác objective. Weighted CE chưa tính được mọi thay đổi phân bố sau crop.
 
-## Contribution and limits
+`--class-crop` là tùy chọn: xác suất 0,5 chọn lớp đang có trong ảnh theo inverse-square-root pixel count, thử tối đa 10 vị trí để giữ ít nhất 64 pixel lớp đó. Không đạt thì giữ crop tốt nhất và ghi log. Crop không khôi phục chi tiết đã mất khi giảm độ phân giải. Thử từng yếu tố riêng, cùng source checkpoint/split/seed trước khi kết hợp.
 
-Thay CE bằng Focal/Dice,tăng B0 lênB2,dùng crop đều là kỹ thuật có trước. Đóng góp tiềm năng cần chứng minh: **chiến lược có đối chứng giúp lớp yếu, giữ source và lặp trên2kiến trúc**, dưới compute/resolution công bố. Không đặt mốc80% nếu paper dùng protocol khác.
+## 5. Khôi phục và truy vết
 
-Distillation,Lovasz/IoU loss,boundary-aware loss,reference-image learning,photometric/weather augment còn là hướng sau. Không ghép hết vì sẽ không biết yếu tố nào giúp. HRDA/Refign có quyền dữ liệu và recipe khác;related work không là bảng superiority.
+[checkpoints.py](../src/training/checkpoints.py) ghi thư mục tạm, kiểm hash rồi thay best/last; giữ thế hệ previous. Bản lưu chứa model, optimizer, scheduler, AMP scaler, RNG và epoch. Bộ điều phối xác minh config/source/manifest để không trộn thí nghiệm khi resume. ZIP kết quả thay atomically sau mỗi epoch hoàn thành; mất giữa epoch thì chạy lại epoch đó. Notebook có cửa sổ phiên 10 giờ, không giới hạn tổng giờ của cả thí nghiệm. [Training guide](TRAINING_GUIDE.md).
 
-CPU QA:4fit/2monitor Cityscapes thật,64×96,2batches/epoch,stop1→resume2 dưới scheduler20. Ba model forward/backward/save/load;DeepLab resumed weights khớp bitwise continuous2;native evaluator tạo confusion/calibration/panels. Đây là plumbing, không20epoch convergence/accuracy. MiT-B2 và DeepLab ImageNet initialization,memory,walltime,loss/crop gains còn chờ Kaggle. [Evidence](../results/repository-release/README.md).
+## 6. Đánh giá và giới hạn
+
+Evaluator cộng ma trận nhầm lẫn trên toàn split trước khi tính IoU/mIoU, trả thêm per-class, per-weather, calibration và panel ảnh/GT/prediction/lỗi. Inference trả về kích thước gốc, FP32, không test-time augmentation. Xem [runner.py](../src/evaluation/runner.py).
+
+Kết quả B2 đã nhận: City monitor 74,74%; ACDC dev 48,44% → 63,02%; City monitor sau thích nghi 74,53%. Đây là **một seed, tập chọn checkpoint**, chưa phải bằng chứng vượt paper hay test độc lập. Night vẫn là nhóm khó. [Báo cáo đã kiểm tra](../results/segformer_b2_seed42/README.md).
+
+## 7. Tham khảo dùng thế nào?
+
+[SegFormer 2021](../research/paper_reviews/SegFormer_2021.md) cung cấp kiến trúc và mốc Cityscapes. [DeepLabV3+](https://arxiv.org/abs/1802.02611), [Focal](https://arxiv.org/abs/1708.02002) và [V-Net / Dice](https://arxiv.org/abs/1606.04797) là nguồn kỹ thuật, không phải đóng góp mới của repo. [Ghi nhận nguồn](../THIRD_PARTY_NOTICES.md).
+
+Hướng đã chọn tiếp theo là checkpoint B2 Cityscapes công bố → fine-tune ACDC 20 epoch, rồi đối chứng replay cùng lượt thấy ACDC và bổ sung control cùng số update. **Chưa có notebook triển khai protocol mới đó**; không thay nhãn kết quả hiện tại thành public-checkpoint baseline. [Chi tiết quyết định](../research/BASELINE_PROTOCOL.md).

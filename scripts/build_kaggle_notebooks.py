@@ -1,4 +1,4 @@
-"""Build three current notebooks and a code-only Kaggle upload bundle."""
+"""Build current notebooks and a code-only Kaggle upload bundle."""
 from pathlib import Path
 import zipfile
 from scripts.build_research_notebooks import build_all

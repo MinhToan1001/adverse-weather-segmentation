@@ -35,7 +35,7 @@ def run(output, data_path):
             writer=csv.DictWriter(handle,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
         paths[key]=str(destination)
     reports = []
-    for name, loss in zip(MODEL_NAMES, ('ce', 'weighted_ce', 'ce_dice')):
+    for name, loss in zip(MODEL_NAMES, ('weighted_ce', 'ce_dice')):
         run_dir = output / name
         cfg = compose_experiment(name, 'source', paths, run_dir, loss=loss, initialization='random', class_crop=True)
         cfg['data']['image_size'] = [64, 96]

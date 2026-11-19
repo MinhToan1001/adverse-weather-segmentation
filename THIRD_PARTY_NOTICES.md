@@ -1,6 +1,6 @@
 # Third-party notices
 
-The explicit SegFormer variant modules `src/models/segformer_b0.py` and
+The explicit SegFormer variant modules `src/models/legacy/segformer_b0.py` and
 `src/models/segformer_b2.py` adapt the segmentation assembly/forward convention
 from Hugging Face Transformers4.57.6, originally credited to NVIDIA and the
 Hugging Face team. They retain the Apache2.0 header. The complete license is

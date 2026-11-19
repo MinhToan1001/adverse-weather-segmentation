@@ -2,11 +2,12 @@ const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const icon = name => `<svg aria-hidden="true"><use href="/icons.svg#${name}"/></svg>`;
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const state = { metadata: null, model: 'segformer_b0', stage: 'adapt', mode: 'single', view: 'overlay',
+const state = { metadata: null, model: 'segformer_b2', stage: 'adapt', mode: 'single', view: 'overlay',
   opacity: 0.55, image: null, results: {}, busy: false, generation: 0 };
 const percent = value => value == null ? '—' : `${(100 * value).toFixed(2)}%`;
 const activeModel = () => state.metadata?.models.find(m => m.id === state.model);
-const result = () => state.results[state.model];
+const cacheKey = (model, stage) => `${model}:${stage}`;
+const result = () => state.results[cacheKey(state.model, state.stage)];
 
 function notice(message = '', type = '') {
   $('#notice').textContent = message;
@@ -33,10 +34,10 @@ function showBusy(busy, message = 'Đang phân đoạn ảnh…') {
 
 function renderRunButton() {
   const available = state.mode === 'compare'
-    ? ['segformer_b0', 'segformer_b2'].every(id => state.metadata?.models.find(m => m.id === id)?.stages[state.stage])
+    ? ['source', 'adapt'].every(stage => activeModel()?.stages[stage])
     : activeModel()?.stages[state.stage];
   $('#runButton').disabled = state.busy || !state.image || !available;
-  $('#runLabel').textContent = state.busy ? 'Đang xử lý…' : state.mode === 'compare' ? 'Chạy cả hai mô hình' : 'Phân đoạn ảnh';
+  $('#runLabel').textContent = state.busy ? 'Đang xử lý…' : state.mode === 'compare' ? 'So sánh trước / sau' : 'Phân đoạn ảnh';
 }
 
 function renderModels() {
@@ -45,7 +46,7 @@ function renderModels() {
     const available = model.stages[state.stage];
     if (model.id.startsWith('deeplab') && !available) return '<div class="pending-model">DeepLabV3+ ResNet50<span>CHỜ TRAIN</span></div>';
     return `<button class="model-option ${model.id === state.model ? 'active' : ''}" role="radio" aria-checked="${model.id === state.model}" data-model="${model.id}" data-unavailable="${!available}" ${!available || state.busy ? 'disabled' : ''}>
-      <span class="model-initial">${model.id.endsWith('b0') ? 'B0' : model.id.endsWith('b2') ? 'B2' : 'R50'}</span><span class="model-name">${escape(model.name)}<small>${available ? escape(model.detail) : 'Chưa có checkpoint local'}</small></span><span class="radio-dot"></span></button>`;
+      <span class="model-initial">${model.id.endsWith('b2') ? 'B2' : 'R50'}</span><span class="model-name">${escape(model.name)}<small>${available ? escape(model.detail) : 'Chưa có checkpoint local'}</small></span><span class="radio-dot"></span></button>`;
   }).join('');
   $('#modelOptions').setAttribute('role', 'radiogroup');
   $('#modelOptions').setAttribute('aria-label', 'Chọn mô hình');
@@ -59,7 +60,7 @@ function renderModels() {
   $('#modelScore').innerHTML = `${percent(score)}<small>mIoU</small>`;
   $('#modelTable').innerHTML = `<table class="model-table"><thead><tr><th>Mô hình</th><th>Tham số</th><th>ACDC dev</th><th>Local</th></tr></thead><tbody>${models.map(m => `<tr><td>${escape(m.name)}</td><td>${m.parameters ? `${(m.parameters / 1e6).toFixed(2)} M` : '—'}</td><td>${percent(m.dev_miou)}</td><td class="${m.stages.adapt ? 'available' : ''}">${m.stages.adapt ? 'Có checkpoint' : 'Chưa có'}</td></tr>`).join('')}</tbody></table>`;
   $('#checkpointHelp').textContent = models.some(m => !m.stages.adapt && !m.id.startsWith('deeplab'))
-    ? 'Thiếu checkpoint? Đặt biến SEGFORMER_B0_CHECKPOINT hoặc SEGFORMER_B2_CHECKPOINT đến thư mục best/, rồi khởi động lại server. Xem web/README.md trong repo.' : '';
+    ? 'Thiếu checkpoint? Đặt biến SEGFORMER_B2_CHECKPOINT và SEGFORMER_B2_SOURCE_CHECKPOINT đến các thư mục best/, rồi khởi động lại server. Xem web/README.md trong repo.' : '';
 }
 
 function renderSamples() {
@@ -136,9 +137,9 @@ function renderResults() {
   $('#imageFrame').hidden = compare;
   $('#compareGrid').hidden = !compare;
   if (compare) {
-    $('#compareGrid').innerHTML = ['segformer_b0', 'segformer_b2'].map(id => {
-      const r = state.results[id];
-      const name = state.metadata?.models.find(m => m.id === id)?.name || id;
+    $('#compareGrid').innerHTML = ['source', 'adapt'].map(stage => {
+      const r = state.results[cacheKey(state.model, stage)];
+      const name = `${activeModel()?.name || 'B2'} · ${stage === 'source' ? 'Trước ACDC' : 'Sau ACDC'}`;
       return `<div class="compare-frame">${state.image ? `<img alt="Ảnh đầu vào ${escape(name)}" src="${r ? r.images.original : state.image.dataUrl}">` : ''}${r ? `<img class="compare-mask" alt="Mask ${escape(name)}" src="${r.images.mask}">` : '<div class="compare-wait">Chọn cùng một ảnh<br>để đối chiếu hai góc nhìn.</div>'}<span class="compare-label">${escape(name)}${r ? ` · ${(r.inference_ms / 1000).toFixed(2)}s` : ''}</span></div>`;
     }).join('');
   }
@@ -162,15 +163,16 @@ async function predict() {
   if (state.busy || !state.image) return;
   const generation = state.generation;
   const snapshot = { image: state.image.dataUrl.split(',')[1], stage: state.stage };
-  const models = state.mode === 'compare' ? ['segformer_b0', 'segformer_b2'] : [state.model];
+  const stages = state.mode === 'compare' ? ['source', 'adapt'] : [state.stage];
   notice();
-  showBusy(true, state.mode === 'compare' ? 'Đang đối chiếu B0 và B2…' : 'Đang phân đoạn ảnh…');
+  showBusy(true, state.mode === 'compare' ? 'Đang đối chiếu trước và sau ACDC…' : 'Đang phân đoạn ảnh…');
   try {
-    for (const model of models) {
-      if (state.results[model]) continue;
-      const prediction = await api('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...snapshot, model }) });
+    for (const stage of stages) {
+      const key = cacheKey(state.model, stage);
+      if (state.results[key]) continue;
+      const prediction = await api('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...snapshot, model: state.model, stage }) });
       if (generation !== state.generation) return;
-      state.results[model] = prediction;
+      state.results[key] = prediction;
       renderResults();
     }
   } catch (error) { if (generation === state.generation) notice(error.message); }
@@ -201,16 +203,16 @@ for (const button of $$('[data-mode]')) button.addEventListener('click', () => {
   if (state.busy) return;
   state.mode = button.dataset.mode;
   for (const item of $$('[data-mode]')) item.classList.toggle('active', item === button);
-  $('#pageCrumb').textContent = state.mode === 'compare' ? 'So sánh mô hình' : 'Phân đoạn ảnh';
-  $('#pageTitle').innerHTML = state.mode === 'compare' ? 'Cùng một ảnh. <span>Hai góc nhìn khác nhau.</span>' : 'Một khung hình. <span>Nhiều lớp ý nghĩa.</span>';
-  $('#pageDescription').textContent = state.mode === 'compare' ? 'Đối chiếu B0 và B2 trên cùng đầu vào. Chọn model ở bên phải để xem diện tích lớp và tải kết quả.' : 'Khám phá cách mô hình nhìn đường phố, từ trời quang đến những điều kiện khó nhất.';
+  $('#pageCrumb').textContent = state.mode === 'compare' ? 'Trước / sau thích nghi' : 'Phân đoạn ảnh';
+  $('#pageTitle').innerHTML = state.mode === 'compare' ? 'Cùng một ảnh. <span>Trước và sau thích nghi.</span>' : 'Một khung hình. <span>Nhiều lớp ý nghĩa.</span>';
+  $('#pageDescription').textContent = state.mode === 'compare' ? 'Đối chiếu B2 trước và sau khi học ACDC. Chọn phiên bản ở bên phải để xem diện tích lớp và tải kết quả.' : 'Khám phá cách mô hình nhìn đường phố, từ trời quang đến những điều kiện khó nhất.';
   renderResults(); renderRunButton();
 });
 for (const button of $$('[data-view]')) button.addEventListener('click', () => { state.view = button.dataset.view; applyView(); });
 $('#opacity').addEventListener('input', e => { state.opacity = Number(e.target.value) / 100; $('#opacityValue').textContent = `${e.target.value}%`; applyView(); });
 $('#stageSelect').addEventListener('change', e => {
   if (!state.metadata) return;
-  state.stage = e.target.value; state.generation++; state.results = {};
+  state.stage = e.target.value; state.generation++;
   renderModels(); renderResults(); renderRunButton();
 });
 for (const button of $$('[data-download]')) button.addEventListener('click', () => download(button.dataset.download).catch(error => notice(error.message)));
@@ -232,7 +234,7 @@ window.addEventListener('drop', e => e.preventDefault());
 async function boot() {
   try {
     state.metadata = await api('/api/metadata');
-    if (!activeModel()?.stages.adapt) state.model = state.metadata.models.find(m => m.stages.adapt)?.id || 'segformer_b0';
+    if (!activeModel()?.stages.adapt) state.model = state.metadata.models.find(m => m.stages.adapt)?.id || 'segformer_b2';
     renderModels(); renderSamples(); renderResults(); renderRunButton();
     if (!state.metadata.models.some(m => m.stages.adapt)) notice('Chưa có checkpoint trên máy. Mở thư viện mô hình để xem cách cài. Bạn có thể xem giao diện và thử tải ảnh.', 'info');
   } catch (error) {

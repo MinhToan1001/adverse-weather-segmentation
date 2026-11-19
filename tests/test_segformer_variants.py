@@ -3,7 +3,7 @@ import pytest
 import torch
 from transformers import SegformerForSemanticSegmentation
 
-from src.models.segformer_b0 import SegFormerB0, make_config as b0_config
+from src.models.legacy.segformer_b0 import SegFormerB0, make_config as b0_config
 from src.models.segformer_b2 import SegFormerB2, make_config as b2_config
 from src.models.segformer import make_model, model_class_for_config, load_segformer_checkpoint
 

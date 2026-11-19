@@ -1,128 +1,95 @@
 ![Project-CV](docs/assets/project_banner.svg)
 
-# Robust Semantic Segmentation under Adverse Weather
+# Project-CV · Phân đoạn đường phố trong thời tiết xấu
 
-**Cityscapes → ACDC · B0 baseline · So sánh B2 và DeepLab · Chung quy trình huấn luyện**
+**Đồ án ứng dụng thị giác máy tính · SegFormer-B2 · Cityscapes → ACDC · Giao diện Node.js**
 
-[Chạy và khôi phục training](docs/TRAINING_GUIDE.md) · [Phương pháp](docs/RESEARCH_FRAMEWORK.md) · [Thuyết trình code](docs/PRESENT_TO_LECTURER.md) · [Bản thảo nghiên cứu](docs/paper/README.md) · [Chứng cứ kiểm thử](results/README.md)
+[Đọc repo từng bước](docs/READING_GUIDE.md) · [Phương pháp và cấu hình](docs/RESEARCH_FRAMEWORK.md) · [Chạy Kaggle / resume](docs/TRAINING_GUIDE.md) · [Chạy giao diện](web/README.md) · [Kết quả đã kiểm tra](results/README.md)
 
-## Tóm tắt
+## 1. Bài toán nói đơn giản
 
-Project-CV nghiên cứu phân đoạn ảnh đường phố trong sương mù, ban đêm, mưa và tuyết. Mục tiêu là cải thiện các lớp dự đoán yếu trên ACDC, đồng thời hạn chế mất kiến thức đã học từ Cityscapes. Kiến trúc model được tách khỏi xử lý dữ liệu, loss, training và evaluation để kiểm tra từng giả thuyết trong cùng điều kiện.
+Đưa vào **một ảnh đường phố**, hệ thống tô màu từng vùng: đường, vỉa hè, người, xe, cây, bầu trời… Tổng cộng **19 lớp**. Mục tiêu ứng dụng là giữ khả năng phân biệt những vùng này khi ảnh có **sương mù, mưa, tuyết hoặc thiếu sáng**.
 
-Cả ba model bắt đầu từ encoder pretrained trên ImageNet và đầu phân đoạn mới. Bảng so sánh hiện hành không sử dụng checkpoint hay điểm số của các lần thử cũ. **B0 và B2 đã hoàn thành training**: trên cùng ACDC dev nội bộ, B0 đạt 51.65% và B2 đạt 63.02% mIoU; [so sánh, kiểm tra và giới hạn](results/segformer_b2_seed42/README.md). DeepLab và kết quả official validation còn chờ thực hiện. Unit test và CPU probe chỉ xác nhận hoạt động của phần mềm.
+Đây là **phân đoạn ngữ nghĩa**: gán một loại cho từng pixel. Ví dụ, mọi pixel thuộc ô tô nhận lớp “car”; hệ thống chưa tách danh tính từng chiếc xe. Đầu ra gồm ảnh tô màu, ảnh chồng màu lên ảnh gốc và bản đồ mã lớp. Chất lượng cần được đo bằng ảnh có nhãn chuẩn; màu sắc trông đẹp chưa chứng minh dự đoán đúng.
 
-## 1. Các model
-
-| Model | Vai trò | Số tham số | GFLOPs được đếm¹ | File kiến trúc |
-| --- | --- | ---: | ---: | --- |
-| SegFormer-B0 | Baseline | 3,719,027 | 35.51 | [segformer_b0.py](src/models/segformer_b0.py) |
-| SegFormer-B2 | Transformer chính | 27,361,235 | 258.33 | [segformer_b2.py](src/models/segformer_b2.py) |
-| DeepLabV3+ ResNet50 | CNN đối chứng | 26,695,619 | 150.71 | [deeplabv3plus_resnet50.py](src/models/deeplabv3plus_resnet50.py) |
-
-¹ Forward với batch 1, ảnh 512 × 1024; đếm các phép conv/matmul được PyTorch hỗ trợ, quy ước 2 FLOPs cho một phép nhân-cộng. DeepLab ít hơn B2 khoảng 2.43% tham số và 41.7% lượng tính toán được đếm. Đây là đối chứng gần về số tham số; tốc độ GPU và VRAM vẫn cần đo thực tế.
-
-Kiến trúc dựa trên [SegFormer](https://arxiv.org/abs/2105.15203) và [DeepLabV3+](https://arxiv.org/abs/1802.02611). DeepLab trong repo dùng ASPP và decoder với separable convolution. Xem [ghi nhận nguồn](THIRD_PARTY_NOTICES.md).
-
-## 2. Quy trình dùng chung
+## 2. Phương pháp đang dùng
 
 ```mermaid
 flowchart LR
-    D[Cityscapes / ACDC] --> P[Chia nhóm dữ liệu / đồng bộ ảnh-mask]
-    P --> A[Tăng cường dữ liệu / normalization]
-    A --> M{Model registry}
-    M --> B0[B0]
-    M --> B2[B2]
-    M --> DL[DeepLab R50]
-    B0 --> L[19 lớp / shared loss]
-    B2 --> L
-    DL --> L
-    L --> T[Shared trainer / checkpoint]
-    T --> E[mIoU / calibration / trực quan lỗi]
+    C[Cityscapes: đường phố trời quang và nhãn] --> S[B2 học nền tảng: 20 epoch]
+    S --> A[Học tiếp ACDC có nhãn: 20 epoch]
+    R[Ảnh Cityscapes học lại xen kẽ] --> A
+    A --> E[Chọn checkpoint bằng dev và kiểm tra giữ kiến thức cũ]
+    E --> W[Node.js UI + PyTorch inference]
 ```
 
-| Thành phần | Code |
+- **Cityscapes** giúp model học cấu trúc đường phố và 19 lớp ban đầu.
+- **ACDC** cung cấp ảnh có nhãn trong bốn điều kiện khó. Model học tiếp bằng ảnh **và nhãn ACDC train**; đây là *supervised adaptation*, không phải chỉ đem ACDC ra test và cũng không phải UDA dùng ảnh đích không nhãn.
+- **Replay** là xen ảnh Cityscapes khi học ACDC để hạn chế quên cảnh trời quang.
+- Xử lý ảnh, augmentation, loss, trainer và evaluator dùng chung; kiến trúc từng model có file riêng.
+
+**Model chính:** [SegFormer-B2](src/models/segformer_b2.py), khoảng 27,36 triệu tham số. [DeepLabV3+ ResNet50](src/models/deeplabv3plus_resnet50.py), khoảng 26,70 triệu tham số, là hướng mở rộng tùy chọn, chưa có lượt train hoàn chỉnh. B0 đã rút khỏi giao diện và luồng chạy mới; [code tương thích cũ](src/models/legacy/README.md) và báo cáo lịch sử được giữ lại.
+
+## 3. Đã làm được gì?
+
+| Hạng mục | Trạng thái / phạm vi |
 | --- | --- |
-| Dataset, chia dữ liệu, resize/crop/flip đồng bộ, ignore 255 | [dataset.py](src/data/dataset.py), [partitions.py](src/data/partitions.py) |
-| Giữ tỷ lệ ảnh, khung 512 × 1024, ImageNet normalization | [shared_512.yaml](configs/preprocessing/shared_512.yaml) |
-| CE, weighted CE theo tập fit, Focal, CE + Dice | [losses.py](src/training/losses.py) |
-| Chọn model và ghép cấu hình thí nghiệm | [registry.py](src/models/registry.py), [config.py](src/experiments/config.py) |
-| Optimizer, AMP, tích lũy gradient, best/last, resume | [train.py](src/training/train.py), [checkpoints.py](src/training/checkpoints.py) |
-| Đánh giá ở kích thước gốc, ECE, bản đồ độ tin cậy và lỗi | [runner.py](src/evaluation/runner.py) |
+| B2 source20 → ACDC replay20, seed 42 | Đã hoàn thành và kiểm tra checkpoint |
+| Cityscapes monitor 188 ảnh | B2 source: **74,74% mIoU**, best epoch 18 |
+| ACDC dev nội bộ 402 ảnh | Trước thích nghi **48,44%** → sau **63,02%**, best epoch 20 |
+| Giữ khả năng trên Cityscapes monitor | Sau thích nghi **74,53%**, giảm khoảng **0,21 điểm phần trăm** |
+| Demo Node.js | Upload ảnh, mask/overlay, tải PNG, so sánh B2 trước/sau ACDC |
+| Đánh giá chính thức Cityscapes val500 / ACDC val406 cho lượt B2 này | Chưa có kết quả nghiệm thu |
+| Baseline mới dùng checkpoint Cityscapes B2 công bố | Đã thống nhất hướng; **chưa triển khai** trong notebook hiện tại |
 
-Chạy đối chứng CE trước. Sau đó kiểm tra riêng ảnh hưởng của loss và class-aware crop; điểm IoU thấp không tự động đồng nghĩa với thiếu mẫu của lớp đó. [Công thức và ma trận thí nghiệm](docs/RESEARCH_FRAMEWORK.md).
+mIoU đo mức chồng khớp dự đoán với nhãn, rồi lấy trung bình các lớp. **63,02% là điểm dev dùng chọn checkpoint**, chưa phải kết quả test độc lập và không có nghĩa mọi ảnh upload đều đúng 63,02%. Chi tiết tại [báo cáo B2](results/segformer_b2_seed42/README.md).
 
-## 3. Kaggle: ba lượt chạy riêng
+[SegFormer, NeurIPS 2021](https://arxiv.org/abs/2105.15203) là nguồn kiến trúc. Bài gốc báo B2 **81,0% single-scale / 82,2% multi-scale trên Cityscapes val**, với recipe và cách suy luận khác. Đó là mốc tham khảo trên Cityscapes, **không thể đặt cạnh điểm ACDC dev để kết luận hơn/kém**. Xem [ghi chú bài gốc](research/paper_reviews/SegFormer_2021.md). Đóng góp ứng dụng của đồ án là tích hợp, thích nghi, đánh giá và trình diễn hệ thống; hiện chưa khẳng định kiến trúc mới hoặc vượt bài báo.
 
-| Lượt | Notebook | Hai giai đoạn |
-| --- | --- | --- |
-| 1 | [Train B0](notebooks/01_train_segformer_b0.ipynb) | Cityscapes 20 epoch → ACDC 20 epoch |
-| 2 | [Train B2](notebooks/02_train_segformer_b2.ipynb) | Cityscapes 20 epoch → ACDC 20 epoch |
-| 3 | [Train DeepLab](notebooks/03_train_deeplabv3plus_resnet50.ipynb) | Cityscapes 20 epoch → ACDC 20 epoch |
+## 4. Bắt đầu đọc và chạy
 
-Mỗi notebook chạy một model và tự chuyển từ source sang adaptation, tổng cộng **40 epoch/model**. Một lượt có thể cần nhiều phiên Kaggle. Input cho lượt mới: **project-code.zip mới + Cityscapes + ACDC**, bật GPU và Internet. Notebook tự tìm dataset theo cấu trúc; có thể khai báo đường dẫn cụ thể nếu có nhiều bản trùng nhau. Chọn **Save Version → Save & Run All**. Xem [hướng dẫn đầy đủ](docs/TRAINING_GUIDE.md).
+**Muốn hiểu repo:** đọc [hướng dẫn từng bước](docs/READING_GUIDE.md). Hướng dẫn nối bài toán → nhãn → dữ liệu → model → training → kiểm thử → giao diện, kèm câu hỏi cần trả lời ở mỗi bước.
 
-Checkpoint và ZIP kết quả cập nhật sau mỗi epoch hoàn thành. Các thế hệ checkpoint trước được giữ để khôi phục khi file mới hỏng. Resume dùng ZIP riêng của model và bản source đã đóng băng; epoch đang chạy dở sẽ được chạy lại. Cần lưu output trên Kaggle hoặc tải ZIP về giữa các phiên.
+**Muốn chạy demo local:** cần Python 3.11, Node.js 22+, môi trường Python của project và weights B2. Git không chứa dataset hoặc weights.
 
-## 4. Cài đặt local và CLI
-
-```bash
+```powershell
 python -m venv .venv
-# Windows: .venv/Scripts/Activate.ps1
-# Linux: source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m pytest -q
-python -m scripts.build_kaggle_notebooks
-# Upload outputs/kaggle/project-code.zip cùng notebook của model cần chạy.
-```
-
-```bash
-python -m scripts.prepare_research_data --city /datasets/Cityscape --acdc /datasets/ACDC --out outputs/data
-python -m scripts.run_research_campaign --models segformer_b2 --data outputs/data/data.json --root outputs/runs/segformer_b2 --archive outputs/segformer_b2_seed42.zip
-python -m scripts.verify_pipeline --data outputs/data/data.json --out outputs/cpu_probe
-```
-
-Đổi model được hỗ trợ bằng `--models`; dữ liệu, loss, trainer và evaluator được tái sử dụng. Các thí nghiệm ablation về sau dùng `scripts.run_research --model ... --stage adapt --loss focal ...` cùng checkpoint source mới của chính model đó.
-
-Chạy **WeatherLens Studio** bằng Node.js sau khi có checkpoint:
-
-```bash
+.venv/Scripts/python.exe -m pip install -r requirements.txt
 npm start
-# Mở http://127.0.0.1:3000
 ```
 
-Giao diện có upload/kéo thả ảnh, ảnh mẫu theo thời tiết, chọn B0/B2 và checkpoint source/adapt, mask với độ đậm tùy chỉnh, so sánh hai model trên cùng ảnh và tải PNG. API Node.js gọi worker PyTorch local bằng CPU; không cần GPU hoặc Streamlit. Studio tự nhận các checkpoint đã nghiệm thu trong `outputs/reviews/`; thành viên khác cần cài weights riêng. [Cài đặt, checkpoint và kiểm thử](web/README.md).
+Mở [WeatherLens Studio](http://127.0.0.1:3000). Demo chạy inference bằng CPU; GPU dùng trên Kaggle khi training. Máy mới clone cần đặt checkpoint theo [hướng dẫn web](web/README.md); thiếu weights thì giao diện vẫn mở nhưng chưa phân đoạn được. Dataset chỉ cần cho ảnh mẫu và train/evaluation; người dùng có thể upload ảnh riêng khi đã có weights.
 
-## 5. Thiết lập thí nghiệm
+**Muốn training:**
 
-| Thiết lập | Source | Adaptation có nhãn |
+```powershell
+.venv/Scripts/python.exe -m scripts.build_kaggle_notebooks
+```
+
+Upload `outputs/kaggle/project-code.zip`, Cityscapes và ACDC vào Kaggle. Import [notebook B2](notebooks/02_train_segformer_b2.ipynb), bật GPU/Internet, sửa input nếu tự tìm không rõ. Mỗi notebook chạy **một model**, source20 rồi adapt20, có checkpoint và ZIP sau mỗi epoch hoàn thành. Đọc [hướng dẫn train/resume](docs/TRAINING_GUIDE.md) trước khi chạy; notebook hiện tại vẫn dùng recipe ImageNet → Cityscapes → ACDC ở trên.
+
+## 5. Bản đồ repo
+
+| Thư mục | Chứa gì? | Bắt đầu ở đâu? |
 | --- | --- | --- |
-| Dữ liệu train | Cityscapes: 2,787 ảnh fit | ACDC: 1,198 ảnh fit + source replay tỷ lệ 1:1 |
-| Chọn checkpoint | Cityscapes: 188 ảnh monitor | ACDC: 402 ảnh dev; mức giảm source ≤ 1 điểm phần trăm |
-| Số epoch / early stopping | 20 / tắt | 20 / tắt |
-| Batch / tích lũy gradient | 2 / 4; `drop_last` | 1 / 8 |
-| BatchNorm: thống kê / affine | Cập nhật / học | Đóng băng / học |
-| AdamW: LR encoder / hệ số LR head | 6e-5 / 10 | 1e-5 / 1 |
-| Weight decay / warm-up / poly power | 0.01 / 20 bước cập nhật / 1 | Tương tự |
-| GPU / precision | Một GPU / FP16 AMP | Tương tự |
+| `src/data/` | Nhãn, chia tập, ghép ảnh–mask, xử lý và replay | [dataset.py](src/data/dataset.py) |
+| `src/models/` | Kiến trúc riêng và bộ chọn model | [README](src/models/README.md) |
+| `src/training/` | Loss, optimizer, BatchNorm, trainer, lưu/khôi phục | [train.py](src/training/train.py) |
+| `src/evaluation/` | mIoU, độ tin cậy, hình minh họa lỗi | [runner.py](src/evaluation/runner.py) |
+| `src/experiments/` + `configs/` | Ghép model với recipe/data/loss | [config.py](src/experiments/config.py), [config map](configs/README.md) |
+| `scripts/` | Lệnh chuẩn bị, train, resume, vẽ và evaluate | [script map](scripts/README.md) |
+| `notebooks/` | B2 và DeepLab tùy chọn, sinh từ template | [README](notebooks/README.md) |
+| `web/` | Node.js server, browser UI, Python worker | [README](web/README.md) |
+| `tests/` | Kiểm tra dữ liệu, model, loss, resume, inference | [đóng góp và kiểm thử](docs/CONTRIBUTING.md) |
+| `docs/` | Tài liệu hiện hành và lộ trình đọc | [mục lục](docs/README.md) |
+| `research/` | Bài báo, kế hoạch tương lai và bản thảo lịch sử | [README](research/README.md) |
+| `results/` | Báo cáo và bằng chứng nhỏ được lưu Git | [README](results/README.md) |
+| `data/`, `outputs/` | Dữ liệu, weights, kết quả chạy lớn trên máy riêng | Git bỏ qua file sinh tự động |
 
-Nhánh pooled BatchNorm của DeepLab cần batch source thực tế ≥ 2; tích lũy gradient không gộp thống kê BatchNorm. Encoder SegFormer dùng LayerNorm. Cityscapes val 500 và ACDC val 406 chỉ được đánh giá sau khi chốt checkpoint. Do các tập này từng được xem trong giai đoạn phát triển trước, chúng chưa phải bằng chứng test độc lập. Kết quả UDA và supervised có quyền truy cập nhãn khác nhau, cần trình bày riêng khi đối chiếu bài báo.
+Tên `run_research` trong code được giữ để không làm hỏng notebook/lệnh cũ; nó là bộ điều phối training dùng chung, không có nghĩa project bắt buộc là công trình nghiên cứu mới. Những kết quả lịch sử giữ nguyên đường dẫn để truy vết; hướng dẫn hiện hành không yêu cầu chạy lại B0.
 
-## 6. Bản đồ repository
+## 6. Hướng tiếp theo
 
-```text
-src/data/          # Dataset, chia dữ liệu, augmentation, trọng số lớp, replay
-src/models/        # File riêng cho B0, B2, DeepLab; registry và loader
-src/training/      # Loss, optimizer, BatchNorm, trainer và checkpoint dùng chung
-src/evaluation/    # Metrics, calibration, trực quan kết quả
-src/experiments/   # Ghép cấu hình và đóng gói workspace
-scripts/           # Chuẩn bị → train/resume → vẽ biểu đồ → đánh giá → đóng gói
-configs/           # Preprocessing, recipe theo giai đoạn, loss preset
-notebooks/         # Ba notebook hiện hành, mỗi model một notebook
-web/               # Node.js server, giao diện và worker inference CPU
-research/          # Kế hoạch thí nghiệm và ghi chú bài báo
-results/           # Chứng cứ kiểm thử gọn nhẹ; chờ kết quả GPU mới
-outputs/           # Checkpoint, ZIP, CPU probe, archive local; Git bỏ qua
-```
+Ưu tiên đánh giá checkpoint đã chốt trên cả hai miền, xem IoU từng lớp/thời tiết và kiểm thử ảnh thực tế trên giao diện. Khi có GPU, triển khai [protocol B2 Cityscapes công bố → ACDC](research/BASELINE_PROTOCOL.md) thành thí nghiệm mới, giữ riêng kết quả của lượt hiện tại. Các loss và augmentation nâng cao đã có thành tùy chọn, **chưa phải cải tiến đã được chứng minh**.
 
-[Hướng dẫn thành viên](docs/CONTRIBUTING.md) · [Mục lục tài liệu](docs/README.md) · [Trích dẫn phần mềm](CITATION.cff).
+[Thuyết trình với giảng viên](docs/PRESENT_TO_LECTURER.md) · [Nguồn và giấy phép](THIRD_PARTY_NOTICES.md) · [Quy trình nhóm](docs/CONTRIBUTING.md)

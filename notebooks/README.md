@@ -1,16 +1,15 @@
-# Ba notebook Kaggle hiện hành
+# Notebook Kaggle
 
-[Hướng dẫn chạy và resume](../docs/TRAINING_GUIDE.md)
+| Notebook | Vai trò |
+| --- | --- |
+| [02_train_segformer_b2.ipynb](02_train_segformer_b2.ipynb) | Model chính B2 |
+| [03_train_deeplabv3plus_resnet50.ipynb](03_train_deeplabv3plus_resnet50.ipynb) | Mở rộng CNN tùy chọn, chưa có kết quả GPU đầy đủ |
 
-| Notebook | Model | Hai giai đoạn |
-| --- | --- | --- |
-| [01_train_segformer_b0.ipynb](01_train_segformer_b0.ipynb) | B0 baseline | Cityscapes 20 epoch → ACDC 20 epoch |
-| [02_train_segformer_b2.ipynb](02_train_segformer_b2.ipynb) | B2 | Cityscapes 20 epoch → ACDC 20 epoch |
-| [03_train_deeplabv3plus_resnet50.ipynb](03_train_deeplabv3plus_resnet50.ipynb) | DeepLabV3+ ResNet50 | Cityscapes 20 epoch → ACDC 20 epoch |
-
-Các notebook được sinh từ template chung [build_research_notebooks.py](../scripts/build_research_notebooks.py). Code xử lý nằm trong `src/` và `scripts/`; mỗi notebook chọn model và đường dẫn output riêng.
+Mỗi notebook chạy **một model**, ImageNet encoder → Cityscapes 20 epoch → ACDC có nhãn + Cityscapes replay 20 epoch. Đây là recipe đang triển khai, chưa phải [protocol public-checkpoint mới](../research/BASELINE_PROTOCOL.md). B0 đã rút khỏi luồng chạy mới; giữ số thứ tự 02/03 để không đổi tên notebook đang được chia sẻ.
 
 - Chạy mới: code ZIP mới + Cityscapes + ACDC.
-- Resume: thêm ZIP kết quả mới nhất của chính model đó, giữ cùng dataset và đường dẫn mount.
+- Resume: ZIP kết quả của đúng model và cùng dataset/mount; không thay config của lượt đang chạy.
+- Sinh lại bằng `python -m scripts.build_kaggle_notebooks`; output code ZIP ở `outputs/kaggle/project-code.zip`.
+- Sửa [template chung](../scripts/build_research_notebooks.py), không sửa lặp logic trainer trong notebook.
 
-Notebook cũ được lưu trữ local, ngoài Git. Mỗi lượt hiện hành có tổng cộng **40 epoch/model**, gồm hai giai đoạn 20 epoch.
+[Hướng dẫn từng bước và checkpoint](../docs/TRAINING_GUIDE.md) · [Đọc code trước khi chạy](../docs/READING_GUIDE.md)

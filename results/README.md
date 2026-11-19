@@ -1,10 +1,12 @@
-# Current evidence and pending results
+# Kết quả và bằng chứng kiểm tra
 
-[Software release verification](repository-release/README.md) · [Run guide](../docs/TRAINING_GUIDE.md)
+**Hiện hành: B2 là model chính; DeepLab tùy chọn chưa train; B0 chỉ là lịch sử.** Báo cáo cũ được giữ nguyên để truy vết, không còn yêu cầu train hay chọn B0 trên giao diện.
 
-| Fresh model | Source20 | Adapt20 | Official Cityval500 | Official ACDCval406 |
+[Current repository verification](repo-refresh/README.md) · [Software release verification](repository-release/README.md) · [Run guide](../docs/TRAINING_GUIDE.md)
+
+| Model / historical run | Source20 | Adapt20 | Official Cityval500 | Official ACDCval406 |
 | --- | --- | --- | --- | --- |
-|[B0](segformer_b0_seed42/README.md)|Complete: best epoch 19, monitor 65.13%|Complete: best epoch 20, dev 51.65%|Pending|Pending|
+|Historical [B0](segformer_b0_seed42/README.md)|Complete: best epoch 19, monitor 65.13%|Complete: best epoch 20, dev 51.65%|Pending|Pending|
 |[B2](segformer_b2_seed42/README.md)|Complete: best epoch 18, monitor 74.74%|Complete: best epoch 20, dev 63.02%|Pending|Pending|
 |DeepLabV3+R50|Pending|Pending|Pending|Pending|
 

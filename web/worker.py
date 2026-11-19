@@ -16,7 +16,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 ROOT = Path(__file__).resolve().parents[1]
 MAX_BYTES = 10 * 1024 * 1024
 MAX_PIXELS = 8_000_000
-MODEL_NAMES = ("segformer_b0", "segformer_b2", "deeplabv3plus_resnet50")
+MODEL_NAMES = ("segformer_b2", "deeplabv3plus_resnet50")
 VI_LABELS = ("Đường", "Vỉa hè", "Tòa nhà", "Tường", "Hàng rào", "Cột", "Đèn giao thông",
              "Biển báo", "Cây xanh", "Địa hình", "Bầu trời", "Người", "Người đi xe",
              "Ô tô", "Xe tải", "Xe buýt", "Tàu", "Xe máy", "Xe đạp")
@@ -83,14 +83,13 @@ class Studio:
 
     def metadata(self):
         models = []
-        for name, title, detail in [("segformer_b0", "SegFormer B0", "Nhẹ & nhanh"),
-                                    ("segformer_b2", "SegFormer B2", "Transformer chính"),
+        for name, title, detail in [("segformer_b2", "SegFormer B2", "Mô hình chính"),
                                     ("deeplabv3plus_resnet50", "DeepLabV3+", "Đối chứng CNN")]:
             report = self.models[name, "adapt"]["report"]
             metrics = report.get("metrics", {})
             models.append(dict(id=name, name=title, detail=detail,
                 stages={s: self.models[name, s]["available"] for s in ("source", "adapt")},
-                parameters=report.get("configuration", {}).get("parameters", 3719027 if name == "segformer_b0" else None),
+                parameters=report.get("configuration", {}).get("parameters"),
                 dev_miou=metrics.get("acdc_dev_after"), source_dev_miou=metrics.get("acdc_dev_before")))
         return dict(models=models, samples=[{k: v for k, v in s.items() if k != "path"} for s in self.samples],
                     device="cpu", max_bytes=MAX_BYTES, max_pixels=MAX_PIXELS)

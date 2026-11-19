@@ -1,53 +1,32 @@
-# Trình bày code với giảng viên
+# Trình bày đồ án với giảng viên
 
-[Method](RESEARCH_FRAMEWORK.md) · [Project](../README.md)
+## Giới thiệu trong một phút
 
-## Câu mở đầu
-
-“Em giữ B0 làm baseline nhỏ. Em so B2 với DeepLabV3+ResNet50 gần nhau về số tham số. Dữ liệu,loss và evaluation tách khỏi model nên thay kiến trúc không phải viết lại pipeline. Mục tiêu là học tốt các lớp yếu và hạn chế quên trời quang khi thích nghi ACDC.”
+“Em xây dựng ứng dụng phân đoạn ảnh đường phố trong điều kiện thiếu sáng và thời tiết xấu. Model SegFormer-B2 học Cityscapes, sau đó học tiếp ảnh và nhãn ACDC. Khi học ACDC, em xen ảnh Cityscapes để giảm quên cảnh trời quang. Ứng dụng Node.js cho phép đưa ảnh vào, xem 19 lớp, so sánh trước/sau thích nghi và tải kết quả. Em đánh giá chất lượng bằng nhãn chuẩn, không chỉ quan sát màu.”
 
 ## Mở code theo thứ tự
 
-| Bước | File | Nói gì |
+| Bước | File | Ý cần giải thích |
 | --- | --- | --- |
-|1|[segformer_b0.py](../src/models/segformer_b0.py)|Baseline3,72M;encoder/decoder riêng|
-|2|[segformer_b2.py](../src/models/segformer_b2.py)|B2 lớn hơn27,36M,decoder768;không copy dataset/loss vào model|
-|3|[deeplabv3plus_resnet50.py](../src/models/deeplabv3plus_resnet50.py)|CNN26,70M;ResNet trích feature,ASPP xem ngữ cảnh nhiều tầm,decoder kết hợp feature nông|
-|4|[registry.py](../src/models/registry.py)|Đổi tên model,cùng19-classlogits,checkpoint đúng kiến trúc|
-|5|[dataset.py](../src/data/dataset.py)|Ảnh/mask cùng geometry,void255;dev không randomaugment|
-|6|[losses.py](../src/training/losses.py)|CEcontrol,weightedCE cho lớp ít pixel,Focal cho pixel khó,Dice cho overlap|
-|7|[config.py](../src/experiments/config.py)|Model+recipe+loss,data/optimizer dùng chung,source/adapt rõ ràng|
-|8|[train.py](../src/training/train.py)|AMP,accumulation,BN,optimizer,scheduler,best/last,resume|
-|9|[evaluate_research.py](../scripts/evaluate_research.py)|IoU từng lớp/thời tiết,confidence,errorpanels,ECE|
-|10|[checkpoints.py](../src/training/checkpoints.py)|Lưu staging+SHA,giữ thế hệ trước,rollback epoch chưa chốt|
-|11|[three notebooks](../notebooks/README.md)|Mỗi notebook tự chạy source20→adapt20 của một model;dùng cùng template và trainer|
+| 1 | [labels.py](../src/data/labels.py) | Các lớp cần nhận diện, 0–18 và vùng bỏ qua 255 |
+| 2 | [dataset.py](../src/data/dataset.py) | Ảnh/mask đi cùng nhau; biến đổi hình học đồng bộ |
+| 3 | [segformer_b2.py](../src/models/segformer_b2.py) | Model chính: encoder và decoder; kế thừa kiến trúc đã công bố |
+| 4 | [registry.py](../src/models/registry.py) | Thay model mà tái sử dụng phần còn lại; DeepLab là tùy chọn chưa train |
+| 5 | [config.py](../src/experiments/config.py) | Recipe source/adapt, 20 epoch mỗi stage, loss CE |
+| 6 | [train.py](../src/training/train.py), [replay.py](../src/data/replay.py) | Cách học, ôn dữ liệu nguồn và chọn best |
+| 7 | [checkpoints.py](../src/training/checkpoints.py) | Lưu/khôi phục khi phiên Kaggle ngắt |
+| 8 | [runner.py](../src/evaluation/runner.py) | mIoU từng lớp/thời tiết và hình minh họa lỗi |
+| 9 | [web guide](../web/README.md) | Node nhận ảnh, Python chạy model, browser hiện kết quả |
 
-## Từ chuyên ngành
+## Trình diễn
 
-- **Baseline:** mốc ban đầu để biết cải tiến có giúp hay không.
-- **Logits:** điểm thô của19lớp tại mỗi pixel;softmax chuyển thành xác suất.
-- **Backbone/encoder:** trích đặc trưng;decoder biến đặc trưng thành bản đồ lớp.
-- **ASPP:** nhiều nhánh convolution nhìn vùng rộng hẹp khác nhau để hiểu ngữ cảnh.
-- **Class imbalance:** road có nhiều pixel,rider ít;model nhận tín hiệu học không đều.
-- **Focal:** bớt chú ý pixel dễ;không tự phân biệt pixel khó với nhãn nhiễu.
-- **Dice:** vùng dự đoán trùng vùng thật bao nhiêu.
-- **Replay:** xen dữ liệu Cityscapes cũ khi học ACDC để giảm quên.
-- **BatchNorm:** ổn định feature bằng thống kê;batch nhỏ có thể làm stats dao động.
-- **Accumulation:** cộng gradient nhiều microbatch;không biến BNbatch1 thànhBNbatch8.
-- **Epoch:** một vòng theo sampler;replay không hứa thấy mọi ảnh nguồn mỗi vòng.
-- **Ablation:** thay một yếu tố để xác định tác dụng.
-- **Retention gate:** chỉ nhận candidate nếu source-monitor giảm không quá1điểm phần trăm.
-- **Dev/val/test:** dev chọn model,val kiểm tra candidate đã chốt,test độc lập hiện chưa có.
+Dùng cùng một ảnh cho B2 source và B2 adapted. Chỉ ra vùng tối, người/xe nhỏ và ranh giới dễ sai. Nếu không có mask chuẩn của ảnh, chỉ mô tả khác biệt quan sát được, không gán điểm chính xác cho ảnh đó.
 
-## Minh họa dùng lại
+## Báo cáo đúng phạm vi
 
-```bash
-python -m scripts.run_research --model segformer_b2 --stage source --loss ce --data outputs/shared_data/data.json --output outputs/b2_source
-python -m scripts.run_research --model deeplabv3plus_resnet50 --stage source --loss ce --data outputs/shared_data/data.json --output outputs/deeplab_source
-```
+- Đã có B2 source20/adapt20, seed42; ACDC dev nội bộ tăng từ 48,44% lên 63,02% mIoU. Đây là tập chọn checkpoint 402 ảnh, chưa là official-val/test độc lập.
+- Giao diện và pipeline là phần ứng dụng tự tích hợp; SegFormer là kiến trúc của tác giả, không nhận là model mới do đồ án phát minh.
+- Điểm bài gốc trên Cityscapes dùng làm tham khảo nguồn; không so trực tiếp với điểm ACDC dev của project.
+- B0 là lịch sử, DeepLab và baseline public-checkpoint mới chưa có kết quả hoàn chỉnh. Các loss/augmentation tùy chọn chưa chứng minh tăng chất lượng.
 
-Đổi tên model và output,giữ data/loss/trainer. Thử loss bằng job mới với `--loss`;không sửa forward của3model.
-
-## Nói đúng mức kết quả
-
-“Ba model đã qua data/loss/save/resume/evaluation với ảnh thật trên CPU. Đó là kiểm tra phần mềm. Thiết kế mới chưa có kết quả GPU và chưa chứng minh vượt paper. Em sẽ làm ablation,đọc IoU từng lớp/source retention và xác nhận nhiều seed trước khi kết luận.”
+[Từ vựng và lộ trình đọc đầy đủ](READING_GUIDE.md) · [Chứng cứ B2](../results/segformer_b2_seed42/README.md) · [Phương pháp](RESEARCH_FRAMEWORK.md)

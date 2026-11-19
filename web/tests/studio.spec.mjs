@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const output = path.resolve('outputs/web-studio');
 
-test('real B0/B2 inference, same-image comparison, mask download and responsive upload flow', async ({ page, request }) => {
+test('real B2 inference, source/adapt comparison, mask download and responsive upload flow', async ({ page, request }) => {
   await mkdir(output, { recursive: true });
   const errors = [];
   const screenshot = async file => {
@@ -14,9 +14,11 @@ test('real B0/B2 inference, same-image comparison, mask download and responsive 
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const metadata = await (await request.get('/api/metadata')).json();
-  expect(metadata.models.filter(m => m.stages.adapt)).toHaveLength(2);
+  expect(metadata.models.map(m => m.id)).not.toContain('segformer_b0');
+  expect(metadata.models.find(m => m.id === 'segformer_b2').stages.adapt).toBe(true);
   await page.goto('/');
-  await expect(page.locator('[data-model="segformer_b0"]')).toBeVisible();
+  await expect(page.locator('[data-model="segformer_b0"]')).toHaveCount(0);
+  await expect(page.locator('[data-model="segformer_b2"]')).toBeVisible();
   await expect(page.locator('#samples button')).toHaveCount(5);
   await expect(page.locator('#runButton')).toBeDisabled();
   await screenshot('desktop-empty.png');
@@ -25,7 +27,7 @@ test('real B0/B2 inference, same-image comparison, mask download and responsive 
   await expect(page.locator('#runButton')).toBeEnabled();
   await page.locator('#runButton').click();
   await expect(page.locator('#resultStrip')).toBeVisible({ timeout: 150_000 });
-  await expect(page.locator('#resultTitle')).toContainText('SegFormer B0');
+  await expect(page.locator('#resultTitle')).toContainText('SegFormer B2');
   const classRows = await page.locator('.class-row').count();
   expect(classRows).toBeGreaterThan(3);
   await page.locator('[data-mode="compare"]').click();
@@ -70,7 +72,7 @@ test('real B0/B2 inference, same-image comparison, mask download and responsive 
   await expect(page.locator('#resultStrip')).toBeVisible({ timeout: 150_000 });
   await expect(page.locator('#resultTitle')).toContainText('SegFormer B2');
   await page.locator('#stageSelect').selectOption('adapt');
-  await expect(page.locator('#resultStrip')).toBeHidden();
+  await expect(page.locator('#resultStrip')).toBeVisible();
   // Invalid files produce a readable error and never trigger inference.
   await page.locator('#fileInput').setInputFiles({ name: 'broken.png', mimeType: 'image/png', buffer: Buffer.from('not-an-image') });
   await expect(page.locator('#notice')).toContainText('hợp lệ');
@@ -88,8 +90,8 @@ test('real B0/B2 inference, same-image comparison, mask download and responsive 
   await page.getByLabel('Đóng hướng dẫn').click();
   expect(errors).toEqual([]);
   await writeFile(path.join(output, 'browser-verification.json'), JSON.stringify({ status: 'PASS',
-    actualLocalCheckpoints: ['segformer_b0', 'segformer_b2'], realSampleInputs: ['clear', 'night', 'fog'],
-    modelComparison: true, uploadAndInvalidFile: true, stageInvalidation: true, sourceInference: true,
+    actualLocalCheckpoints: ['segformer_b2_source', 'segformer_b2_adapt'], realSampleInputs: ['clear', 'night', 'fog'],
+    beforeAfterComparison: true, retiredB0Absent: true, uploadAndInvalidFile: true, stageInvalidation: true, sourceInference: true,
     maskDownload: true, colorAndOpacityOverlayDownloads: true,
     mobileViewport: 390, browserErrors: errors, accuracyClaims: false }, null, 2));
 });

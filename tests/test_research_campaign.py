@@ -8,10 +8,10 @@ from scripts import run_research_campaign as campaign
 from scripts import build_research_notebooks as builder
 
 
-def test_six_fresh_jobs_use_each_model_source_then_adaptation_and_twenty_epochs():
+def test_active_jobs_exclude_retired_b0_and_keep_twenty_epochs():
     jobs=campaign.jobs()
-    assert [j['model'] for j in jobs]==['segformer_b0']*2+['segformer_b2']*2+['deeplabv3plus_resnet50']*2
-    assert [j['stage'] for j in jobs]==['source','adapt']*3
+    assert [j['model'] for j in jobs]==['segformer_b2']*2+['deeplabv3plus_resnet50']*2
+    assert [j['stage'] for j in jobs]==['source','adapt']*2
     assert all(j['epochs']==20 and j['loss']=='ce' for j in jobs)
 
 
@@ -39,7 +39,7 @@ def test_campaign_pauses_then_continues_without_retraining_completed_jobs(tmp_pa
         if previous.is_file() and json.loads(previous.read_text())['epoch']==20:return
         calls.append((args.model,args.stage,args.initialization,deadline))
         epoch=20
-        if not paused[0] and args.model=='segformer_b0' and args.stage=='adapt':epoch=3;paused[0]=True
+        if not paused[0] and args.model=='segformer_b2' and args.stage=='adapt':epoch=3;paused[0]=True
         if args.stage=='source':assert args.checkpoint is None
         else:assert Path(args.checkpoint)==root/'jobs'/(args.model+'_source')/'run/best'
         for kind in ('last','best'):
@@ -54,10 +54,10 @@ def test_campaign_pauses_then_continues_without_retraining_completed_jobs(tmp_pa
     first=campaign.run_campaign(root,data,archive,runner=runner,clock=lambda:0,exporter=exporter)
     assert first['status']=='session_checkpoint_ready' and first['completed_jobs']==1
     second=campaign.run_campaign(root,data,archive,runner=runner,clock=lambda:0,exporter=exporter)
-    assert second['status']=='training_complete' and second['completed_jobs']==6
-    assert sum(model=='segformer_b0' and stage=='source' for model,stage,_,_ in calls)==1
+    assert second['status']=='training_complete' and second['completed_jobs']==4
+    assert sum(model=='segformer_b2' and stage=='source' for model,stage,_,_ in calls)==1
     assert all(initial=='imagenet_encoder' and deadline==36000 for _,_,initial,deadline in calls)
-    assert len(snapshots)>=8
+    assert len(snapshots)>=6
 
 
 def test_failed_job_with_truncated_logs_still_exports_workspace(tmp_path,monkeypatch):
@@ -92,6 +92,13 @@ def test_single_model_plan_has_two_jobs_and_refuses_cross_model_resume(tmp_path)
     assert [j['model'] for j in plan['jobs']]==['segformer_b2']*2
     assert campaign.progress(root,plan)['total_jobs']==2
     with pytest.raises(ValueError,match='original campaign'):
-        campaign.prepare_campaign(root,data,models=['segformer_b0'])
+        campaign.prepare_campaign(root,data,models=['deeplabv3plus_resnet50'])
     with pytest.raises(ValueError,match='unique supported'):
         campaign.jobs(['segformer_b2','segformer_b2'])
+
+
+def test_retired_b0_cannot_be_queued_or_generated():
+    with pytest.raises(ValueError, match="unique supported"):
+        campaign.jobs(["segformer_b0"])
+    with pytest.raises(ValueError, match="Unknown model"):
+        builder.build("segformer_b0")

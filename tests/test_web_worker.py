@@ -46,13 +46,20 @@ def test_metadata_missing_checkpoints_and_no_path_access(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match='hỗ trợ'):
         studio.predict('../arbitrary', 'adapt', '')
     with pytest.raises(ValueError, match='Checkpoint'):
-        studio.predict('segformer_b0', 'adapt', '')
+        studio.predict('segformer_b2', 'adapt', '')
     with pytest.raises(ValueError, match='ảnh mẫu'):
         studio.sample('../../file')
     # A local checkpoint can be supplied, but raw filesystem paths are not sent to clients.
     ckpt = tmp_path / 'best'; ckpt.mkdir()
     (ckpt / 'config.json').write_text('{}'); (ckpt / 'model.safetensors').write_bytes(b'fixture')
-    monkeypatch.setenv('SEGFORMER_B0_CHECKPOINT', str(ckpt))
+    monkeypatch.setenv('SEGFORMER_B2_CHECKPOINT', str(ckpt))
     metadata = Studio().metadata()
     assert metadata['models'][0]['stages']['adapt'] is True
     assert str(tmp_path) not in json.dumps(metadata)
+
+
+def test_retired_b0_is_not_exposed_by_studio():
+    studio = Studio()
+    assert "segformer_b0" not in [m["id"] for m in studio.metadata()["models"]]
+    with pytest.raises(ValueError, match="hỗ trợ"):
+        studio.predict("segformer_b0", "adapt", "")

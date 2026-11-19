@@ -1,4 +1,4 @@
-"""Generate three thin Kaggle launchers from one shared template."""
+"""Generate current Kaggle launchers from one shared template."""
 import ast
 import json
 from pathlib import Path
@@ -6,7 +6,6 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 NOTEBOOKS={
-    'segformer_b0':'01_train_segformer_b0.ipynb',
     'segformer_b2':'02_train_segformer_b2.ipynb',
     'deeplabv3plus_resnet50':'03_train_deeplabv3plus_resnet50.ipynb',
 }
@@ -24,7 +23,7 @@ def build(model):
     boot=(ROOT/'scripts/kaggle_bootstrap.py').read_text(encoding='utf-8')
     texts=[('markdown','''# Project-CV · __MODEL__
 
-Một model, hai giai đoạn: **Cityscapes 20 epoch → ACDC replay 20 epoch**. CE control, cùng data/training/evaluation với hai model còn lại. Encoder ImageNet + head mới;không nạp checkpoint project cũ.
+Một model, hai giai đoạn: **Cityscapes 20 epoch → ACDC replay 20 epoch**. Recipe hiện có, không phải notebook baseline checkpoint công bố mới. Encoder ImageNet + head mới;không nạp checkpoint project cũ. B0 đã ngừng sử dụng.
 
 **Fresh:** code ZIP mới + Cityscapes + ACDC, GPU + Internet. **Resume:** ZIP của chính model này + cùng dataset/mount;điền `RESUME_INPUT`. Khi resume,source code được lấy từ snapshot của lượt chạy đó.
 

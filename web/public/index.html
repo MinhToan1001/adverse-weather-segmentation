@@ -16,10 +16,10 @@
     <p class="nav-label">KHÔNG GIAN LÀM VIỆC</p>
     <nav aria-label="Điều hướng chính">
       <button class="nav-item active" data-mode="single"><svg><use href="/icons.svg#layers"/></svg>Phân đoạn ảnh<span class="nav-key">01</span></button>
-      <button class="nav-item" data-mode="compare"><svg><use href="/icons.svg#columns"/></svg>So sánh mô hình<span class="nav-key">02</span></button>
+      <button class="nav-item" data-mode="compare"><svg><use href="/icons.svg#columns"/></svg>Trước / sau thích nghi<span class="nav-key">02</span></button>
       <button class="nav-item" id="modelsButton"><svg><use href="/icons.svg#box"/></svg>Thư viện mô hình<svg class="nav-arrow"><use href="/icons.svg#arrow-up-right"/></svg></button>
     </nav>
-    <div class="sidebar-study"><div class="small-caps">NGHIÊN CỨU HIỆN TẠI</div><h3>Thấy rõ hơn.<br>Trong mọi thời tiết.</h3><p>Cityscapes → ACDC<br>19 lớp ngữ nghĩa · 4 điều kiện</p><div class="weather-icons"><svg><use href="/icons.svg#sun"/></svg><svg><use href="/icons.svg#rain"/></svg><svg><use href="/icons.svg#fog"/></svg><svg><use href="/icons.svg#moon"/></svg></div></div>
+    <div class="sidebar-study"><div class="small-caps">ĐỒ ÁN ỨNG DỤNG</div><h3>Thấy rõ hơn.<br>Trong mọi thời tiết.</h3><p>Cityscapes → ACDC<br>19 lớp ngữ nghĩa · 4 điều kiện</p><div class="weather-icons"><svg><use href="/icons.svg#sun"/></svg><svg><use href="/icons.svg#rain"/></svg><svg><use href="/icons.svg#fog"/></svg><svg><use href="/icons.svg#moon"/></svg></div></div>
     <div class="sidebar-footer"><span class="live-dot"></span><div>Local workspace<small>Chạy trên máy của bạn</small></div><span class="version">v1.0</span></div>
   </aside>
 
@@ -58,7 +58,7 @@
       <footer class="page-footer"><span>WEATHERLENS <b>/</b> PROJECT-CV</span><span>Same data. Shared recipe. Different perspectives.</span></footer>
     </main>
   </div>
-  <dialog id="helpDialog"><button class="icon-button dialog-close" data-close aria-label="Đóng hướng dẫn"><svg><use href="/icons.svg#close"/></svg></button><p class="eyebrow">BẮT ĐẦU TRONG MỘT KHUNG HÌNH</p><h2>Nhìn, thử và đối chiếu.</h2><ol><li>Chọn ảnh mẫu hoặc tải một ảnh đường phố từ máy.</li><li>Chọn B0 để thử nhanh, B2 để xem model lớn hơn.</li><li>Chọn phiên bản chỉ Cityscapes hoặc đã học thêm ACDC.</li><li>Bấm Phân đoạn ảnh. Đổi kiểu hiển thị, chỉnh độ đậm hoặc tải PNG.</li></ol><p>Chế độ so sánh chạy B0 và B2 trên cùng ảnh. Đây là so sánh trực quan; phần trăm trong bảng lớp là diện tích ảnh, không phải độ tin cậy.</p><p class="help-limits">Ảnh tối đa 10 MB và 8 triệu pixel. Ảnh được xử lý trong bộ nhớ của server local, không ghi thành lịch sử upload.</p></dialog>
+  <dialog id="helpDialog"><button class="icon-button dialog-close" data-close aria-label="Đóng hướng dẫn"><svg><use href="/icons.svg#close"/></svg></button><p class="eyebrow">BẮT ĐẦU TRONG MỘT KHUNG HÌNH</p><h2>Nhìn, thử và đối chiếu.</h2><ol><li>Chọn ảnh mẫu hoặc tải một ảnh đường phố từ máy.</li><li>Chọn SegFormer B2 để phân đoạn ảnh.</li><li>Chọn phiên bản chỉ Cityscapes hoặc đã học thêm ACDC.</li><li>Bấm Phân đoạn ảnh. Đổi kiểu hiển thị, chỉnh độ đậm hoặc tải PNG.</li></ol><p>Chế độ so sánh chạy B2 trước và sau khi học ACDC trên cùng ảnh. Đây là so sánh trực quan; phần trăm trong bảng lớp là diện tích ảnh, không phải độ tin cậy.</p><p class="help-limits">Ảnh tối đa 10 MB và 8 triệu pixel. Ảnh được xử lý trong bộ nhớ của server local, không ghi thành lịch sử upload.</p></dialog>
   <dialog id="modelsDialog"><button class="icon-button dialog-close" data-close aria-label="Đóng thư viện"><svg><use href="/icons.svg#close"/></svg></button><p class="eyebrow">CÙNG MỘT QUY TRÌNH HUẤN LUYỆN</p><h2>Những góc nhìn khác nhau.</h2><p>20 epoch Cityscapes → 20 epoch ACDC + source replay. CE control, seed 42.</p><div id="modelTable"></div><p class="help-limits">Điểm ACDC dev nội bộ dùng trong chọn checkpoint. Chưa phải kết quả official validation hay độ chính xác của ảnh upload.</p><p class="help-limits" id="checkpointHelp"></p></dialog>
 </body>
 </html>
