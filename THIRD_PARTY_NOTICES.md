@@ -23,3 +23,10 @@ Lin et al., ICCV2017 (https://arxiv.org/abs/1708.02002) and Milletari et al.,201
 (https://arxiv.org/abs/1606.04797), with the exact project reductions implemented
 in src/training/losses.py. These optional historical objectives are not enabled
 in the current DG recipe and are not claims of new loss functions.
+
+K1 weather effects in `src/data/augmentations/weather/` are project-written
+implementations of atmospheric scattering and shot/read-noise approximations,
+plus heuristic 2D rain/snow overlays. Conceptual references, exact assumptions
+and limitations are listed in `docs/K1_WEATHER.md`. No Foggy Cityscapes or
+Unprocessing source code, dataset, calibration file or pretrained weight is
+bundled. This is not a claim to reproduce either complete published pipeline.

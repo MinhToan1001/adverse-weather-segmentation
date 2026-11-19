@@ -4,6 +4,9 @@
 | --- | --- |
 | [01_dg_segformer_b2.ipynb](01_dg_segformer_b2.ipynb) | Profile GPU → baseline20 → aug20 → consistency20 |
 | [02_dg_deeplabv3plus_resnet50.ipynb](02_dg_deeplabv3plus_resnet50.ipynb) | Profile GPU → baseline20 → aug20 → consistency20 |
+| [03_k1_weather_preview.ipynb](03_k1_weather_preview.ipynb) | K1 độc lập: CPU preview thời tiết mức1–5; không train |
+
+K1 là phần mở rộng trên nhánh riêng. Notebook03 chỉ cần CPU + Internet, có demo với khoảng cách tổng hợp đã biết và preview ảnh Cityscapes train nếu được gắn vào input. Fog cần metric distance hoặc disparity/camera; thiếu độ sâu thì bỏ riêng fog. [Cách chạy và giới hạn](../docs/K1_WEATHER.md).
 
 DeepLab có đủ aug như B2. Không còn phải đổi ARM hoặc PROFILE_ONLY trong notebook. Chỉ khai báo CODE_INPUT/CITYSCAPES_ROOT khi auto-find không rõ và RESUME_INPUT nếu tiếp tục kết quả trước. Run All sẽ lần lượt chạy ba chiến thuật độc lập của model đó, mỗi chiến thuật20epoch; không dùng weights baseline để học nối proposed.
 

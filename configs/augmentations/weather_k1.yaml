@@ -1,0 +1,13 @@
+# Merge this mapping into cfg.data.augment for a NEW source-only experiment.
+# Existing B2/DeepLab recipes are not modified.
+weather:
+  conditions: [clean, fog, night, rain, snow]
+  severities: [1, 2, 3, 4, 5]
+  probabilities: [0.2, 0.2, 0.2, 0.2, 0.2]
+  # Must contain disparity/train/<city> and camera/train/<city>.
+  cityscapes_root: null
+  # Alternative: distance_root/<original-image-stem>.npy, in camera-ray meters.
+  distance_root: null
+  distance_unit: meters
+  invalid_policy: error
+  max_distance_m: 200.0

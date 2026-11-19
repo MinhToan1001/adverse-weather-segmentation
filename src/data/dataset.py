@@ -36,7 +36,7 @@ class ManifestSegmentationDataset(Dataset):
                 raise ValueError('Paired style requires Cityscapes train only')
             self.source_style = SourceStyle(paired_style)
         self.augment = augment or {}
-        unknown = set(self.augment) - {"min_scale", "max_scale", "horizontal_flip", "gamma_darkening", "photometric", "class_aware_crop"}
+        unknown = set(self.augment) - {"min_scale", "max_scale", "horizontal_flip", "gamma_darkening", "photometric", "class_aware_crop", "weather"}
         if unknown:
             raise ValueError(f"Unknown augmentation options: {sorted(unknown)}")
         self.min_scale = float(self.augment.get("min_scale", 0.5))
@@ -52,6 +52,14 @@ class ManifestSegmentationDataset(Dataset):
         )
         self.photo=Photometric(self.augment['photometric']) if 'photometric' in self.augment else None
         self.class_crop = self.augment.get('class_aware_crop')
+        self.weather = None
+        if 'weather' in self.augment:
+            from src.data.augmentations.weather.policy import SourceWeather
+            if not training or any(row['domain'] not in {'cityscapes', 'synthetic'} for row in self.items):
+                raise ValueError('K1 weather is opt-in for source training only')
+            if self.source_style or self.gamma or self.photo:
+                raise ValueError('K1 condition labels cannot be mixed with other RGB style/gamma/photometric transforms')
+            self.weather = SourceWeather(self.augment['weather'])
         self.seed = seed
         self.epoch = 0
         self.native_labels = native_labels
@@ -110,6 +118,7 @@ class ManifestSegmentationDataset(Dataset):
 
     def __getitem__(self, idx):
         row = self.items[idx]
+        weather_sample = None
         crop_info = {}
         gamma_exponent = None
         if self.training and self.gamma and self.gamma.probability and row["domain"] == "cityscapes":
@@ -123,8 +132,13 @@ class ManifestSegmentationDataset(Dataset):
             if not np.isin(original, [*range(19), 255]).all():
                 raise ValueError(f"Invalid trainId mask: {row['mask']}")
             source_w, source_h = source_image.size
+            rgb = source_image.convert('RGB')
+            if self.weather is not None:
+                # The distance map is aligned to native RGB before any crop/flip.
+                weather_sample = self.weather.apply(rgb, row, self.seed, self.epoch, idx)
+                rgb = weather_sample.image
             image, mask = self._resize_and_fit(
-                source_image.convert("RGB"), source_mask.convert("L"), gamma_exponent, idx if self.training else None, crop_info,
+                rgb, source_mask.convert("L"), gamma_exponent, idx if self.training else None, crop_info,
             )
         if self.training and random.random() < self.flip_probability:
             image = ImageOps.mirror(image)
@@ -139,6 +153,9 @@ class ManifestSegmentationDataset(Dataset):
             "labels": torch.from_numpy(labels.copy()).long(),
             "domain": row.get("domain", "unknown"),
         }
+        if weather_sample is not None:
+            result['condition_labels'] = torch.tensor(weather_sample.condition_id, dtype=torch.long)
+            result['weather_severity'] = torch.tensor(weather_sample.severity, dtype=torch.long)
         if self.source_style is not None:
             # The clean PIL image already underwent the final crop/pad/flip.
             # RGB-only styling cannot change geometry or the shared mask.

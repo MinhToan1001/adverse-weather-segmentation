@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-19",
+  "scope": "K1 software and analytic-scene visual QA, not real-weather validation",
+  "python_tests": {"passed": 189, "skipped": 4, "seconds": 77.45},
+  "k1_tests": 26,
+  "node_api_tests": {"passed": 1},
+  "dependency_check": "no broken requirements",
+  "preview_samples": 20,
+  "preview_scene": "procedural with known synthetic camera-ray distances",
+  "visual_grid_inspected": true,
+  "actual_kaggle_cells_tested": "uploaded source bundle, synthetic source image, missing-depth skip-fog path",
+  "real_cityscapes_visual_validation": false,
+  "kaggle_runtime_executed": false,
+  "gpu_training_executed": false,
+  "segmentation_improvement_measured": false
+}
