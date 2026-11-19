@@ -1,3 +1,5 @@
+[Kế hoạch hoàn thành B2 + DeepLab với 30 giờ GPU](research/PROJECT_COMPLETION_PLAN.md)
+
 ![Project-CV](docs/assets/project_banner.svg)
 
 # Project-CV · Phân đoạn đường phố bền vững theo DG

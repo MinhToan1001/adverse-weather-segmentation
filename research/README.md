@@ -1,3 +1,5 @@
+[Kế hoạch hoàn thành B2 + DeepLab với 30 giờ GPU](PROJECT_COMPLETION_PLAN.md)
+
 # Tài liệu DG và lịch sử
 
 **Hiện hành:** [DG recovery plan](DG_RECOVERY_PLAN.md). Cityscapes train/selection, ACDC chỉ evaluation sau freeze.

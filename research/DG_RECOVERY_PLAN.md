@@ -1,3 +1,5 @@
+[Kế hoạch hoàn thành B2 + DeepLab với 30 giờ GPU](PROJECT_COMPLETION_PLAN.md)
+
 # Khôi phục giao thức DG từ kế hoạch gốc
 
 Ngày chốt lại: 2026-11-19. Tài liệu này **thay thế hướng supervised ACDC trong BASELINE_PROTOCOL.md**. Câu hỏi chính: chỉ học đường phố Cityscapes, model có phân đoạn tốt ảnh thời tiết xấu chưa dùng để học hay không?
