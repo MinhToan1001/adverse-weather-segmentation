@@ -1,4 +1,6 @@
-# Predeclared development order
+# Predeclared development order — original shared-recipe study
+
+The next study follows the [2026-11-19 baseline decision](BASELINE_PROTOCOL.md). B0/B2 below are completed historical controls; this original order is retained for provenance. A runnable published-checkpoint baseline and its new experiment matrix are pending implementation.
 
 1. Train all three models independently:sourceCE20 then ACDC replayCE20. B0 is the small baseline;B2 and DeepLab form the main architecture comparison.
 2. Diagnose per-class/weather errors,fit exposure,dev CE and source retention. Low IoU is not equivalent to class rarity.
