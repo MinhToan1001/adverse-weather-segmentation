@@ -10,6 +10,8 @@ Status: **research direction and primary budget agreed with the user**. This is 
 
 No GPU training has been launched during this decision. Existing results remain valid records of the previous project recipe.
 
+**Clarified study scope:** Cityscapes is the published source reference; ACDC is the user's downstream fine-tuning/evaluation extension. A paper does not need an ACDC score to provide the starting model for this study. Keep published Cityscapes results and project-measured ACDC adaptation results in separate tables. The [verified SegFormer review](paper_reviews/SegFormer_2021.md) records B0/B2 source-paper results and their evaluation conditions.
+
 ## Paper and artifact selection
 
 | Reference | Role | Verified findings / limits |
