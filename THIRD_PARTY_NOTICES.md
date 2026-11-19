@@ -20,5 +20,6 @@ No segmentation_models.pytorch dependency or source is included.
 
 Shared Focal and Dice objectives are project implementations of ideas from
 Lin et al., ICCV2017 (https://arxiv.org/abs/1708.02002) and Milletari et al.,2016
-(https://arxiv.org/abs/1606.04797), with the exact project reductions documented
-in docs/RESEARCH_FRAMEWORK.md. They are not claims of new loss functions.
+(https://arxiv.org/abs/1606.04797), with the exact project reductions implemented
+in src/training/losses.py. These optional historical objectives are not enabled
+in the current DG recipe and are not claims of new loss functions.

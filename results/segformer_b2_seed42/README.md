@@ -1,3 +1,5 @@
+> **Lịch sử supervised, không phải DG hiện hành.** Run này học cả ảnh và nhãn ACDC. Các số liệu dưới giữ nguyên để truy vết; hướng chạy tiếp theo ở [kế hoạch DG](../../research/PROJECT_COMPLETION_PLAN.md).
+
 # SegFormer-B2 — seed 42, CE control
 
 [Results index](../README.md) · [Integrity and comparability checks](verification.json) · [Per-class scores](acdc_dev_classes.csv) · [Curve data](learning_curves.csv)
@@ -46,7 +48,7 @@ Monitor/dev CE generally decreases and there is no sustained dev-mIoU deteriorat
 
 These curves do not prove the absence of overfitting. Augmented training CE and monitor/dev CE use different input conditions, and train-eval probes are small. One seed and internal model-selection sets do not support statistical superiority or published-benchmark claims.
 
-Keep the B0 and B2 source/adapted checkpoints frozen. Complete the DeepLabV3+ ResNet50 CE control with the same 20 + 20 recipe before changing augmentation or loss. Then use the shared evaluator for frozen candidates on the official validation splits. Augmentation experiments should remain separate ablations; none was added to this run or to the source code during this review.
+Keep these historical source/adapted checkpoints frozen. The supervised20+20 follow-up originally proposed here has been retired. Current work uses fresh independent B2/DeepLab DG runs, learning Cityscapes only; see the [current plan](../../research/PROJECT_COMPLETION_PLAN.md). No DG result is added to this historical report.
 
 ## Artifact checks
 

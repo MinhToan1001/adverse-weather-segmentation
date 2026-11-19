@@ -12,6 +12,16 @@ Mỗi model có một notebook. Cả B2 và DeepLab đều tự chạy **profili
 4. Save Version → Save & Run All. Notebook chuẩn bị dữ liệu một lần, profile model một lần; khi profile đạt thì tự chạy tiếp cả ba chiến thuật. Không dừng để bắt đổi cờ.
 5. Giữ ZIP `dg_<model>_suite_seed42.zip`. suite_complete nghĩa là model đó đủ3×20epoch; hai suite hoàn chỉnh tạo đủ6candidate.
 
+`None` có hai nghĩa theo biến: CITYSCAPES_ROOT=None yêu cầu tự tìm dataset; RESUME_INPUT=None bắt đầu lượt mới. Khi có nhiều bản code/dataset, đặt đường dẫn rõ ràng, ví dụ:
+
+```python
+CODE_INPUT = Path('/kaggle/input/datasets/khangcules10/codizip')
+CITYSCAPES_ROOT = Path('/kaggle/input/datasets/kavithak1388/cityscapes/Cityscape')
+RESUME_INPUT = None
+```
+
+Đây là ví dụ; dùng nút copy path của **input thực tế**. CODE_INPUT nhận ZIP hoặc thư mục đã giải nén chứa src/scripts/configs; CITYSCAPES_ROOT phải chứa leftImg8bit và gtFine, đủ train/val. Cùng code ZIP dùng cho hai notebook.
+
 ## Nếu phiên bị ngắt hoặc hết thời gian
 
 Mỗi epoch hoàn thành cập nhật một ZIP chung. Gần hết cửa sổ10giờ, suite lưu trạng thái session_checkpoint_ready. Phiên mới: thêm ZIP suite của đúng model, giữ cùng dataset version/mount, chỉ đặt RESUME_INPUT và Run All.
@@ -40,7 +50,7 @@ run_dg vẫn là API/CLI từng arm cho phát triển và QA; notebook thông th
 
 ## Freeze và evaluate sau cả hai suite
 
-Đưa hai suite hoàn chỉnh vào cùng môi trường. Lệnh tự tìm sáu arm:
+Đưa hai suite hoàn chỉnh vào cùng môi trường. Lệnh tự tìm sáu arm. Những đường dẫn trong dấu `<...>` dưới đây cần thay bằng đường dẫn thực tế:
 
 ```powershell
 python -m scripts.evaluate_dg freeze --suites <B2_suite_root> <DeepLab_suite_root> --out outputs/dg_cohort.json
@@ -48,3 +58,12 @@ python -m scripts.evaluate_dg evaluate --cohort outputs/dg_cohort.json --run-id 
 ```
 
 Chỉ sau khi đủ sáu candidate đã khóa mới evaluate ACDC. Không dùng ACDC để học/chọn best/tune. Dùng official val406, không dev402 lịch sử. Điểm target đã từng xem phải khai báo, không nhận là test độc lập mới.
+
+Sau freeze, tạo manifest ACDC với cấu trúc local đã mô tả trong [data contract](DATA_CONTRACT.md):
+
+```powershell
+python -m scripts.make_manifest --dataset acdc --split val --root data/raw/ACDC/rgb_anon_trainvaltest --mask-root data/raw/ACDC/gt_trainval --output-dir outputs/evaluation/manifests
+python -m scripts.validate_manifest --manifest outputs/evaluation/manifests/acdc_val.csv --check-files --check-labels
+```
+
+Dùng CSV đó làm `--manifest`, lặp lệnh evaluate cho cả sáu run-id theo dạng `model:arm`. Đổi `--scope official-city` và dùng Cityscapes val CSV nếu đánh giá nguồn. Không trộn CSV từ máy/mount khác nếu chưa kiểm và tái khóa đường dẫn.

@@ -1,25 +1,30 @@
-[Automatic suites: both models run all3strategies](dg-suite-automation/README.md) · 177tests passed; GPU results pending.
+# Trạng thái kết quả và bằng chứng
 
-[DG implementation: 173 tests + real CPU QA](dg-implementation/README.md) · GPU results pending.
+## Luồng DG hiện hành
 
-[DG recovery verification](dg-recovery/README.md) · [Current protocol](../research/DG_RECOVERY_PLAN.md)
+**Chưa có kết quả full GPU cho sáu lượt DG mới.** B2/DeepLab và baseline/aug/consistency đã có code, CPU tests và đường chạy Kaggle/resume. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
 
-> **DG protocol restored:** chưa có kết quả GPU cho baseline DG mới. Các bảng dưới là lịch sử source/adapt. Đặc biệt B2 adapted63,02% đã dùng ACDC train/dev, **không là DG**. Xem [recovery plan](../research/DG_RECOVERY_PLAN.md).
+| Bằng chứng | Phạm vi |
+| --- | --- |
+| [Suite tự động](dg-suite-automation/README.md) | Queue ba chiến thuật, resume, bootstrap notebook, profile seal và source preflight |
+| [DG CPU QA](dg-implementation/README.md) | Loss/gradient/geometry; hai model chạy thử nhỏ và save/resume khớp chạy liền |
 
-# Kết quả và bằng chứng kiểm tra
+Test record ghi rõ phiên bản và thời điểm kiểm tra. Kết quả tests xác nhận phần mềm ở phạm vi đã thử, không thay thế mIoU hay timing GPU. [Kế hoạch còn lại](../research/PROJECT_COMPLETION_PLAN.md).
 
-**Hiện hành: B2 là model chính; DeepLab tùy chọn chưa train; B0 chỉ là lịch sử.** Báo cáo cũ được giữ nguyên để truy vết, không còn yêu cầu train hay chọn B0 trên giao diện.
+## Kết quả lịch sử — ngoài bảng DG
 
-[Current repository verification](repo-refresh/README.md) · [Software release verification](repository-release/README.md) · [Run guide](../docs/TRAINING_GUIDE.md)
+Các run dưới từng học ảnh và nhãn ACDC. Giữ nguyên báo cáo/weights để truy vết và phục vụ demo; không sử dụng điểm đó để chứng minh DG. B0 đã bỏ khỏi lượt train mới.
 
-| Model / historical run | Source20 | Adapt20 | Official Cityval500 | Official ACDCval406 |
-| --- | --- | --- | --- | --- |
-|Historical [B0](segformer_b0_seed42/README.md)|Complete: best epoch 19, monitor 65.13%|Complete: best epoch 20, dev 51.65%|Pending|Pending|
-|[B2](segformer_b2_seed42/README.md)|Complete: best epoch 18, monitor 74.74%|Complete: best epoch 20, dev 63.02%|Pending|Pending|
-|DeepLabV3+R50|Pending|Pending|Pending|Pending|
+| Run | Cityscapes monitor188, source best | ACDC dev402, adapted best | Official validation của run này |
+| --- | ---: | ---: | --- |
+| [B0 lịch sử](segformer_b0_seed42/README.md) | 65,13% | 51,65% | Chưa nghiệm thu |
+| [B2 lịch sử](segformer_b2_seed42/README.md) | 74,74% | 63,02% | Chưa nghiệm thu |
 
-The B0/B2 scores are internal selection metrics, not official validation results. Source monitoring uses 188 Cityscapes images; adaptation selection uses 402 ACDC dev images. Both training runs are complete, with official validation still pending. DeepLab has not yet been received under this fresh protocol.
+Đây là điểm chọn checkpoint trên split nội bộ, không phải ACDC val406. Demo Node.js hiện dùng B2 source/adapted của các run này. ACDC đã được xem trong phát triển là giới hạn phải công bố của đánh giá DG tiếp theo.
 
-B2 exceeds B0 by 11.37 percentage points on the same ACDC internal dev split under the same recipe. This is a single-seed model comparison with different parameter counts, ImageNet encoders and training compute; it is not a published-benchmark superiority claim. [Comparison and integrity audit](segformer_b2_seed42/README.md).
+## Quy tắc lưu kết quả
 
-No old project score fills these cells. Each notebook trains one model from an ImageNet encoder/new head with transactional checkpointing. Software tests and tiny real-image CPU probes are not accuracy benchmarks. Large checkpoints/ZIPs/raw data and local legacy archives are ignored by Git; only compact verification evidence belongs here.
+- Git giữ config/tài liệu, bảng số nhỏ và báo cáo kiểm chứng.
+- Dataset, weights, optimizer/RNG state, ZIP, ảnh dataset/panel và log lớn nằm local trong `data/`, `outputs/` hoặc input Kaggle; không commit.
+- Giữ ZIP gốc để resume, cả snapshot code của run. Không thay config/đổi tên kết quả cũ thành protocol mới.
+- Các log XML/TXT và báo cáo phần mềm cũ đã thay thế được gỡ khỏi cây hiện hành; xem lịch sử Git khi cần.

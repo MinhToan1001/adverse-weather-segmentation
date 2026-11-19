@@ -1,11 +1,11 @@
-"""Standard-library source bootstrap shared by the three model notebooks."""
+"""Standard-library source bootstrap shared by the two DG model notebooks."""
 from pathlib import Path, PurePosixPath
 import shutil
 import stat
 import zipfile
 
 
-MARKERS=('scripts/run_research_campaign.py','src/training/checkpoints.py','src/models/registry.py')
+MARKERS=('scripts/run_dg_suite.py','src/training/checkpoints.py','src/models/registry.py')
 
 
 def valid_source(path):
@@ -50,5 +50,5 @@ def copy_source(source,destination):
         destination.mkdir(parents=True,exist_ok=True)
         for name in ('src','scripts','configs','tests','third_party'):
             if (source/name).exists():shutil.copytree(source/name,destination/name,dirs_exist_ok=True)
-        for name in ('requirements.txt','requirements-demo.txt','pyproject.toml','THIRD_PARTY_NOTICES.md'):
+        for name in ('requirements.txt','pyproject.toml','THIRD_PARTY_NOTICES.md'):
             if (source/name).is_file():shutil.copy2(source/name,destination/name)

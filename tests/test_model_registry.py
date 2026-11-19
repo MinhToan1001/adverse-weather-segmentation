@@ -9,7 +9,7 @@ from src.experiments.config import compose_experiment
 
 
 @pytest.mark.parametrize('name', MODEL_NAMES)
-def test_all_three_architectures_share_logits_loss_and_gradient_contract(name):
+def test_active_architectures_share_logits_loss_and_gradient_contract(name):
     torch.manual_seed(9)
     model = build_model(dict(model=dict(name=name, initialization='random')))
     set_training_mode(model, True)

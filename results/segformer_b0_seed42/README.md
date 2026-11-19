@@ -1,3 +1,5 @@
+> **Lịch sử supervised, không phải DG hiện hành.** Run này học cả ảnh và nhãn ACDC. Các số liệu dưới giữ nguyên để truy vết; hướng chạy tiếp theo ở [kế hoạch DG](../../research/PROJECT_COMPLETION_PLAN.md).
+
 # SegFormer-B0 — seed 42, CE control
 
 [Results index](../README.md) · [Integrity checks](verification.json) · [Per-class ACDC dev scores](acdc_dev_classes.csv)
@@ -32,7 +34,7 @@ ACDC dev mIoU increases while dev CE generally decreases. Gains become small nea
 
 Night remains the hardest condition. The lowest aggregate class IoUs are motorcycle (8.69%), bus (17.49%) and rider (19.86%). Low IoU alone does not establish class imbalance as the cause. Keep this CE control fixed; inspect per-class errors after completing the comparable model runs, then test targeted loss/crop changes as separate ablations.
 
-Train B2 next using its own notebook, the same dataset split and the same recipe, with `RESUME_INPUT=None`. Its initialization is its own ImageNet encoder, not B0 weights. Then train DeepLab using the same protocol. Evaluate the frozen source and adapted checkpoints on official Cityscapes val 500 / ACDC val 406 under the shared evaluation recipe.
+The follow-up supervised campaign originally proposed here has been retired. Current work trains B2/DeepLab independently under the Cityscapes-only DG protocol; see the [current plan](../../research/PROJECT_COMPLETION_PLAN.md). Keep the measurements in this report as historical evidence.
 
 **Official validation is pending.** The numbers above are internal monitor/dev results used during model selection, from one seed. They do not establish superiority over published papers or independent-test generalization.
 

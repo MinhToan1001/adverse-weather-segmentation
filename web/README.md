@@ -1,4 +1,4 @@
-> **Historical demo, not DG evidence:** source is the old Cityscapes-only run; adapted checkpoints used ACDC images/labels. DG baseline/proposed results are pending. [Recovery plan](../research/DG_RECOVERY_PLAN.md).
+> **Historical demo, not DG evidence:** source is the old Cityscapes-only run; adapted checkpoints used ACDC images/labels. DG baseline/proposed results are pending. [Current DG method](../docs/DG_METHOD.md).
 
 # WeatherLens Studio
 

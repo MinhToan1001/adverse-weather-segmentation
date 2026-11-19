@@ -1,7 +1,14 @@
-# Shared data pipeline
+# Pipeline dữ liệu dùng chung
 
-partitions.py creates grouped Cityscapes fit/monitor and ACDC fit/dev without using model scores. preparation.py handles explicit labelIds→trainIds conversion and image-mask manifests. validation.py checks files,dimensions,labels and disjoint paths. dataset.py applies paired geometry and deterministic evaluation. preprocessing.py defines the common canvas/normalization contract.
+| Module | Vai trò trong DG |
+| --- | --- |
+| `labels.py` | 19 trainIds và ignore255 |
+| `preparation.py` | Tạo manifest, chuyển labelIds → trainIds |
+| `validation.py` | Kiểm cặp file, nhãn, kích thước và đường dẫn trùng |
+| `preprocessing.py` | Giữ tỷ lệ, resize/pad, chuẩn hóa |
+| `dataset.py` | Hình học ảnh–mask đồng bộ, clean/style views, eval xác định |
+| `augmentations/source_style.py` | Đổi RGB nguồn; cùng mask, RNG riêng |
 
-class_weights.py computes bounded fit-only pixel priors. replay.py balances source/target draws. augmentations/ contains RGB-only gamma/photometric transforms and label-guided class crop. These components do not depend on B0/B2/DeepLab classes.
+Suite DG chỉ dùng Cityscapes train2975/val500; ACDC val dành cho evaluator sau freeze. [Contract](../../docs/DATA_CONTRACT.md).
 
-Use scripts.prepare_research_data once per model workspace. Generated manifests/derived masks stay outside Git. [Contract](../../docs/DATA_CONTRACT.md).
+`partitions.py`, `replay.py`, `sampling.py`, `class_weights.py` và augmentation cũ còn giữ cho checkpoint/config lịch sử và kiểm thử tiện ích. Chúng không tham gia chiến thuật DG đã chốt. Manifest và mask sinh ra nằm trong workspace local, không commit.

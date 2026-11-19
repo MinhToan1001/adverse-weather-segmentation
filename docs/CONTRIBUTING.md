@@ -1,27 +1,36 @@
-> **Hiện hành:** sửa [DG launcher](../scripts/run_dg.py) / [DG notebook template](../scripts/build_dg_notebook.py), dùng Cityscapes train2975/val500. Không bật target training hoặc chọn model bằng ACDC. Hai notebook supervised trước đây được lưu archive; chạy chúng phải ghi rõ ngoài protocol DG.
+# Làm việc trong nhóm
 
-# Hướng dẫn làm việc trong nhóm
+## Quy tắc chung
 
-## Bắt đầu
-
-Tạo môi trường ảo, cài `requirements.txt`, rồi chạy `python -m pytest -q`. Các kiểm tra pretrained tùy chọn dùng `RUN_PRETRAINED_TESTS=1`; `HF_HUB_OFFLINE=1` ngăn tải weights. GPU training chạy trên Kaggle qua notebook B2 hoặc DeepLab tùy chọn.
+- Giữ DG: học Cityscapes train, chọn best bằng Cityscapes val; chỉ đánh giá ACDC sau khi chốt cohort. Không trộn điểm supervised lịch sử vào DG.
+- Mỗi model có file riêng; data, augmentation, loss, trainer và evaluator dùng chung.
+- Thay chiến thuật ở config/module chung; không copy vòng train vào notebook.
+- Dùng nhánh riêng cho thay đổi của thành viên, mô tả hành vi và cách kiểm tra trong PR; tránh force-push.
 
 ## Đặt thay đổi ở đâu?
 
-- Kiến trúc model: file riêng trong `src/models/`, đăng ký tên và loader trong registry.
-- Dataset, augmentation và nhãn: `src/data/`.
-- Loss, optimizer và checkpoint: `src/training/`.
-- Ghép cấu hình thí nghiệm: `src/experiments/` và `configs/`.
-- Đánh giá và độ tin cậy: `src/evaluation/`.
-- Notebook: sửa generator chung, rồi tạo lại hai notebook hiện hành. Trainer được tái sử dụng từ module chung.
-- Giao diện Node.js và API: `web/`; chạy `npm test`. Kiểm thử trình duyệt bằng `npm run test:e2e` khi có checkpoint và dataset local, xem `web/README.md`.
+| Nội dung | Vị trí |
+| --- | --- |
+| Kiến trúc/nạp model | `src/models/`, `registry.py` |
+| Dataset, nhãn, augmentation | `src/data/` |
+| Loss, optimizer, checkpoint | `src/training/` |
+| Recipe/preprocessing | `configs/` |
+| Ghép config, guard và khóa kết quả | `src/experiments/` |
+| Điều phối suite/đánh giá | `scripts/` |
+| Giao diện Node.js | `web/` |
 
-## Trước khi commit hoặc tạo PR
+## Trước khi bàn giao
 
-1. Chạy test liên quan; chạy `python -m pytest -q` khi đổi pipeline.
-2. Chạy `python -m scripts.build_kaggle_notebooks`. Kiểm tra notebook sinh ra không chứa output hay trạng thái thực thi.
-3. Xem Git diff. Commit source, config, tài liệu, test và hai notebook. Dataset, manifest sinh tự động, weights, ZIP kết quả và archive local được Git bỏ qua.
-4. Mô tả vấn đề, thay đổi hành vi và cách kiểm thử. Dùng nhánh riêng cho thay đổi của nhóm; tránh force-push ghi đè công việc của thành viên khác.
-5. Ghi config, source và seed trước khi chạy GPU. Khi resume, giữ nguyên thí nghiệm. Phân biệt kết quả source-only, adaptation có nhãn và UDA khi báo cáo.
+```powershell
+python -m pytest -q
+python -m scripts.build_kaggle_notebooks
+npm test
+```
 
-Dataset local đặt trong `data/raw/`; trên Kaggle dùng input mount. Mỗi thành viên có thể chọn đường dẫn khác nhau và tạo manifest bằng `scripts.prepare_research_data`, thay vì commit đường dẫn tuyệt đối trên máy cá nhân. Archive cũ trong `outputs/` không được đẩy lên Git và không cần thiết để clone/chạy project.
+Sửa notebook qua [generator](../scripts/build_dg_notebook.py), rồi sinh lại hai notebook; không commit output thực thi. `npm test` chạy kiểm thử API, không cần weights. Kiểm thử trình duyệt cần checkpoint/dataset và dev dependencies; xem [web](../web/README.md).
+
+Test pretrained chỉ chạy khi đặt `RUN_PRETRAINED_TESTS=1`; `HF_HUB_OFFLINE=1` dùng cache, không tải weights. Tiny CPU QA kiểm tra đường đi dữ liệu/gradient/lưu–khôi phục, không phải đánh giá độ chính xác.
+
+Commit code/config/tài liệu/tests/notebook và báo cáo nhỏ. Không commit dataset, đường dẫn máy cá nhân, weights, ZIP, ảnh dataset hay outputs lớn. Những file này nằm trong `data/raw/`, `outputs/` và được Git bỏ qua.
+
+Resume phải dùng snapshot code/config/dataset gốc. Đổi code/recipe là thí nghiệm mới; không sửa config trong ZIP cũ để vượt kiểm tra hash. Lưu kết quả và các giới hạn vào [results](../results/README.md); chỉ đánh dấu train hoàn thành khi đủ log và checkpoint 20 epoch của từng chiến thuật.

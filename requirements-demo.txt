@@ -1,2 +1,0 @@
--r requirements.txt
-# The web studio uses Node.js; no additional Python UI dependency.

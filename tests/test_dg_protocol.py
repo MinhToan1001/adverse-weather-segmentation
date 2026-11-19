@@ -3,7 +3,6 @@ from copy import deepcopy
 import ast
 import json
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 
@@ -60,13 +59,13 @@ def test_historical_supervised_requires_explicit_override_and_cannot_claim_dg():
     with pytest.raises(ValueError,match='outside DG'):require_training_permission(cfg,True)
 
 
-def test_old_campaign_and_adapt_cli_fail_before_accessing_data(tmp_path):
-    from scripts.run_research_campaign import run_campaign
-    from scripts.run_research import prepare
-    with pytest.raises(ValueError,match='supervised, not DG'):
-        run_campaign(tmp_path/'work',tmp_path/'nonexistent_data.json',tmp_path/'result.zip')
-    with pytest.raises(ValueError,match='disabled for DG'):
-        prepare(SimpleNamespace(stage='adapt'))
+def test_retired_model_cannot_start_a_new_dg_run(tmp_path):
+    from scripts.run_dg import prepare
+    from scripts.build_dg_notebook import build
+    with pytest.raises(ValueError,match='supported DG model'):
+        prepare(tmp_path/'city',tmp_path/'work',model='segformer_b0')
+    with pytest.raises(ValueError,match='Unknown DG model'):
+        build('segformer_b0')
     assert not (tmp_path/'work').exists()
 
 
@@ -148,7 +147,7 @@ def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path,model):
     import sys
     import shutil
     from scripts.build_dg_notebook import build
-    from scripts.run_research import fingerprints, snapshot_source
+    from src.experiments.run_support import fingerprints, snapshot_source
     from scripts.kaggle_bootstrap import extract_safe
     from src.experiments.packaging import export_workspace
     inputs=tmp_path/'inputs';inputs.mkdir()

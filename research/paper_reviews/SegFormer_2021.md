@@ -20,17 +20,10 @@ Single-scale evaluates one scale; multi-scale combines predictions at several sc
 
 The paper uses ImageNet-1K encoder pretraining followed by supervised segmentation training. Section 4.1 specifies 1024 × 1024 Cityscapes training crops and sliding-window evaluation. A 512 × 1024 fit-to-canvas research evaluator is a different recipe; do not claim it reproduces the paper's Cityscapes scores without checking the matching inference conditions and checkpoint.
 
-## Role in the user's study
+## Vai trò trong project hiện hành
 
-The agreed question is: **can supervised ACDC fine-tuning improve a Cityscapes-trained SegFormer on adverse conditions while retaining source-domain performance?** The source paper need not itself report ACDC results to serve as the model/source benchmark for this extension.
+Dùng SegFormer-B2 làm kiến trúc chính, khởi tạo encoder ImageNet và head mới. Baseline học Cityscapes train2975, chọn best bằng val500,20epoch; ACDC chỉ đánh giá sau freeze. Recipe và inference của project khác paper, vì vậy không nhận là tái lập nguyên số Cityscapes của bài.
 
-Use two clearly separated result tables:
+Hai nhánh aug/consistency kiểm tra độ bền vững khi chỉ biến đổi nguồn. Kiến trúc công bố là nền tảng; hiệu quả DG phải do project đo với đối chứng cùng protocol. Điểm B2 adapted63,02% lịch sử đã dùng nhãn ACDC, không thuộc bảng DG.
 
-1. **Cityscapes source reference:** report the paper's numbers as published, then actual Cityscapes measurements of the selected checkpoint under the documented evaluation recipe. Re-evaluate frozen adapted models on the same Cityscapes set to measure retention.
-2. **ACDC extension:** evaluate the same published checkpoint before adaptation (S0), conventional supervised fine-tuning (FT20), and proposed improvements on the same held-out ACDC images. These ACDC numbers must all be measured by this project; Cityscapes reference numbers cannot populate this table.
-
-ACDC train/fit labels supervise fine-tuning; internal dev selects checkpoints; official val/test measures performance. Do not fine-tune on the evaluation images. Comparing S0 with a supervised model measures the practical benefit of target supervision/adaptation. Comparing FT20 with a controlled improved arm is needed to attribute gains to the proposed strategy.
-
-The existing B2 result of 63.02% is from the earlier project-trained source initialization and internal dev. It is not a published-checkpoint S0 or FT20 result. Ordinary fine-tuning, replay and augmentation are established techniques; research novelty requires a concrete, validated contribution beyond simply applying them.
-
-See the [baseline protocol](../BASELINE_PROTOCOL.md). No new checkpoint evaluation or training was performed during this literature verification.
+[Phương pháp và dữ liệu hiện hành](../../docs/DG_METHOD.md).

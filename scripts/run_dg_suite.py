@@ -8,7 +8,7 @@ import sys
 import time
 
 from scripts.run_dg import prepare_cityscapes,prepare,run as run_one
-from scripts.run_research import fingerprints,snapshot_source
+from src.experiments.run_support import fingerprints,snapshot_source
 from src.experiments.packaging import export_workspace
 from src.experiments.protocol import DG_PROTOCOL
 from src.models.registry import MODEL_NAMES

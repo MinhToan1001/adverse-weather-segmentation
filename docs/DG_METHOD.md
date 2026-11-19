@@ -1,10 +1,27 @@
 # Phương pháp DG đang triển khai
 
-[Training guide](TRAINING_GUIDE.md) · [Kế hoạch30giờ](../research/PROJECT_COMPLETION_PLAN.md)
+[Training guide](TRAINING_GUIDE.md) · [Cơ sở bài báo](../research/README.md) · [Kế hoạch](../research/PROJECT_COMPLETION_PLAN.md)
 
 ## Ranh giới dữ liệu và trạng thái
 
 Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Hiện code cho cả B2 và DeepLab đã có, kiểm thử CPU với dữ liệu thật đã qua; **chưa có full GPU training hoặc bằng chứng tăng mIoU**.
+
+## Recipe train dùng chung
+
+| Nội dung | Giá trị hiện hành / ý nghĩa |
+| --- | --- |
+| Epoch và chọn best | 20 epoch, không early stopping; best theo Cityscapes val mIoU |
+| Khởi tạo | Encoder ImageNet đã pin, head mới; seed42 cho từng lượt |
+| Batch / tích lũy gradient | Batch thật2, tích lũy4 minibatch rồi update; drop_last bỏ minibatch thiếu cuối epoch |
+| Optimizer / LR | AdamW; encoder6e-5, head×10; weight decay0,01 |
+| Scheduler | Warmup20 optimizer updates rồi poly power1 |
+| Số học | FP16 AMP trên GPU; scaler nằm trong checkpoint; KL tính FP32 |
+| Normalization | RGB theo ImageNet; BN cập nhật từ nguồn, SegFormer encoder dùng LayerNorm |
+| Input và hình học | Canvas512×1024; giữ tỷ lệ, scale0,5–2/crop/pad/flip0,5 đồng bộ ảnh–mask |
+| Loss | CE ở cả ba nhánh; consistency thêm KL theo bảng dưới |
+| Checkpoint | best/last/previous theo epoch, kèm optimizer/scheduler/scaler/RNG; ZIP sau epoch hoàn thành |
+
+BatchNorm (BN) chuẩn hóa bằng thống kê batch; accumulation chỉ cộng gradient nên không thay batch thật cho BN. AMP giảm chi phí số học; scheduler điều chỉnh LR theo tiến độ học. Recipe ở [source_20epoch.yaml](../configs/recipes/source_20epoch.yaml), preprocessing ở [shared_512.yaml](../configs/preprocessing/shared_512.yaml). Không thay recipe hoặc model giữa một run đang resume.
 
 ## Ba chế độ dùng chung
 

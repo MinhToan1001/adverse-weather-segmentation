@@ -1,48 +1,37 @@
-# Đọc repo theo giao thức DG
+# Đọc code theo một đường đi
 
-## 1. Hiểu câu hỏi trước
+Nên đọc [README](../README.md) trước. Luồng hiện hành là **Cityscapes → train → chọn best bằng Cityscapes val → khóa sáu candidate → đánh giá ACDC**.
 
-Đọc [README](../README.md) và [DG recovery plan](../research/DG_RECOVERY_PLAN.md). Câu hỏi: học Cityscapes rồi có xử lý được thời tiết xấu chưa học hay không? Vì vậy **không train/chọn checkpoint bằng ACDC**. Điểm supervised63,02% cũ không trả lời câu hỏi này.
+## 1. Dữ liệu vào model như thế nào?
 
-## 2. Theo một ảnh qua dữ liệu
+- [preparation.py](../src/data/preparation.py): ghép ảnh với mask và chuyển mã nhãn khi cần. Manifest là file CSV liệt kê các cặp ảnh–mask.
+- [labels.py](../src/data/labels.py): 19 lớp và mã bỏ qua 255.
+- [preprocessing.py](../src/data/preprocessing.py): giữ tỷ lệ, resize/pad, normalization.
+- [dataset.py](../src/data/dataset.py): áp dụng cùng hình học cho ảnh và mask.
+- [source_style.py](../src/data/augmentations/source_style.py): tạo thêm phiên bản chỉ thay ngoại hình RGB, giữ nhãn.
 
-[labels.py](../src/data/labels.py): 19 mã lớp0–18, ignore255. [preparation.py](../src/data/preparation.py): ghép ảnh–mask và chuyển labelIds. [preprocessing.py](../src/data/preprocessing.py): giữ tỷ lệ, padding, normalization. [dataset.py](../src/data/dataset.py): tensor ảnh/nhãn, train geometry đồng bộ; validation xác định. [validation.py](../src/data/validation.py): lỗi ghép cặp/split/nhãn.
+[DATA_CONTRACT](DATA_CONTRACT.md) giải thích split và cấu trúc thư mục. Các file `partitions.py`, `replay.py` phục vụ luồng supervised lịch sử; suite DG không dùng chúng để chia/học ACDC.
 
-DG launcher chuẩn bị toàn Cityscapes train2975/val500. Các module [partitions.py](../src/data/partitions.py), [replay.py](../src/data/replay.py), [acdc.py](../src/data/acdc.py) phục vụ lịch sử supervised hoặc công cụ dataset; **không dùng target partitions/replay trong DG**. Không nhầm sự tồn tại của module với việc đang bật nó.
+## 2. Hai kiến trúc nằm ở đâu?
 
-## 3. Xem model và training
+Mở [segformer_b2.py](../src/models/segformer_b2.py) và [deeplabv3plus_resnet50.py](../src/models/deeplabv3plus_resnet50.py). Đây là hai file model riêng. [registry.py](../src/models/registry.py) chọn/nạp model theo tên; [segformer.py](../src/models/segformer.py) giữ helper SegFormer dùng chung. Cả hai trả logits — điểm dự đoán 19 lớp trước khi chọn lớp cho từng pixel.
 
-[segformer_b2.py](../src/models/segformer_b2.py) là kiến trúc chính; [registry.py](../src/models/registry.py) chọn/nạp đúng model. [config.py](../src/experiments/config.py) ghép recipe. [protocol.py](../src/experiments/protocol.py) chặn target train/selection và checkpoint ACDC trong DG v1.
+## 3. Chiến thuật và vòng train nằm ở đâu?
 
-[run_dg.py](../scripts/run_dg.py) là entrypoint hiện hành: chuẩn bị Cityscapes, khóa config/manifest/source, chạy20epoch và xuất ZIP. [train.py](../src/training/train.py) dùng chung: forward → CE → backward → optimizer → Cityscapes val → best/last. [optim.py](../src/training/optim.py), [strategies.py](../src/training/strategies.py), [checkpoints.py](../src/training/checkpoints.py) tách optimizer, BatchNorm và lưu/khôi phục. [Notebook DG](../notebooks/README.md) chỉ gọi các phần đó.
+- [dg.py trong experiments](../src/experiments/dg.py) ghép config model + chiến thuật + đường dẫn.
+- [protocol.py](../src/experiments/protocol.py) chặn ACDC train/selection và config sai DG.
+- [dg.py trong training](../src/training/dg.py) thực hiện baseline/aug/consistency.
+- [train.py](../src/training/train.py) quản lý batch, loss, optimizer, validation và chọn best.
+- [checkpoints.py](../src/training/checkpoints.py) lưu/khôi phục cả trạng thái train.
 
-Ba arm đã cài trong [dg.py](../src/training/dg.py), [SourceStyle](../src/data/augmentations/source_style.py) và [DG composer](../src/experiments/dg.py). C0=baseline, C1=aug, C2=consistency. Xem [phương pháp chính xác và kiểm thử](DG_METHOD.md); CPU QA đã qua, full GPU còn chờ. Các loss/class crop khác không bật trong DG controls.
+Thông số tập trung ở [source_20epoch.yaml](../configs/recipes/source_20epoch.yaml), [shared_512.yaml](../configs/preprocessing/shared_512.yaml), [paired_source.yaml](../configs/dg/paired_source.yaml). Đọc [DG_METHOD](DG_METHOD.md) trước khi thay chúng.
 
-## 4. Đánh giá và sử dụng
+## 4. Notebook điều phối gì?
 
-[metrics.py](../src/evaluation/metrics.py): ma trận nhầm lẫn → IoU từng lớp → mIoU. [runner.py](../src/evaluation/runner.py): native output, per-weather, độ tin cậy và panel lỗi. [evaluate_research.py](../scripts/evaluate_research.py) là công cụ đánh giá riêng; chỉ dùng ACDC sau khi khóa phương pháp/checkpoint. Không chạy vòng lặp chọn tham số bằng điểm ACDC.
+[build_dg_notebook.py](../scripts/build_dg_notebook.py) sinh hai notebook từ một template. [run_dg_suite.py](../scripts/run_dg_suite.py) chuẩn bị Cityscapes một lần, đo GPU rồi chạy ba chiến thuật. [run_dg.py](../scripts/run_dg.py) chạy một chiến thuật, tiếp tục từ epoch đã lưu và xuất kết quả. Notebook không chứa bản sao kiến trúc hay trainer.
 
-[inference.py](../src/inference.py) xử lý một ảnh. [server.mjs](../web/server.mjs) nhận request; [worker.py](../web/worker.py) chạy PyTorch; [app.js](../web/public/app.js), [index.html](../web/public/index.html), [styles.css](../web/public/styles.css) trình bày ảnh/mask/overlay. Demo hiện chứa checkpoints lịch sử, chưa có model DG mới.
+## 5. Đọc kết quả và giao diện
 
-## 5. Kiểm chứng và tham khảo
+[evaluate_dg.py](../scripts/evaluate_dg.py) khóa đủ sáu candidate rồi cho phép đánh giá checkpoint đã khóa. [runner.py](../src/evaluation/runner.py) xuất metrics và ảnh lỗi; [metrics.py](../src/evaluation/metrics.py) tính IoU từ ma trận nhầm lẫn. [plot_research_run.py](../scripts/plot_research_run.py) vẽ lịch sử train.
 
-[tests/test_dg_protocol.py](../tests/test_dg_protocol.py) kiểm target selection, adapted initialization, override và resume. Các [tests](../tests) khác kiểm metrics/model/loss/checkpoint; [web tests](../web/tests) kiểm UI/API. Test phần mềm không thay benchmark model.
-
-[SegFormer](../research/paper_reviews/SegFormer_2021.md) là nguồn kiến trúc. [VLTSeg](../research/paper_reviews/VLTSeg_2024.md) là ứng viên đối chứng DG; ISSA và SHADE được nối với giả thuyết trong [DG plan](../research/DG_RECOVERY_PLAN.md). HRDA/Refign nguyên thiết lập là UDA. [Archive](../research/archive/README.md) giữ các hướng cũ; đọc sau cùng khi cần truy vết.
-
-## Từ vựng ngắn
-
-| Từ | Nghĩa |
-| --- | --- |
-| DG | Học miền nguồn, đánh giá miền chưa dùng để học/chọn model |
-| Supervised adaptation | Học tiếp bằng ảnh và nhãn miền mới; khác DG |
-| Source / target | Cityscapes / ACDC trong giao thức này |
-| Consistency | Cùng nội dung dưới ngoại hình khác thì dự đoán nên nhất quán |
-| Ablation | Tắt một thành phần để đo tác dụng riêng |
-| Manifest | Danh sách ảnh–mask/split/domain |
-| Epoch / batch | Vòng theo bộ mẫu / số ảnh xử lý cùng lúc |
-| CE / logits | Hàm lỗi pixel / điểm thô của19lớp |
-| Best / last / resume | Bản tốt nhất / epoch đã chốt gần nhất / tiếp tục trạng thái lưu |
-| mIoU | Trung bình mức chồng khớp dự đoán/nhãn của các lớp |
-| Normalization / augmentation | Chuẩn hóa pixel / tăng đa dạng ảnh nguồn |
-| Pretraining | Kiến thức ban đầu từ dữ liệu được công bố rõ, ở đây ImageNet |
+[web/server.mjs](../web/server.mjs) phục vụ giao diện/API; [web/worker.py](../web/worker.py) nạp weights; [inference.py](../src/inference.py) dùng preprocessing/model chung. Demo B2 hiện là **lịch sử supervised**, chưa phải kết quả DG mới. Xem [results](../results/README.md) trước khi trích số liệu.

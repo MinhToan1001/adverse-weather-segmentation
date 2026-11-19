@@ -11,7 +11,7 @@ data/raw/ACDC/
   gt_trainval/gt/{fog,rain,snow,night}/
 ```
 
-DG hiện hành chỉ học Cityscapes; không dùng ACDC train hoặc nhãn ACDC để chọn best. ACDC val chỉ evaluate sau khi khóa model. Chia fit/dev/monitor và mã nhãn xem [data contract](../docs/DATA_CONTRACT.md). Thư mục mount trên Kaggle có thể khác; không cần đổi source để khớp đường dẫn máy người khác.
+DG hiện hành chỉ học Cityscapes; không dùng ACDC train hoặc nhãn ACDC để chọn best. ACDC val chỉ evaluate sau khi khóa model. Quy ước train/val và mã nhãn xem [data contract](../docs/DATA_CONTRACT.md). Thư mục mount trên Kaggle có thể khác; không cần đổi source để khớp đường dẫn máy người khác.
 
 Chạy `python -m scripts.run_dg --city data/raw/cityscapes --root outputs/dg/b2 --archive outputs/dg_b2_seed42.zip --prepare-only` để tạo danh sách ảnh–mask và nhãn đã chuyển. Manifest sinh ra chứa đường dẫn máy hiện tại và hash, không commit dữ liệu sinh tự động. Không sửa trực tiếp mask gốc của dataset.
 

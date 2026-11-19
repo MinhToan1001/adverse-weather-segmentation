@@ -1,17 +1,11 @@
-> Historical verification of the first manual-arm interface. The active notebooks now run all three strategies automatically; see [automatic-suite verification](../dg-suite-automation/README.md). Original evidence below is preserved.
+# Bằng chứng CPU của phương pháp DG
 
-# Shared DG implementation verification · 2026-11-19
+[Phương pháp](../../docs/DG_METHOD.md) · [Record gốc](verification.json) · [Suite tự động hiện hành](../dg-suite-automation/README.md)
 
-[Method](../../docs/DG_METHOD.md) · [Training guide](../../docs/TRAINING_GUIDE.md) · [Verification record](verification.json)
+Record này giữ kết quả kiểm tra phương pháp ở lần triển khai trước đợt dọn repo. Nó gồm gradient clean/style, teacher detach, bỏ ignore255, RNG, BN, khởi tạo và tính toàn vẹn cohort. Số test trong JSON là số của lần kiểm tra đó, không phải số test hiện tại.
 
-Implemented baseline / source-style two-view CE / two-view CE+detached-teacher KL for B2 and DeepLabV3+ ResNet50. RGB style preserves one shared geometry and mask; local RNG isolates appearance and pair scheduling from geometric/dropout RNG. Sequential clean/styled backward uses the original minibatch accumulation/update count. C1/C2 have the same forward/BatchNorm order.
+CPU QA thật dùng4ảnh Cityscapes train/2val,64×96,random init,2batches/epoch. B2 và DeepLab đều chạy2epoch: ngắt/resume cho weights khớp từng giá trị với chạy liền. Hash weights ban đầu của ba chiến thuật giống nhau trong mỗi kiến trúc. Config sáu nhánh qua guard trên manifest Cityscapes train2975/val500.
 
-**173 Python tests passed**, including cached pretrained checks, teacher detachment, void exclusion, joint-vs-sequential gradient agreement, BN buffers, source-only guards, cohort tamper detection and actual notebook resume after Kaggle nested ZIP expansion for both models/all three arms. GPU/AMP timing and convergence remain unverified until hardware is available.
+JSON gốc còn mô tả giao diện manual-arm trước đây; **hiện dùng hai notebook tự chạy đủ ba chiến thuật và khóa sáu candidate**, theo [training guide](../../docs/TRAINING_GUIDE.md). Không chạy theo các cờ notebook trong record lịch sử.
 
-Real CPU QA used4Cityscapes train/2val,64×96,random initialization,2batches/epoch for each model. Both completed2epochs with interruption/resume and matched continuous-run weights bitwise. All three arm initial safetensors hashes matched within each architecture; optimizer updates remained1per epoch and paired KL was finite. Tiny random-model metrics are not reported as quality evidence.
-
-All six model/arm configs passed DG guards against real Cityscapes train2975/val500 manifests and file checks. No ACDC images/masks were used in these tests or QA. Two notebooks default to PROFILE_ONLY=True; the GPU pilot discards its weights and produces timing/VRAM estimates that exclude checkpoint/ZIP/setup costs.
-
-The cohort evaluator requires5completed20epoch candidates, equal source split/code/seed/processing, equal initialization/recipe within each model, aligned DG settings and immutable artifact hashes. Existing generic historical evaluation tools are not the new DG reporting entrypoint.
-
-No GPU run, DG mIoU improvement, paper reproduction or statistical superiority is established. Candidate defaults p_pair0,5 and λ0,1 require full GPU/source-validation review. Source-image preview, full logs and large probe checkpoints stay local/Git-ignored; only this compact evidence is committed.
+Không có full GPU timing, AMP/convergence benchmark hoặc bằng chứng tăng mIoU trong QA này. Checkpoint probe, preview ảnh và full log nằm local/Git-ignored dưới `outputs/dg-implementation/`.

@@ -1,6 +1,6 @@
 {
   "date": "2026-11-19",
-  "tests_passed": 177,
+  "tests_passed": 167,
   "failures": 0,
   "automatic_flow": [
     "source preparation once",
@@ -46,12 +46,41 @@
     "source_only": true,
     "gpu_training": false,
     "archive": "D:\\python\\Project-CV\\outputs\\dg-suite-automation\\real-source-preflight.zip",
-    "scope": "Real source preparation/config/hash/path checks only; no profiling or full training"
+    "scope": "Real source preparation/config/hash/path checks only; no profiling or full training",
+    "checked_before_repository_cleanup": true
   },
   "orchestration_test_scope": "Fake profiler/trainer used to test queue/control flow on CPU; no full GPU training",
   "target_training": false,
   "cohort_required_candidates": 6,
   "gpu_timing_verified": false,
   "accuracy_benchmark": false,
-  "quota_limit": "Two independent suites cannot query shared Kaggle quota; six full runs are not guaranteed within30hours."
+  "quota_limit": "Two independent suites cannot query shared Kaggle quota; six full runs are not guaranteed within30hours.",
+  "pre_cleanup_tests_passed": 177,
+  "repository_cleanup": {
+    "date": "2026-11-19",
+    "scope": "Retire superseded supervised launchers/notebooks/plans and old software test dumps; retain historical model results and all local datasets/checkpoints.",
+    "python": {
+      "passed": 167,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cached_pretrained_checks": true,
+      "junit": "outputs/repo-cleanup/python-tests.xml"
+    },
+    "node_api_tests": {
+      "passed": 1,
+      "failed": 0
+    },
+    "local_markdown_links_checked": 170,
+    "missing_local_links": 0,
+    "notebooks": 2,
+    "new_gpu_training": false,
+    "legacy_campaign_test_removal": "Ten obsolete supervised-workflow cases removed; committed-state/archive tests retained and fresh Kaggle setup tests migrated to DG.",
+    "checkpoint_helpers": "src/experiments/run_support.py",
+    "code_bundle": {
+      "path": "outputs/kaggle/project-code.zip",
+      "sha256": "e72385384e3349d942aeb8ef30c8df893733dbcd499e1530f51985ad4c897269",
+      "data_or_weights_included": false
+    }
+  }
 }

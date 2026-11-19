@@ -1,5 +1,10 @@
-# Shared evaluation
+# Đánh giá dùng chung
 
-runner.py evaluates all three supported models with native output,pooled confusion,mIoU/per-class/weather scores,ECE,coverage and visual RGB/GT/prediction/confidence/error panels. semantic.py restores logits through the same unpad/resize contract. metrics.py ignores255;zero union is undefined,false-positive-only classes score0. calibration.py contains reliability diagnostics.
+- `metrics.py`: ma trận nhầm lẫn → IoU từng lớp → mIoU; bỏ ignore255. Lớp có union0 không có IoU xác định; chỉ có false-positive thì IoU0.
+- `semantic.py`: nội suy logits, bỏ pad và phục hồi kích thước ảnh gốc.
+- `runner.py`: chạy inference, gộp confusion, per-weather/per-class, xuất ảnh RGB/GT/prediction/confidence/error.
+- `calibration.py`: ECE và reliability diagnostics; không phải chứng nhận an toàn triển khai.
 
-CLI:scripts.evaluate_research with checkpoint,manifest,scope and out. Scope enforces expected dataset counts/split. Models/config/manifests and confusion caches are hashed. Current inference is512×1024 canvas,float32,no TTA. Confidence metrics are diagnostics,not deployment safety evidence. Paired group-CI and independent-seed confirmation remain part of the experiment plan,not fabricated measurements.
+Entry point hiện hành là [scripts.evaluate_dg](../../scripts/evaluate_dg.py). Nó khóa sáu candidate hoàn chỉnh trước khi đánh giá ACDC; thay checkpoint sau freeze sẽ bị từ chối. Dùng canvas512×1024, FP32, native output, không TTA (không cộng nhiều phiên bản ảnh khi dự đoán).
+
+Overall mIoU tính từ confusion của toàn tập; không trung bình cơ học bốn mIoU thời tiết. Confidence của ảnh upload không phải độ chính xác có nhãn thật. Khoảng tin cậy theo nhóm và xác nhận nhiều seed chưa triển khai trong luồng bàn giao hiện tại. [Hướng dẫn](../../docs/TRAINING_GUIDE.md).

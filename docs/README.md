@@ -1,18 +1,14 @@
-[DG method đã triển khai và kiểm thử CPU](DG_METHOD.md) · baseline / aug / consistency dùng chung B2 và DeepLab. Full GPU results pending.
+# Tài liệu cho thành viên
 
-# Tài liệu hiện hành
-
-**Giao thức chính là DG:** chỉ Cityscapes để học/chọn model; ACDC evaluate sau freeze. Các tài liệu supervised đã được đánh dấu lịch sử, không dùng làm hướng dẫn DG.
-
-| Nhu cầu | Đọc |
+| Cần làm gì? | Đọc ở đâu? |
 | --- | --- |
-| Bài toán và tình trạng | [README](../README.md) |
-| Kế hoạch khôi phục, phương pháp tham khảo, ablation | [DG recovery plan](../research/DG_RECOVERY_PLAN.md) |
-| Kaggle baseline DG và checkpoint/resume | [Training guide](TRAINING_GUIDE.md) |
-| Đọc code | [Reading guide](READING_GUIDE.md) |
-| Quy tắc nhãn/manifest | [Data contract](DATA_CONTRACT.md), phần protocol lấy DG plan làm chuẩn |
-| Thuyết trình | [Walkthrough](PRESENT_TO_LECTURER.md) |
-| Node.js demo lịch sử và weights | [Web](../web/README.md) |
-| Kết quả và giới hạn | [Results](../results/README.md) |
-| Nhóm và kiểm thử | [Contributing](CONTRIBUTING.md) |
-| Phương pháp source→ACDC đã bỏ khỏi hướng hiện hành | [Historical framework](RESEARCH_FRAMEWORK.md) |
+| Hiểu project và trạng thái | [README chính](../README.md) |
+| Lần theo code | [READING_GUIDE](READING_GUIDE.md) |
+| Hiểu dữ liệu, nhãn, split | [DATA_CONTRACT](DATA_CONTRACT.md) |
+| Hiểu chiến thuật và thông số train | [DG_METHOD](DG_METHOD.md) |
+| Chạy Kaggle, tải ZIP, resume, đánh giá | [TRAINING_GUIDE](TRAINING_GUIDE.md) |
+| Sửa code và kiểm tra trước khi push | [CONTRIBUTING](CONTRIBUTING.md) |
+| Chuẩn bị thuyết trình | [PRESENT_TO_LECTURER](PRESENT_TO_LECTURER.md) |
+| Việc còn lại và cơ sở bài báo | [Kế hoạch](../research/PROJECT_COMPLETION_PLAN.md), [tài liệu tham khảo](../research/README.md) |
+
+Các kế hoạch supervised ACDC và notebook cũ đã được gỡ khỏi cây hiện hành. Khi cần truy vết, xem lịch sử Git trước đợt dọn repo; không dùng hướng dẫn cũ để chạy thí nghiệm DG.

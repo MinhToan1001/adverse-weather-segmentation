@@ -10,7 +10,7 @@ import time
 
 import yaml
 
-from scripts.run_research import committed_state, fingerprints, fits_session, snapshot_source
+from src.experiments.run_support import committed_state, fingerprints, fits_session, snapshot_source
 from src.data.preparation import create_manifest, write_manifest, convert_label_ids
 from src.data.validation import validate_manifests
 from src.experiments.dg import compose_dg

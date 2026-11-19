@@ -1,3 +1,5 @@
-# Generated manifests
+# Danh sách ảnh–mask sinh tự động
 
-Run scripts.prepare_research_data with your own Cityscapes/ACDC roots. CSVs and derived masks belong in the generated output workspace and are hashed per run. Personal absolute paths and dataset files are not committed. This folder is retained only as a documented placeholder.
+Manifest là CSV gồm image, mask, domain, split. Suite DG tự tạo Cityscapes train2975/val500 trong workspace của nó; không cần đặt CSV vào thư mục này. Chuẩn bị/kiểm tra độc lập bằng `scripts.run_dg --prepare-only`; xem [data contract](../../docs/DATA_CONTRACT.md).
+
+Đánh giá ACDC chỉ tạo manifest val406 sau khi khóa candidate, qua `scripts.make_manifest`. Manifest chứa đường dẫn local, được hash theo run và không commit. Thư mục này chỉ giữ hướng dẫn và placeholder.

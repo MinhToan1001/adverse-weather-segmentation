@@ -1,11 +1,9 @@
-method,role,target_labels,current_training_status,primary_source
-SegFormer-B0,retired historical control,supervised,source20 and adapt20 complete; official validation pending,https://arxiv.org/abs/2105.15203
-SegFormer-B2,historical source and supervised-adapt run,supervised,source20 and adapt20 complete; official validation pending,https://arxiv.org/abs/2105.15203
-SegFormer-B2-published-FT20,superseded supervised proposal,supervised,abandoned for the restored DG protocol; not implemented,https://huggingface.co/nvidia/segformer-b2-finetuned-cityscapes-1024-1024
-DeepLabV3+R50,optional project CNN variant,supervised,source20 then adapt20 pending,https://arxiv.org/abs/1802.02611
-Kalb-Beyerer2023,forgetting and normalization background,supervised,related work with a different incremental task sequence,https://arxiv.org/abs/2303.14115
-Focal,loss idea,project uses fit labels,isolated ablation planned,https://arxiv.org/abs/1708.02002
-V-Net-Dice,overlap objective idea,project uses fit labels,adapted multiclass reduction implemented,https://arxiv.org/abs/1606.04797
-HRDA,UDA related work,no target labels,not a matched project reproduction,https://github.com/lhoyer/HRDA
-Refign,UDA related work,no target labels,not a matched project reproduction,https://github.com/brdav/refign
-SegFormer-B2-DG-v1,active source-only baseline,none from ACDC,Cityscapes train2975 and select val500; 20epochs; GPU results pending,https://arxiv.org/abs/2105.15203
+method,role,data_access,status,primary_source
+SegFormer-B2,active Transformer architecture,Cityscapes train and val selection; no ACDC training,baseline aug consistency implemented; full GPU DG pending,https://arxiv.org/abs/2105.15203
+DeepLabV3+R50,active CNN comparison architecture,Cityscapes train and val selection; no ACDC training,baseline aug consistency implemented; full GPU DG pending,https://arxiv.org/abs/1802.02611
+ISSA,source-style motivation,source only,background; not reproduced by RGB transforms,https://arxiv.org/abs/2210.10175
+SHADE,style and consistency motivation,source only,background; project does not reproduce full SHADE,https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136880530.pdf
+VLTSeg,DG paper reference,Cityscapes source to ACDC evaluation,checkpoint and matched inference evaluation pending,https://vltseg.github.io/
+HRDA,UDA background,unlabelled target images during training,not a matched DG comparator,https://github.com/lhoyer/HRDA
+Refign,UDA background,unlabelled target images during training,not a matched DG comparator,https://github.com/brdav/refign
+B0/B2 supervised historical,retained results and demo,Cityscapes then labelled ACDC,completed historical runs; excluded from DG table,https://github.com/MinhToan1001/adverse-weather-segmentation

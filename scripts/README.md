@@ -1,32 +1,26 @@
-**Entry point hiện hành:** [run_dg_suite.py](run_dg_suite.py) tự profile → baseline → aug → consistency cho mỗi model; [training guide](../docs/TRAINING_GUIDE.md). run_dg.py là runner một arm bên dưới.
+# Lệnh của project
 
-[DG method đã triển khai và kiểm thử CPU](../docs/DG_METHOD.md) · baseline / aug / consistency dùng chung B2 và DeepLab. Full GPU results pending.
+Luồng chính: **build notebook → run suite → freeze → evaluate**. Logic học nằm trong `src/`; các script chỉ điều phối và chuẩn bị artifact.
 
-> **Lệnh DG hiện hành:** `python -m scripts.run_dg --city ... --root ... --archive ...`; chỉ Cityscapes train2975/val500. [run_dg.py](run_dg.py), [build_dg_notebook.py](build_dg_notebook.py). Các lệnh chuẩn bị ACDC/replay/campaign dưới đây là lịch sử supervised và đã chặn train mặc định.
-
-# Các lệnh điều phối
-
-Logic model/data/training nằm trong `src/`; `scripts/` ghép chúng thành các thao tác chạy được. Tên lệnh `research` được giữ để tương thích, hiện phục vụ cả đồ án ứng dụng.
-
-| Giai đoạn | File / lệnh | Vai trò |
-| --- | --- | --- |
-| Chuẩn bị dataset | [extract_dataset.py](extract_dataset.py) | Giải nén archive, kiểm tra đường dẫn |
-| Ghép cặp và kiểm kê | [make_manifest.py](make_manifest.py), [validate_manifest.py](validate_manifest.py), [audit_labels.py](audit_labels.py) | Danh sách ảnh–mask, xác minh dữ liệu và mã nhãn |
-| Chuyển nhãn | [convert_labels.py](convert_labels.py) | LabelIds → trainIds |
-| Chuẩn bị toàn pipeline | [prepare_research_data.py](prepare_research_data.py) | Chia fit/dev/monitor, manifest và data.json chung |
-| Sinh notebook/code ZIP | [build_kaggle_notebooks.py](build_kaggle_notebooks.py), [build_research_notebooks.py](build_research_notebooks.py) | Hai notebook hiện hành B2/DeepLab từ một template |
-| Input Kaggle | [kaggle_bootstrap.py](kaggle_bootstrap.py) | Tìm code, kiểm tra và copy/giải nén an toàn |
-| Một stage | [run_research.py](run_research.py) | Ghép config, train/resume theo epoch, giữ config/source |
-| Hai stage một model | [run_research_campaign.py](run_research_campaign.py) | Source20 → adapt20; xuất ZIP sau epoch |
-| Vẽ lịch sử | [plot_research_run.py](plot_research_run.py) | Loss, mIoU và diagnostics từ log |
-| Evaluate | [evaluate_research.py](evaluate_research.py) | Checkpoint + manifest → metrics và ảnh lỗi, không train |
-| Kiểm tra pipeline nhỏ | [verify_pipeline.py](verify_pipeline.py) | CPU probe để kiểm plumbing, không phải benchmark chất lượng |
-
-Ví dụ CLI hiện hành:
+| Công việc | File |
+| --- | --- |
+| Sinh hai notebook + code ZIP | [build_kaggle_notebooks.py](build_kaggle_notebooks.py), [build_dg_notebook.py](build_dg_notebook.py) |
+| Tìm/copy/giải nén code Kaggle | [kaggle_bootstrap.py](kaggle_bootstrap.py) |
+| Tự chạy ba chiến thuật của một model | [run_dg_suite.py](run_dg_suite.py) |
+| Chuẩn bị Cityscapes, train/resume một chiến thuật | [run_dg.py](run_dg.py) |
+| Đo timing/VRAM bằng pilot nguồn | [profile_dg.py](profile_dg.py) |
+| Khóa sáu candidate, đánh giá checkpoint đã khóa | [evaluate_dg.py](evaluate_dg.py) |
+| Vẽ loss, Cityscapes mIoU và DG diagnostics | [plot_research_run.py](plot_research_run.py) |
+| QA CPU nhỏ, không phải benchmark | [verify_dg.py](verify_dg.py) |
+| Tạo/kiểm tra danh sách ảnh–mask | [make_manifest.py](make_manifest.py), [validate_manifest.py](validate_manifest.py) |
+| Kiểm tra/chuyển mã nhãn | [audit_labels.py](audit_labels.py), [convert_labels.py](convert_labels.py) |
+| Giải nén dataset an toàn | [extract_dataset.py](extract_dataset.py) |
 
 ```powershell
-python -m scripts.prepare_research_data --city data/raw/cityscapes --acdc data/raw/ACDC --out outputs/data
-python -m scripts.run_research_campaign --models segformer_b2 --data outputs/data/data.json --root outputs/runs/segformer_b2 --archive outputs/segformer_b2_seed42.zip
+python -m scripts.build_kaggle_notebooks
+python -m scripts.run_dg_suite --city data/raw/cityscapes --model segformer_b2 --root outputs/dg/b2_suite --archive outputs/dg_b2_suite.zip
 ```
 
-Luôn chọn rõ `--models segformer_b2` nếu chỉ muốn B2; gọi campaign không có `--models` sẽ xếp cả B2 và DeepLab tùy chọn. Không ghi đè workspace cũ để khởi động lại. [Hướng dẫn Kaggle/resume](../docs/TRAINING_GUIDE.md).
+Lệnh thứ hai cần GPU và có thể chạy qua nhiều phiên; người dùng Kaggle dùng notebook thay vì gọi CLI thủ công. [Hướng dẫn](../docs/TRAINING_GUIDE.md).
+
+Các launcher source→ACDC supervised và generator notebook cũ đã gỡ. Snapshot code trong ZIP kết quả cũ vẫn giữ cách chạy của chính run đó; không resume run cũ bằng code hiện tại.

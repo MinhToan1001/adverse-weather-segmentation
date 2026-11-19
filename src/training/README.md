@@ -1,13 +1,16 @@
-# Shared training
+# Training dùng chung cho B2 và DeepLab
 
-| Module | Responsibility |
+| Module | Vai trò |
 | --- | --- |
-|losses.py|CE,fit-weighted CE,Focal,CE+Dice;void-safe,architecture-independent|
-|optim.py|AdamW,encoder/head LR groups|
-|strategies.py|BN mode and optional data-policy composition|
-|checkpoints.py|Staging/SHA/previous generations,recovery and log rollback|
-|train.py|Data loaders,AMP,accumulation,scheduler,validation,best/last,RNG state|
+| `train.py` | Vòng train, validation, best/last, log và resume |
+| `dg.py` | Baseline, hai view CE và consistency KL |
+| `losses.py` | CE dùng trong DG; các loss khác giữ cho thử nghiệm/tương thích |
+| `optim.py` | AdamW, nhóm LR encoder/head |
+| `strategies.py` | Chế độ BatchNorm và tiện ích data-policy |
+| `checkpoints.py` | Ghi checkpoint theo giao dịch, xác minh hash, khôi phục generation trước |
 
-Current source/adaptation recipes each20epochs,no early stopping. Source uses batch2/accum4,encoderLR6e-5/head×10,BN stats update. Adapt uses batch1/accum8,LR1e-5 uniform,BN stats frozen and affine learnable. Both use weight decay0.01,warm-up20updates,poly power1,FP16AMP onGPU. SegFormer encoder LayerNorm differs from BN.
+Recipe hiện hành: 20 epoch, không early stopping, batch thật2, accumulation4, encoder LR6e-5/head×10, weight decay0,01, warmup20updates, poly power1, FP16 AMP khi có GPU. BN cập nhật từ ảnh nguồn; không nhận ACDC. SegFormer encoder dùng LayerNorm, DeepLab có BatchNorm nên cần giữ batch thật ít nhất2.
 
-Model notebooks call scripts.run_research_campaign with one model;it reuses scripts.run_research for source/adapt and exports one atomic workspace ZIP per completed epoch. Interrupted epochs repeat. A model run may span several sessions. [Guide](../../docs/TRAINING_GUIDE.md).
+[run_dg_suite.py](../../scripts/run_dg_suite.py) tự chạy ba chiến thuật độc lập từ ImageNet; xuất ZIP sau mỗi epoch hoàn thành. Checkpoint giữ model/optimizer/scheduler/scaler/RNG; ngắt giữa epoch thì lặp lại epoch đó. [Phương pháp](../../docs/DG_METHOD.md) · [Chạy/resume](../../docs/TRAINING_GUIDE.md).
+
+Trainer vẫn đọc config supervised lịch sử qua opt-in riêng; notebook DG không gọi đường này và protocol guard chặn nó mặc định.
