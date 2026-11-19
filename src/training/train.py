@@ -246,6 +246,13 @@ def main():
     replay = protocol == "supervised_acdc_replay"
     target_training = protocol in {"supervised_acdc", "supervised_acdc_replay"}
     dg_settings = cfg.get('dg')
+    condition_training = cfg.get('condition_training', False)
+    if not isinstance(condition_training, bool):
+        raise ValueError('condition_training must be a boolean')
+    if condition_training and (target_training or dg_settings is not None
+            or cfg['model'].get('name') != 'weatherseg_b0'
+            or 'weather' not in cfg['data'].get('augment', {})):
+        raise ValueError('K2 auxiliary training requires source-only WeatherSeg-B0 and labeled synthetic conditions')
     if dg_settings is not None:
         from src.training.dg import validate_settings, paired_batch, backward_batch
         validate_settings(dg_settings)
@@ -488,6 +495,8 @@ def main():
         step_started = global_step
         set_training_mode(model, freeze_bn)
         losses = []
+        condition_losses, condition_correct, condition_count = [], 0, 0
+        condition_exposure = [0] * 5
         dg_batches = []
         dg_source_presentations = 0
         dg_styled_presentations = 0
@@ -519,13 +528,22 @@ def main():
             else:
                 context = torch.autocast(device_type="cuda", dtype=amp_dtype) if amp_enabled else nullcontext()
                 with context:
+                    condition_kwargs = dict(condition_labels=batch['condition_labels'].to(device)) if condition_training else {}
                     if criterion is None:
                         # Preserve historical models' exact built-in loss path.
-                        result = model(pixel_values=batch['pixel_values'].to(device), labels=batch['labels'].to(device))
+                        result = model(pixel_values=batch['pixel_values'].to(device), labels=batch['labels'].to(device), **condition_kwargs)
                         loss = result.loss
                     else:
-                        result = model(pixel_values=batch['pixel_values'].to(device))
+                        result = model(pixel_values=batch['pixel_values'].to(device), **condition_kwargs)
                         loss = criterion(result.logits, batch['labels'].to(device))
+                        if condition_training:
+                            loss = loss + model.config.condition_loss_weight * result.condition_loss
+                if condition_training:
+                    condition_losses.append(float(result.condition_loss.detach()))
+                    condition_correct += int((result.condition_logits.detach().argmax(1).cpu() == batch['condition_labels']).sum())
+                    condition_count += len(batch['condition_labels'])
+                    for index, count in enumerate(torch.bincount(batch['condition_labels'], minlength=5).tolist()):
+                        condition_exposure[index] += count
                 if not torch.isfinite(loss):
                     raise RuntimeError("Non-finite loss; check labels, all-ignore crops and AMP before resuming")
                 losses.append(float(loss.detach()))
@@ -564,6 +582,10 @@ def main():
             "learning_rate": optimizer.param_groups[0]["lr"],
         }
         current_rank = None
+        if condition_training:
+            record['condition_train'] = dict(cross_entropy=float(np.mean(condition_losses)),
+                accuracy=condition_correct / max(1, condition_count), counts=condition_exposure,
+                weight=model.config.condition_loss_weight, label_scope='synthetic transform IDs, not real weather accuracy')
         if dg_settings is not None:
             paired_rows = [r for r in dg_batches if r['paired']]
             record['dg_train'] = dict(arm=dg_settings['arm'], paired_batches=len(paired_rows),

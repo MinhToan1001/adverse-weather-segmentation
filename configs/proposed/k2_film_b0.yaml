@@ -1,0 +1,44 @@
+# Independent K2 experiment; does not alter the six-run B2/DeepLab DG cohort.
+protocol: source_only
+experiment_protocol: weatherseg_k2_source_v1
+condition_training: true
+seed: 42
+model:
+  name: weatherseg_b0
+  num_labels: 19
+  initialization: imagenet_encoder
+  film_reduction: 4
+  condition_loss_weight: 0.1
+data:
+  train_manifest: data/manifests/cityscapes_train.csv
+  val_manifest: data/manifests/cityscapes_val.csv
+  image_size: [512, 1024]
+  augment:
+    min_scale: 0.5
+    max_scale: 2.0
+    horizontal_flip: 0.5
+    weather:
+      # The launcher adds fog only after metric-depth preflight succeeds.
+      conditions: [clean, night, rain, snow]
+      severities: [1, 2, 3, 4, 5]
+      probabilities: [0.25, 0.25, 0.25, 0.25]
+loss:
+  name: ce
+train:
+  epochs: 20
+  batch_size: 2
+  gradient_accumulation_steps: 4
+  drop_last: true
+  num_workers: 2
+  lr: 0.00006
+  head_lr_multiplier: 10.0
+  weight_decay: 0.01
+  warmup_steps: 20
+  poly_power: 1.0
+  amp: true
+  amp_dtype: float16
+checkpointing:
+  transactional: true
+monitoring:
+  validation_loss: true
+output_dir: outputs/k2_film_b0/run

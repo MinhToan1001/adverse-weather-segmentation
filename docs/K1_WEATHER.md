@@ -1,6 +1,6 @@
 # K1 — Bộ tạo ảnh thời tiết có tham số
 
-K1 là nền dữ liệu cho phần K2 FiLM/condition head. Nhánh này triển khai K1 trước, không chứa K2 đang làm dở và không thay recipe của sáu lượt B2/DeepLab hiện hành.
+K1 là nền dữ liệu cho phần K2 FiLM/condition head. Nhánh này hiện có cả [K2 và notebook train](K2_TRAINING.md); notebook03 vẫn chỉ preview K1. Recipe của sáu lượt B2/DeepLab hiện hành được giữ riêng.
 
 ## Chạy thử trên Kaggle
 

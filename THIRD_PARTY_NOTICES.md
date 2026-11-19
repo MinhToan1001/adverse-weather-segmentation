@@ -30,3 +30,10 @@ plus heuristic 2D rain/snow overlays. Conceptual references, exact assumptions
 and limitations are listed in `docs/K1_WEATHER.md`. No Foggy Cityscapes or
 Unprocessing source code, dataset, calibration file or pretrained weight is
 bundled. This is not a claim to reproduce either complete published pipeline.
+
+`src/models/proposed/weatherseg_b0.py` adapts the SegFormer encoder traversal
+from Hugging Face Transformers4.57.6 (NVIDIA / Hugging Face, Apache-2.0), with
+stage-wise statistical conditioning and a project auxiliary head. The FiLM
+conditioning idea is credited to Perez et al., AAAI2018,
+https://arxiv.org/abs/1709.07871. No claim of inventing FiLM or reproducing its
+original visual-reasoning experiments is made.

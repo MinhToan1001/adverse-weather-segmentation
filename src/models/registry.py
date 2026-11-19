@@ -10,7 +10,7 @@ from src.data.labels import CLASS_NAMES
 
 
 MODEL_NAMES = ('segformer_b2', 'deeplabv3plus_resnet50')
-COMPATIBLE_MODEL_NAMES = ('segformer_b0', *MODEL_NAMES)
+COMPATIBLE_MODEL_NAMES = ('segformer_b0', 'weatherseg_b0', *MODEL_NAMES)
 ROLES = dict(segformer_b0='retired', segformer_b2='main', deeplabv3plus_resnet50='optional_cnn')
 ENCODERS = {
     'b0': ('nvidia/mit-b0', '80983a413c30d36a39c20203974ae7807835e2b4',
@@ -32,6 +32,12 @@ def build_model(settings):
         return load_checkpoint(cfg['checkpoint'], name)
     if initialization not in ('random', 'imagenet_encoder'):
         raise ValueError('Use random, imagenet_encoder or checkpoint initialization')
+    if name == 'weatherseg_b0':
+        from src.models.proposed.weatherseg_b0 import WeatherSegB0
+        base_settings = dict(settings, model=dict(cfg, name='segformer_b0'))
+        baseline = build_model(base_settings)
+        return WeatherSegB0.from_b0(baseline, film_reduction=cfg.get('film_reduction', 4),
+                                   condition_loss_weight=cfg.get('condition_loss_weight', .1))
     if name == 'deeplabv3plus_resnet50':
         return DeepLabV3PlusResNet50(imagenet_encoder=initialization == 'imagenet_encoder')
     variant = name.rsplit('_', 1)[1]
@@ -58,6 +64,11 @@ def build_model(settings):
 
 def load_checkpoint(directory, name=None):
     config = json.loads((Path(directory) / 'config.json').read_text())
+    if config.get('project_model') == 'weatherseg_b0':
+        if name not in (None, 'weatherseg_b0'):
+            raise ValueError('Checkpoint is K2 WeatherSeg-B0, requested a different model')
+    elif name == 'weatherseg_b0':
+        raise ValueError('K2 requires its own complete FiLM/condition-head checkpoint')
     if config.get('model_type') == 'project_deeplabv3plus_resnet50':
         if name not in (None, 'deeplabv3plus_resnet50'):
             raise ValueError('Checkpoint is DeepLab, requested a different model')

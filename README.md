@@ -8,6 +8,8 @@
 
 Cách làm này gọi là **Domain Generalization (DG)**: học ở điều kiện nguồn, kiểm tra ở điều kiện khác. ACDC không được dùng để train, lấy style hoặc chọn model trong luồng hiện hành.
 
+**Nhánh thử nghiệm K1 + K2:** [notebook04](notebooks/04_k2_weatherseg_b0_train.ipynb) train WeatherSeg-B0 với FiLM và condition head từ ảnh K1, có ZIP/resume. [Hướng dẫn](docs/K2_TRAINING.md). Đây là thí nghiệm riêng; chưa có kết quả full GPU và không thay thế cohort B2/DeepLab dưới đây.
+
 ## Project hiện làm được gì?
 
 | Thành phần | Hiện trạng |
@@ -72,7 +74,7 @@ results/         Báo cáo nhỏ, bằng chứng kiểm tra và kết quả lị
 data/, outputs/  Dataset, weights và ZIP local; không đẩy lên Git
 ```
 
-B0 chỉ còn loader trong `src/models/legacy/` để đọc checkpoint cũ. Các tiện ích replay/chia tập/loss khác còn giữ cho tương thích và kiểm thử; **không được bật trong recipe DG hiện hành**.
+B0 thuần trong `src/models/legacy/` phục vụ checkpoint cũ và control của thí nghiệm K1/K2; không nằm trong cohort sáu lượt B2/DeepLab. WeatherSeg-B0 ở `src/models/proposed/`. Các tiện ích replay/chia tập/loss khác còn giữ cho tương thích và kiểm thử; **không được bật trong recipe DG hiện hành**.
 
 ## Chuẩn bị và chạy
 

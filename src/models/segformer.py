@@ -5,6 +5,11 @@ from src.models.legacy import segformer_b0
 
 def model_class_for_config(config, variant=None):
     """Dispatch checkpoint loading to its separate B0 or B2 implementation."""
+    if getattr(config, 'project_model', None) == 'weatherseg_b0':
+        if variant is not None:
+            raise ValueError('K2 checkpoint is not a plain B0/B2 checkpoint')
+        from src.models.proposed.weatherseg_b0 import WeatherSegB0
+        return WeatherSegB0
     variants = {"b0": segformer_b0, "b2": segformer_b2}
     if variant is not None:
         if variant not in variants or not variants[variant].matches_config(config):

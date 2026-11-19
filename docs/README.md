@@ -9,6 +9,7 @@
 | Chạy Kaggle, tải ZIP, resume, đánh giá | [TRAINING_GUIDE](TRAINING_GUIDE.md) |
 | Sửa code và kiểm tra trước khi push | [CONTRIBUTING](CONTRIBUTING.md) |
 | K1: tạo/kiểm ảnh thời tiết và chuẩn bị nhãn điều kiện cho K2 | [K1_WEATHER](K1_WEATHER.md) |
+| Train K1 + K2 FiLM B0 trên Kaggle | [K2_TRAINING](K2_TRAINING.md) |
 | Chuẩn bị thuyết trình | [PRESENT_TO_LECTURER](PRESENT_TO_LECTURER.md) |
 | Việc còn lại và cơ sở bài báo | [Kế hoạch](../research/PROJECT_COMPLETION_PLAN.md), [tài liệu tham khảo](../research/README.md) |
 

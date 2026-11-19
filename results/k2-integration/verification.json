@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-19",
+  "scope": "K1/K2 CPU software integration, not quality or GPU convergence",
+  "python_tests": {"passed": 200, "skipped": 4, "seconds": 123.78},
+  "new_integration_tests": 11,
+  "node_api_tests": {"passed": 1},
+  "model": "weatherseg_b0",
+  "parameters": 3817720,
+  "identity_with_copied_b0": "exact CPU logits and all four stage features",
+  "film_gradient_stages": [1, 2, 3, 4],
+  "condition_head_gradient": true,
+  "checkpoint_roundtrip": "exact",
+  "shared_inference": "passed",
+  "tiny_training": {
+    "source": "synthetic Cityscapes-shaped fixture",
+    "train_images": 4,
+    "val_images": 2,
+    "canvas": [64, 96],
+    "epochs": 2,
+    "batches_per_epoch": 2,
+    "initialization": "random",
+    "resumed_weights_match_continuous": true
+  },
+  "notebooks": {"fresh_setup": "passed with uploaded source bundle", "resume_setup": "passed ZIP and expanded workspace"},
+  "pretrained_tests_enabled": false,
+  "local_cuda_available": false,
+  "kaggle_training_executed": false,
+  "segmentation_improvement_measured": false
+}

@@ -3,10 +3,11 @@ from pathlib import Path
 import zipfile
 from scripts.build_dg_notebook import build_all as build_dg
 from scripts.build_k1_notebook import build as build_k1
+from scripts.build_k2_notebook import build as build_k2
 ROOT=Path(__file__).resolve().parents[1]
 
 def build():
-    notebooks=[*build_dg(),build_k1()]
+    notebooks=[*build_dg(),build_k1(),build_k2()]
     destination=ROOT/'outputs/kaggle/project-code.zip'
     destination.parent.mkdir(parents=True,exist_ok=True)
     with zipfile.ZipFile(destination,'w',zipfile.ZIP_DEFLATED) as archive:
