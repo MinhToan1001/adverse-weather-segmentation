@@ -2,6 +2,7 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -46,7 +47,8 @@ def prepare_cityscapes(city, output):
     return paths
 
 
-def prepare(city, root, seed=42, model='segformer_b2', arm='baseline', pair_probability=.5, consistency_weight=.1):
+def prepare(city, root, seed=42, model='segformer_b2', arm='baseline', pair_probability=.5, consistency_weight=.1,
+            prepared_paths=None):
     root, city = Path(root).resolve(), Path(city).resolve()
     # Validate run choices before converting thousands of source masks.
     compose_dg(model,arm,dict(source_train_manifest='',source_monitor_manifest=''),
@@ -74,7 +76,16 @@ def prepare(city, root, seed=42, model='segformer_b2', arm='baseline', pair_prob
     if root.exists() and any(root.iterdir()):
         raise ValueError('Preserve existing outputs; choose a fresh DG workspace')
     root.mkdir(parents=True, exist_ok=True)
-    paths = prepare_cityscapes(city, root / 'data')
+    if prepared_paths is None:
+        paths = prepare_cityscapes(city, root / 'data')
+    else:
+        # A suite owns converted masks once; each arm owns an immutable CSV copy.
+        (root/'data').mkdir()
+        paths={}
+        for split,key in [('train','source_train_manifest'),('val','source_monitor_manifest')]:
+            destination=root/f'data/cityscapes_{split}.csv'
+            shutil.copy2(prepared_paths[key],destination)
+            paths[key]=str(destination)
     cfg = compose_dg(model, arm, paths, root / 'run', seed, pair_probability, consistency_weight)
     require_training_permission(cfg)
     validate_manifests(list(paths.values()), check_files=True)
@@ -89,17 +100,22 @@ def prepare(city, root, seed=42, model='segformer_b2', arm='baseline', pair_prob
 
 
 def run(city, root, archive, seed=42, session_hours=10., prepare_only=False,
-        model='segformer_b2', arm='baseline', pair_probability=.5, consistency_weight=.1):
+        model='segformer_b2', arm='baseline', pair_probability=.5, consistency_weight=.1,
+        prepared_paths=None,on_checkpoint=None):
     if not 0 < session_hours <= 10:
         raise ValueError('Session window must be in (0,10] hours')
     root, archive = Path(root).resolve(), Path(archive).resolve()
     if archive.is_relative_to(root):
         raise ValueError('Save result ZIP outside the DG workspace')
     started = time.monotonic()
-    cfg = prepare(city, root, seed, model, arm, pair_probability, consistency_weight)
+    args=(city, root, seed, model, arm, pair_probability, consistency_weight)
+    cfg = prepare(*args,prepared_paths=prepared_paths) if prepared_paths is not None else prepare(*args)
+    def snapshot():
+        if on_checkpoint is not None:on_checkpoint()
+        else:export_workspace(root, archive)
     if prepare_only:
         print('DG config prepared; no training or target data accessed:', root / 'train.yaml')
-        export_workspace(root, archive)
+        snapshot()
         return
     import torch
     if not torch.cuda.is_available():
@@ -109,12 +125,10 @@ def run(city, root, archive, seed=42, session_hours=10., prepare_only=False,
     recover_run(run_dir)
     status = 'running'
     try:
-        for epoch in range(1, 21):
-            metadata = run_dir / 'last/checkpoint.json'
-            saved = json.loads(metadata.read_text())['epoch'] if metadata.is_file() else 0
-            if saved >= epoch:
-                committed_state(run_dir, saved)
-                continue
+        metadata = run_dir / 'last/checkpoint.json'
+        saved = json.loads(metadata.read_text())['epoch'] if metadata.is_file() else 0
+        if saved:committed_state(run_dir,saved)
+        for epoch in range(saved+1, 21):
             usage = records(run_dir / 'resources.jsonl')
             if not fits_session(time.monotonic(), started + session_hours * 3600,
                                 [r['epoch_seconds'] for r in usage]):
@@ -126,10 +140,11 @@ def run(city, root, archive, seed=42, session_hours=10., prepare_only=False,
                 command += ['--resume', str(run_dir / 'last')]
             subprocess.run(command, check=True)
             committed_state(run_dir, epoch)
+            saved=epoch
             from scripts.plot_research_run import plot
             plot(run_dir)
             write_json(root / 'status.json', dict(protocol=DG_PROTOCOL, status='running', completed_epochs=epoch))
-            export_workspace(root, archive)
+            snapshot()
             print('DG checkpoint ZIP ready:', archive, flush=True)
         else:
             committed_state(run_dir, 20)
@@ -147,7 +162,7 @@ def run(city, root, archive, seed=42, session_hours=10., prepare_only=False,
         raise
     finally:
         write_json(root / 'status.json', dict(protocol=DG_PROTOCOL, status=status, elapsed_seconds=time.monotonic()-started))
-        export_workspace(root, archive)
+        snapshot()
 
 
 if __name__ == '__main__':

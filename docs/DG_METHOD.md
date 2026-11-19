@@ -30,7 +30,7 @@ B2/DeepLab không thêm layer hoặc teacher model thường trú; inference v�
 
 Mỗi arm độc lập bắt đầu từ ImageNet encoder đã pin và head mới cùng seed, không train thêm từ baseline20epoch. `run/initialization.json` ghi hash safetensors ban đầu. Cohort yêu cầu hash này giống giữa các arm của cùng model; không yêu cầu B2 và ResNet cùng weights.
 
-Model, optimizer, scheduler, scaler, RNG và epoch lưu trong checkpoint transactional. Config model/arm/p_pair/λ/style/source/data được đóng băng và đối chiếu khi resume; ngắt giữa epoch thì chạy lại epoch đó. Hai notebook cố định model, mỗi phiên một arm và ZIP riêng.
+Model, optimizer, scheduler, scaler, RNG và epoch lưu trong checkpoint transactional. Config model/arm/p_pair/λ/style/source/data được đóng băng và đối chiếu khi resume; ngắt giữa epoch thì chạy lại epoch đó. Hai notebook cố định model tự chạy profile và cả ba arm; mỗi model một ZIP suite, từng arm có checkpoint riêng.
 
 ## Kiểm chứng và đánh giá
 
@@ -38,4 +38,4 @@ CPU QA: 4ảnh Cityscapes train/2val,64×96,random init,2batches/epoch; cả hai
 
 [profile_dg.py](../scripts/profile_dg.py) chỉ chạy khi có CUDA, đo nguồn và extrapolate Cityscapes val; weights pilot bị bỏ, không dùng cho lượt chính. Ước lượng giờ chưa gồm checkpoint/ZIP/setup và biến thiên runtime, cần giữ reserve30giờ. Profiler chưa được chạy trên GPU trong đợt triển khai CPU.
 
-Sau đủ20epoch, launcher tạo frozen_candidate.json. [evaluate_dg.py](../scripts/evaluate_dg.py) yêu cầu cohort gồm5lượt chính B2-C0/C1/C2 và DeepLab-C0/C2. Nó kiểm checkpoint, source split/code/seed, initial hash và recipe; candidate đổi sau seal sẽ bị từ chối trước khi đọc target. Đánh giá dùng FP32/native-size/noTTA; báo mIoU tổng/per-weather/per-class, calibration và ảnh lỗi. Historical ACDC feedback vẫn phải khai báo, không nhận test độc lập mới.
+Sau đủ20epoch, launcher tạo frozen_candidate.json. [evaluate_dg.py](../scripts/evaluate_dg.py) yêu cầu cohort gồm6lượt chính B2-C0/C1/C2 và DeepLab-C0/C1/C2. Nó kiểm checkpoint, source split/code/seed, initial hash và recipe; candidate đổi sau seal sẽ bị từ chối trước khi đọc target. Đánh giá dùng FP32/native-size/noTTA; báo mIoU tổng/per-weather/per-class, calibration và ảnh lỗi. Historical ACDC feedback vẫn phải khai báo, không nhận test độc lập mới.

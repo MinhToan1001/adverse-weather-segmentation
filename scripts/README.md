@@ -1,3 +1,5 @@
+**Entry point hiện hành:** [run_dg_suite.py](run_dg_suite.py) tự profile → baseline → aug → consistency cho mỗi model; [training guide](../docs/TRAINING_GUIDE.md). run_dg.py là runner một arm bên dưới.
+
 [DG method đã triển khai và kiểm thử CPU](../docs/DG_METHOD.md) · baseline / aug / consistency dùng chung B2 và DeepLab. Full GPU results pending.
 
 > **Lệnh DG hiện hành:** `python -m scripts.run_dg --city ... --root ... --archive ...`; chỉ Cityscapes train2975/val500. [run_dg.py](run_dg.py), [build_dg_notebook.py](build_dg_notebook.py). Các lệnh chuẩn bị ACDC/replay/campaign dưới đây là lịch sử supervised và đã chặn train mặc định.

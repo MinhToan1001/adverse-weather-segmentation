@@ -76,7 +76,8 @@ def test_active_notebook_has_no_target_input_or_adapt_command():
     code='\n'.join(''.join(c['source']) for c in nb['cells'] if c['cell_type']=='code')
     for c in nb['cells']:
         if c['cell_type']=='code':ast.parse(''.join(c['source']))
-    assert 'scripts.run_dg' in code and 'CITYSCAPES_ROOT' in code
+    assert 'scripts.run_dg_suite' in code and 'CITYSCAPES_ROOT' in code
+    assert 'ARM=' not in code and 'PROFILE_ONLY=' not in code
     assert 'ACDC_ROOT' not in code and 'scripts.prepare_research_data' not in code
     assert 'scripts.run_research_campaign' not in code
     assert 'source_hashes' in code and 'RESUME_INPUT=None' in code
@@ -142,8 +143,7 @@ def test_dg_queue_exports_then_resumes_only_unfinished_epochs(tmp_path,monkeypat
 
 
 @pytest.mark.parametrize('model',['segformer_b2','deeplabv3plus_resnet50'])
-@pytest.mark.parametrize('arm',['baseline','aug','consistency'])
-def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path,model,arm):
+def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path,model):
     import os
     import sys
     import shutil
@@ -158,13 +158,11 @@ def test_dg_notebook_restores_kaggle_autoexpanded_source_zip(tmp_path,model,arm)
     hashes=fingerprints();snapshot_source(previous/'source.zip',hashes)
     extract_safe(previous/'source.zip',previous/'source')
     (previous/'source.zip').unlink()  # Simulate Kaggle expanding the nested source archive.
-    (previous/'dg_plan.json').write_text(json.dumps(dict(experiment_protocol=DG_PROTOCOL,
-        source_hashes=hashes,city_root=str(city),model=model,arm=arm,seed=42,
-        pair_probability=0. if arm=='baseline' else .5,consistency_weight=.1 if arm=='consistency' else 0.)))
-    work=tmp_path/f'working/dg_{model}_{arm}_seed42'
-    repo=tmp_path/f'working/project_{model}_{arm}'
+    (previous/'suite_plan.json').write_text(json.dumps(dict(schema='automatic_dg_model_suite_v1',protocol=DG_PROTOCOL,
+        source_hashes=hashes,city_root=str(city),model=model,seed=42)))
+    work=tmp_path/f'working/dg_{model}_suite_seed42'
+    repo=tmp_path/f'working/project_{model}_suite'
     setup=''.join(json.loads(build(model).read_text(encoding='utf-8'))['cells'][1]['source'])
-    setup=setup.replace("ARM='baseline'",f'ARM={arm!r}')
     for old,new in [('/kaggle/input',inputs),('/kaggle/working',tmp_path/'working')]:
         setup=setup.replace(f'Path({old!r})',f'Path({str(new)!r})')
     setup=setup.replace('RESUME_INPUT=None',f'RESUME_INPUT=Path({str(previous)!r})')

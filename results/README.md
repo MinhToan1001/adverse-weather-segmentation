@@ -1,3 +1,5 @@
+[Automatic suites: both models run all3strategies](dg-suite-automation/README.md) · 177tests passed; GPU results pending.
+
 [DG implementation: 173 tests + real CPU QA](dg-implementation/README.md) · GPU results pending.
 
 [DG recovery verification](dg-recovery/README.md) · [Current protocol](../research/DG_RECOVERY_PLAN.md)

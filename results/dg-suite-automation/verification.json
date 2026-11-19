@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-19",
+  "tests_passed": 177,
+  "failures": 0,
+  "automatic_flow": [
+    "source preparation once",
+    "GPU profile once per model",
+    "baseline20",
+    "aug20",
+    "consistency20"
+  ],
+  "models": [
+    "segformer_b2",
+    "deeplabv3plus_resnet50"
+  ],
+  "manual_arm_or_profile_flags": false,
+  "resume_checks": [
+    "Completed epochs are not retrained",
+    "Sealed profiling is reused",
+    "Partial aug continues before consistency",
+    "Generated notebooks restore Kaggle-autoexpanded source ZIPs",
+    "Python failures export recovery diagnostics"
+  ],
+  "real_source_preflight": {
+    "status": "PASS",
+    "checks": [
+      {
+        "arm": "baseline",
+        "train": 2975,
+        "val": 500,
+        "shared_converted_masks": true
+      },
+      {
+        "arm": "aug",
+        "train": 2975,
+        "val": 500,
+        "shared_converted_masks": true
+      },
+      {
+        "arm": "consistency",
+        "train": 2975,
+        "val": 500,
+        "shared_converted_masks": true
+      }
+    ],
+    "source_only": true,
+    "gpu_training": false,
+    "archive": "D:\\python\\Project-CV\\outputs\\dg-suite-automation\\real-source-preflight.zip",
+    "scope": "Real source preparation/config/hash/path checks only; no profiling or full training"
+  },
+  "orchestration_test_scope": "Fake profiler/trainer used to test queue/control flow on CPU; no full GPU training",
+  "target_training": false,
+  "cohort_required_candidates": 6,
+  "gpu_timing_verified": false,
+  "accuracy_benchmark": false,
+  "quota_limit": "Two independent suites cannot query shared Kaggle quota; six full runs are not guaranteed within30hours."
+}

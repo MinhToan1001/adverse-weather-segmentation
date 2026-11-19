@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 
-from src.experiments.dg_artifacts import seal_cohort, resolve_frozen
+from src.experiments.dg_artifacts import seal_cohort,seal_suites, resolve_frozen
 
 
 def evaluate_frozen(cohort,run_id,manifest,out,scope,device=None):
@@ -18,11 +18,14 @@ def evaluate_frozen(cohort,run_id,manifest,out,scope,device=None):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);commands=p.add_subparsers(dest='command',required=True)
-    freeze=commands.add_parser('freeze');freeze.add_argument('--workspaces',nargs='+',required=True);freeze.add_argument('--out',required=True)
+    freeze=commands.add_parser('freeze');inputs=freeze.add_mutually_exclusive_group(required=True)
+    inputs.add_argument('--workspaces',nargs='+');inputs.add_argument('--suites',nargs=2)
+    freeze.add_argument('--out',required=True)
     evaluate=commands.add_parser('evaluate')
     for name in ['cohort','run-id','manifest','out']:evaluate.add_argument('--'+name,required=True)
     evaluate.add_argument('--scope',choices=['official-city','official-acdc'],required=True)
     evaluate.add_argument('--device',choices=['cpu','cuda'])
     a=p.parse_args()
-    if a.command=='freeze':seal_cohort(a.workspaces,a.out)
+    if a.command=='freeze':
+        seal_suites(a.suites,a.out) if a.suites else seal_cohort(a.workspaces,a.out)
     else:evaluate_frozen(a.cohort,a.run_id,a.manifest,a.out,a.scope,a.device)

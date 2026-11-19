@@ -60,7 +60,7 @@ def cohort_candidates():
 def test_cohort_requires_five_runs_and_rejects_initialization_or_recipe_mismatch(tmp_path,monkeypatch):
     candidates=cohort_candidates()
     monkeypatch.setattr(artifacts,'inspect_candidate',lambda key:deepcopy(candidates[key]))
-    with pytest.raises(ValueError,match='all5'):
+    with pytest.raises(ValueError,match='all6'):
         artifacts.seal_cohort(['segformer_b2:baseline'],tmp_path/'missing.json')
     candidates['segformer_b2:consistency']['initial_sha256']='different'
     with pytest.raises(ValueError,match='initialization'):
@@ -80,3 +80,19 @@ def test_target_evaluation_cannot_start_without_frozen_cohort(tmp_path,monkeypat
     with pytest.raises(FileNotFoundError):
         evaluate_frozen(tmp_path/'missing.json','segformer_b2:baseline',tmp_path/'ACDC.csv',tmp_path/'out','official-acdc')
     assert not (tmp_path/'out').exists()
+
+
+def test_freeze_accepts_two_complete_suites_and_expands_all_six_arms(tmp_path,monkeypatch):
+    candidates=cohort_candidates();roots=[]
+    for model in ['segformer_b2','deeplabv3plus_resnet50']:
+        root=tmp_path/model;root.mkdir();roots.append(root)
+        write_json(root/'suite_plan.json',dict(schema='automatic_dg_model_suite_v1',model=model,
+                    arms=['baseline','aug','consistency']))
+        write_json(root/'suite_status.json',dict(status='suite_complete'))
+    monkeypatch.setattr(artifacts,'inspect_candidate',
+        lambda path:deepcopy(candidates[f'{path.parents[1].name}:{path.name}']))
+    result=artifacts.seal_suites(roots,tmp_path/'cohort.json')
+    assert len(result['candidates'])==6
+    write_json(roots[1]/'suite_status.json',dict(status='session_checkpoint_ready'))
+    with pytest.raises(ValueError,match='must complete all3'):
+        artifacts.seal_suites(roots,tmp_path/'incomplete.json')

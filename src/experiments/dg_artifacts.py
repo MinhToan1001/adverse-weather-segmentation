@@ -8,7 +8,8 @@ from src.experiments.protocol import DG_PROTOCOL, require_training_permission
 from src.utils.artifacts import sha256_file, records, write_json
 
 PRIMARY_IDS = {'segformer_b2:baseline', 'segformer_b2:aug', 'segformer_b2:consistency',
-               'deeplabv3plus_resnet50:baseline', 'deeplabv3plus_resnet50:consistency'}
+               'deeplabv3plus_resnet50:baseline', 'deeplabv3plus_resnet50:aug',
+               'deeplabv3plus_resnet50:consistency'}
 
 
 def inspect_candidate(workspace):
@@ -63,8 +64,8 @@ def seal_cohort(workspaces,destination):
     candidates=[inspect_candidate(p) for p in workspaces]
     ids=[c['id'] for c in candidates]
     if len(set(ids))!=len(ids) or not PRIMARY_IDS.issubset(ids):
-        raise ValueError('Freeze all5 primary model/arm candidates before target evaluation')
-    if set(ids)-PRIMARY_IDS-{'deeplabv3plus_resnet50:aug'}:
+        raise ValueError('Freeze all6 primary model/arm candidates before target evaluation')
+    if set(ids)-PRIMARY_IDS:
         raise ValueError('Unexpected candidate outside the predeclared matrix')
     first=candidates[0]
     for c in candidates[1:]:
@@ -97,3 +98,18 @@ def resolve_frozen(cohort,run_id):
     current=inspect_candidate(saved['workspace'])
     if current!=saved:raise ValueError('Candidate changed after cohort freeze')
     return current
+
+
+def seal_suites(suites,destination):
+    roots=[Path(p).resolve() for p in suites]
+    models=[];jobs=[]
+    for root in roots:
+        plan=json.loads((root/'suite_plan.json').read_text())
+        status=json.loads((root/'suite_status.json').read_text())
+        if (plan.get('schema')!='automatic_dg_model_suite_v1' or status.get('status')!='suite_complete'
+                or set(plan.get('arms',[]))!={'baseline','aug','consistency'}):
+            raise ValueError('Both automatic model suites must complete all3 arms before cohort freeze')
+        models.append(plan['model']);jobs.extend(root/'jobs'/arm for arm in plan['arms'])
+    if sorted(models)!=['deeplabv3plus_resnet50','segformer_b2']:
+        raise ValueError('Provide one complete B2 suite and one complete DeepLab suite')
+    return seal_cohort(jobs,destination)

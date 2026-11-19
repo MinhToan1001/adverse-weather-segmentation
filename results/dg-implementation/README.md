@@ -1,3 +1,5 @@
+> Historical verification of the first manual-arm interface. The active notebooks now run all three strategies automatically; see [automatic-suite verification](../dg-suite-automation/README.md). Original evidence below is preserved.
+
 # Shared DG implementation verification · 2026-11-19
 
 [Method](../../docs/DG_METHOD.md) · [Training guide](../../docs/TRAINING_GUIDE.md) · [Verification record](verification.json)

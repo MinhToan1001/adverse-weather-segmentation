@@ -35,7 +35,7 @@ ACDC không đi vào trainer, augmentation, pseudo-label hay chọn best. Đã t
 .venv/Scripts/python.exe -m scripts.build_kaggle_notebooks
 ```
 
-Import [01_dg_segformer_b2_baseline.ipynb](notebooks/01_dg_segformer_b2_baseline.ipynb). Input chỉ cần **code ZIP DG mới + Cityscapes train/val**; không gắn ACDC cho lượt train. Code ZIP ở `outputs/kaggle/project-code.zip`. Notebook B2 và [DeepLab](notebooks/02_dg_deeplabv3plus_resnet50.ipynb) chọn ARM riêng; lần GPU đầu mặc định PROFILE_ONLY=True chỉ đo timing/VRAM. False mới train20epoch. Mỗi epoch hoàn thành lưu best/last, trạng thái resume và cập nhật ZIP. [Hướng dẫn đầy đủ](docs/TRAINING_GUIDE.md).
+Import [01_dg_segformer_b2.ipynb](notebooks/01_dg_segformer_b2.ipynb). Input chỉ cần **code ZIP DG mới + Cityscapes train/val**; không gắn ACDC cho lượt train. Code ZIP ở `outputs/kaggle/project-code.zip`. Notebook B2 và [DeepLab](notebooks/02_dg_deeplabv3plus_resnet50.ipynb) đều tự chạy **profiling → baseline20 → aug20 → consistency20**. Không cần đổi ARM/PROFILE_ONLY. Dữ liệu chuẩn bị một lần mỗi model, một ZIP chung cập nhật sau mỗi epoch; resume tự tiếp tục phần chưa xong. [Hướng dẫn đầy đủ](docs/TRAINING_GUIDE.md).
 
 Launcher/campaign supervised cũ đã bị chặn mặc định và cần opt-in rõ ràng `--allow-supervised-acdc` cho công việc lịch sử. Hai notebook source→adapt cũ nằm ở [research/archive/notebooks](research/archive/notebooks), không còn là notebook hiện hành.
 

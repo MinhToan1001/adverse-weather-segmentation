@@ -1,3 +1,5 @@
+**Luồng notebook hiện hành:** tự profile và chạy đủ baseline/aug/consistency cho cả B2 lẫn DeepLab; không đổi cờ giữa lượt. [Hướng dẫn](../docs/TRAINING_GUIDE.md).
+
 [Kế hoạch hoàn thành B2 + DeepLab với 30 giờ GPU](PROJECT_COMPLETION_PLAN.md)
 
 # Khôi phục giao thức DG từ kế hoạch gốc
