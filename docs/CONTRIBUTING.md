@@ -1,3 +1,5 @@
+> **Hiện hành:** sửa [DG launcher](../scripts/run_dg.py) / [DG notebook template](../scripts/build_dg_notebook.py), dùng Cityscapes train2975/val500. Không bật target training hoặc chọn model bằng ACDC. Hai notebook supervised trước đây được lưu archive; chạy chúng phải ghi rõ ngoài protocol DG.
+
 # Hướng dẫn làm việc trong nhóm
 
 ## Bắt đầu

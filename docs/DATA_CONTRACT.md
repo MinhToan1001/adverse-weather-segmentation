@@ -1,3 +1,5 @@
+> **DG hiện hành:** Cityscapes train2975 để học, val500 để chọn best; ACDC chỉ sau freeze. Các split fit2787/monitor188 và ACDC1198/dev402 dưới đây là lịch sử supervised, không phải DG hiện hành. [DG plan](../research/DG_RECOVERY_PLAN.md).
+
 # Data contract
 
 - RGB image and integer,one-channel mask share native dimensions.

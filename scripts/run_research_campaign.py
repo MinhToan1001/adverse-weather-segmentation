@@ -77,7 +77,11 @@ def progress(root, plan):
 
 
 def run_campaign(root, data, archive, seed=42, session_hours=10., allow_cpu=False,
-                 runner=run_one, clock=time.monotonic, exporter=export_workspace, models=None):
+                 runner=run_one, clock=time.monotonic, exporter=export_workspace, models=None,
+                 allow_supervised_acdc=False):
+    if not allow_supervised_acdc:
+        raise ValueError('This source+ACDC campaign is supervised, not DG. Use scripts.run_dg; '
+                         'historical runs require --allow-supervised-acdc.')
     if not 0 < session_hours <= 10:
         raise ValueError('Per-session window must be in (0,10] hours')
     root, archive = Path(root).resolve(), Path(archive).resolve()
@@ -115,7 +119,8 @@ def run_campaign(root, data, archive, seed=42, session_hours=10., allow_cpu=Fals
             print('CAMPAIGN JOB:', job['id'], '20 epochs; fresh campaign only', flush=True)
             args = SimpleNamespace(model=job['model'], stage=job['stage'], loss='ce', data=str(Path(data).resolve()),
                 output=str(output), checkpoint=str(source) if source else None, initialization='imagenet_encoder',
-                class_crop=False, seed=seed, session_hours=session_hours, allow_cpu=allow_cpu, inspect=False, prepare_only=False)
+                class_crop=False, seed=seed, session_hours=session_hours, allow_cpu=allow_cpu, inspect=False,
+                prepare_only=False, allow_supervised_acdc=True)
             runner(args, on_epoch=snapshot, deadline=deadline)
             job_status = json.loads((output / 'status.json').read_text())
             if job_status['status'] != 'training_complete':
@@ -142,6 +147,8 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--session-hours', type=float, default=10.)
     parser.add_argument('--allow-cpu', action='store_true', help='Only for small integration QA')
+    parser.add_argument('--allow-supervised-acdc', action='store_true', help='Legacy supervised experiment, not DG')
     parser.add_argument('--models', nargs='+', choices=MODEL_NAMES, help='Select models;each runs source20 then adapt20')
     a = parser.parse_args()
-    run_campaign(a.root, a.data, a.archive, a.seed, a.session_hours, a.allow_cpu, models=a.models)
+    run_campaign(a.root, a.data, a.archive, a.seed, a.session_hours, a.allow_cpu, models=a.models,
+                 allow_supervised_acdc=a.allow_supervised_acdc)

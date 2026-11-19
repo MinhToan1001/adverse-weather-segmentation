@@ -56,6 +56,8 @@ def fits_session(now, deadline, recent_epoch_seconds):
 
 
 def prepare(args):
+    if args.stage == 'adapt' and not getattr(args, 'allow_supervised_acdc', False):
+        raise ValueError('ACDC adaptation is disabled for DG; historical runs require --allow-supervised-acdc')
     if args.model not in MODEL_NAMES:
         raise ValueError('Retired model: use segformer_b2 or the optional DeepLab model for new runs')
     root = Path(args.output).resolve()
@@ -169,6 +171,8 @@ def run(args, on_epoch=None, deadline=None):
                        '--stop-after-epoch', str(epoch)]
             if saved:
                 command += ['--resume', str(run_dir / 'last')]
+            if getattr(args, 'allow_supervised_acdc', False):
+                command += ['--allow-supervised-acdc']
             subprocess.run(command, cwd=REPO, check=True)
             committed_state(run_dir, epoch)
             if on_epoch is not None:
@@ -201,6 +205,7 @@ def parser():
     p.add_argument('--prepare-only', action='store_true')
     p.add_argument('--inspect', action='store_true')
     p.add_argument('--allow-cpu', action='store_true')
+    p.add_argument('--allow-supervised-acdc', action='store_true', help='Legacy supervised training, not DG')
     return p
 
 

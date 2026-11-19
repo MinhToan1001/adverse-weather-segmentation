@@ -1,11 +1,13 @@
 """Build current notebooks and a code-only Kaggle upload bundle."""
 from pathlib import Path
 import zipfile
-from scripts.build_research_notebooks import build_all
+from scripts.build_dg_notebook import build as build_dg
+from scripts.build_research_notebooks import build_all as build_legacy
 ROOT=Path(__file__).resolve().parents[1]
 
 def build():
-    notebooks=build_all()
+    build_legacy()  # Archived files, retained for historical regression coverage only.
+    notebooks=[build_dg()]
     destination=ROOT/'outputs/kaggle/project-code.zip'
     destination.parent.mkdir(parents=True,exist_ok=True)
     with zipfile.ZipFile(destination,'w',zipfile.ZIP_DEFLATED) as archive:

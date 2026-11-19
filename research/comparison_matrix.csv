@@ -1,10 +1,11 @@
 method,role,target_labels,current_training_status,primary_source
 SegFormer-B0,retired historical control,supervised,source20 and adapt20 complete; official validation pending,https://arxiv.org/abs/2105.15203
-SegFormer-B2,current application model,supervised,source20 and adapt20 complete; official validation pending,https://arxiv.org/abs/2105.15203
-SegFormer-B2-published-FT20,selected next supervised baseline,supervised,published Cityscapes checkpoint and 20 ACDC passes agreed; implementation pending,https://huggingface.co/nvidia/segformer-b2-finetuned-cityscapes-1024-1024
+SegFormer-B2,historical source and supervised-adapt run,supervised,source20 and adapt20 complete; official validation pending,https://arxiv.org/abs/2105.15203
+SegFormer-B2-published-FT20,superseded supervised proposal,supervised,abandoned for the restored DG protocol; not implemented,https://huggingface.co/nvidia/segformer-b2-finetuned-cityscapes-1024-1024
 DeepLabV3+R50,optional project CNN variant,supervised,source20 then adapt20 pending,https://arxiv.org/abs/1802.02611
 Kalb-Beyerer2023,forgetting and normalization background,supervised,related work with a different incremental task sequence,https://arxiv.org/abs/2303.14115
 Focal,loss idea,project uses fit labels,isolated ablation planned,https://arxiv.org/abs/1708.02002
 V-Net-Dice,overlap objective idea,project uses fit labels,adapted multiclass reduction implemented,https://arxiv.org/abs/1606.04797
 HRDA,UDA related work,no target labels,not a matched project reproduction,https://github.com/lhoyer/HRDA
 Refign,UDA related work,no target labels,not a matched project reproduction,https://github.com/brdav/refign
+SegFormer-B2-DG-v1,active source-only baseline,none from ACDC,Cityscapes train2975 and select val500; 20epochs; GPU results pending,https://arxiv.org/abs/2105.15203

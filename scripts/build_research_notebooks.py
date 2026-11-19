@@ -6,8 +6,8 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 NOTEBOOKS={
-    'segformer_b2':'02_train_segformer_b2.ipynb',
-    'deeplabv3plus_resnet50':'03_train_deeplabv3plus_resnet50.ipynb',
+    'segformer_b2':'../research/archive/notebooks/02_train_segformer_b2.ipynb',
+    'deeplabv3plus_resnet50':'../research/archive/notebooks/03_train_deeplabv3plus_resnet50.ipynb',
 }
 
 
@@ -21,7 +21,9 @@ def cell(kind,text):
 def build(model):
     if model not in NOTEBOOKS:raise ValueError('Unknown model')
     boot=(ROOT/'scripts/kaggle_bootstrap.py').read_text(encoding='utf-8')
-    texts=[('markdown','''# Project-CV · __MODEL__
+    texts=[('markdown','''# LỊCH SỬ SUPERVISED · __MODEL__
+
+Không dùng notebook này cho DG. Campaign đã bị chặn mặc định; ACDC có nhãn từng được dùng để học.
 
 Một model, hai giai đoạn: **Cityscapes 20 epoch → ACDC replay 20 epoch**. Recipe hiện có, không phải notebook baseline checkpoint công bố mới. Encoder ImageNet + head mới;không nạp checkpoint project cũ. B0 đã ngừng sử dụng.
 

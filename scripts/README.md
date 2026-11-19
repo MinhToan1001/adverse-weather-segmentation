@@ -1,3 +1,5 @@
+> **Lệnh DG hiện hành:** `python -m scripts.run_dg --city ... --root ... --archive ...`; chỉ Cityscapes train2975/val500. [run_dg.py](run_dg.py), [build_dg_notebook.py](build_dg_notebook.py). Các lệnh chuẩn bị ACDC/replay/campaign dưới đây là lịch sử supervised và đã chặn train mặc định.
+
 # Các lệnh điều phối
 
 Logic model/data/training nằm trong `src/`; `scripts/` ghép chúng thành các thao tác chạy được. Tên lệnh `research` được giữ để tương thích, hiện phục vụ cả đồ án ứng dụng.

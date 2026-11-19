@@ -51,9 +51,9 @@ def test_campaign_pauses_then_continues_without_retraining_completed_jobs(tmp_pa
             (run/name).write_text(''.join(json.dumps(r)+'\n' for r in rows))
         on_epoch(epoch)
         (output/'status.json').write_text(json.dumps(dict(status='training_complete' if epoch==20 else 'session_checkpoint_ready')))
-    first=campaign.run_campaign(root,data,archive,runner=runner,clock=lambda:0,exporter=exporter)
+    first=campaign.run_campaign(root,data,archive,allow_supervised_acdc=True,runner=runner,clock=lambda:0,exporter=exporter)
     assert first['status']=='session_checkpoint_ready' and first['completed_jobs']==1
-    second=campaign.run_campaign(root,data,archive,runner=runner,clock=lambda:0,exporter=exporter)
+    second=campaign.run_campaign(root,data,archive,allow_supervised_acdc=True,runner=runner,clock=lambda:0,exporter=exporter)
     assert second['status']=='training_complete' and second['completed_jobs']==4
     assert sum(model=='segformer_b2' and stage=='source' for model,stage,_,_ in calls)==1
     assert all(initial=='imagenet_encoder' and deadline==36000 for _,_,initial,deadline in calls)
@@ -69,7 +69,7 @@ def test_failed_job_with_truncated_logs_still_exports_workspace(tmp_path,monkeyp
         (run/'history.jsonl').write_text('{"epoch":')
         raise RuntimeError('training interrupted')
     with pytest.raises(RuntimeError,match='training interrupted'):
-        campaign.run_campaign(tmp_path/'work',data,tmp_path/'result.zip',runner=runner,
+        campaign.run_campaign(tmp_path/'work',data,tmp_path/'result.zip',allow_supervised_acdc=True,runner=runner,
             exporter=lambda work,path:snapshots.append(path))
     assert snapshots
 

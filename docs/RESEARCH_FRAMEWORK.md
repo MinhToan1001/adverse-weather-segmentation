@@ -1,3 +1,5 @@
+> **SUPERSEDED / LỊCH SỬ:** Không phải giao thức hiện hành. Xem [DG recovery plan](../research/DG_RECOVERY_PLAN.md). ACDC supervised không được dùng làm DG.
+
 # Phương pháp hiện hành của đồ án
 
 [Tổng quan](../README.md) · [Lộ trình đọc](READING_GUIDE.md) · [Training / resume](TRAINING_GUIDE.md)

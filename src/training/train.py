@@ -223,12 +223,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
     parser.add_argument("--resume", help="Resume from a checkpoint directory saved by this trainer")
+    parser.add_argument('--allow-supervised-acdc', action='store_true',
+                        help='Historical supervised experiment only; incompatible with DG')
     parser.add_argument("--stop-after-epoch", type=int, help="Save and stop after this epoch while preserving the original scheduler horizon")
     args = parser.parse_args()
     if args.stop_after_epoch is not None and args.stop_after_epoch < 1:
         raise ValueError("stop-after-epoch must be positive")
 
     cfg = read_cfg(args.config)
+    from src.experiments.protocol import require_training_permission
+    require_training_permission(cfg, args.allow_supervised_acdc)
     transactional = bool(cfg.get('checkpointing', {}).get('transactional', False))
     if transactional and args.resume:
         from src.training.checkpoints import recover_run

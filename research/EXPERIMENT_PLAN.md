@@ -1,3 +1,5 @@
+> **SUPERSEDED / LỊCH SỬ:** Không phải giao thức hiện hành. Xem [DG recovery plan](DG_RECOVERY_PLAN.md). ACDC supervised không được dùng làm DG.
+
 # Predeclared development order — original shared-recipe study
 
 The next study follows the [2026-11-19 baseline decision](BASELINE_PROTOCOL.md). B0/B2 below are completed historical controls; this original order is retained for provenance. A runnable published-checkpoint baseline and its new experiment matrix are pending implementation.

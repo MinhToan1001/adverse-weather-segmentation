@@ -1,3 +1,5 @@
+> **Historical demo, not DG evidence:** source is the old Cityscapes-only run; adapted checkpoints used ACDC images/labels. DG baseline/proposed results are pending. [Recovery plan](../research/DG_RECOVERY_PLAN.md).
+
 # WeatherLens Studio
 
 Local web interface for Project-CV, served by **Node.js**. A persistent Python worker runs the existing trained PyTorch models on CPU. Training, preprocessing and model architectures are reused unchanged. No Streamlit or JavaScript model conversion is required.

@@ -1,3 +1,5 @@
+> **SUPERSEDED / LỊCH SỬ:** Không phải giao thức hiện hành. Xem [DG recovery plan](DG_RECOVERY_PLAN.md). ACDC supervised không được dùng làm DG.
+
 # Baseline decision — 2026-11-19
 
 Status: **research direction and primary budget agreed with the user**. This is a protocol document, not an executable training configuration. The existing trainer, checkpoints and three model notebooks have not been changed to implement this protocol.

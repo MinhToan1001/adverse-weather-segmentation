@@ -1,43 +1,35 @@
-# Training B2 trên Kaggle và model mở rộng
+# Train và khôi phục baseline DG B2
 
-[Danh sách notebook](../notebooks/README.md) · [Phương pháp](RESEARCH_FRAMEWORK.md)
+[Protocol khôi phục](../research/DG_RECOVERY_PLAN.md) · [Notebook](../notebooks/01_dg_segformer_b2_baseline.ipynb)
 
-## Mỗi lượt chạy làm gì?
+## Quy tắc
 
-Chọn notebook B2 chính hoặc DeepLab tùy chọn. B0 đã rút khỏi luồng chạy mới. Đây là recipe ImageNet → Cityscapes → ACDC hiện có, chưa phải protocol checkpoint Cityscapes công bố trong research/BASELINE_PROTOCOL.md. Model khởi tạo encoder từ ImageNet, đầu phân đoạn 19 lớp mới; train Cityscapes 20 epoch rồi tự dùng checkpoint source tốt nhất để train ACDC với source replay thêm 20 epoch. Mỗi model có workspace, bản source đóng băng và ZIP kết quả riêng.
+Chỉ Cityscapes train 2.975 ảnh để học, Cityscapes val500 để chọn best; **không ACDC input**. Encoder ImageNet được pin, head mới, 20 epoch, CE, không early stopping. Giữ recipe source chung: khung512×1024 giữ tỷ lệ, scale0,5–2/crop/flip đồng bộ, batch2/accum4, AdamW encoder6e-5/head×10, weight_decay0,01, warm-up20updates/poly1, FP16AMP. Đây là baseline mới, chưa có module DG proposed hoặc kết quả GPU.
 
-| Model | Notebook | Thời gian trên một T4 |
-| --- | --- | --- |
-| B2 | [02](../notebooks/02_train_segformer_b2.ipynb) | Đã ghi nhận 7,77 giờ cho lượt seed 42 |
-| DeepLabV3+ ResNet50 | [03](../notebooks/03_train_deeplabv3plus_resnet50.ipynb) | 12–24 giờ; chưa có đo GPU trực tiếp |
+## Kaggle
 
-Các số trên tính cho **40 epoch/model**, gồm hai giai đoạn 20 epoch. Thời gian B2 lấy từ training invocation thực tế, gồm validation và nén kết quả trong lượt chạy; chưa tính cài dependencies và chuẩn bị dữ liệu. B2 có median khoảng 8,36 phút/epoch source và 10,24 phút/epoch adaptation, nhanh hơn dự trù bảo thủ 16–24 giờ trước đây. Đây không phải cam kết thời gian cho mọi phiên Kaggle. [báo cáo B2](../results/segformer_b2_seed42/README.md). DeepLab vẫn là ước lượng sơ bộ, chưa đo GPU trực tiếp; [dự trù ban đầu](../results/repository-release/runtime_budget.json).
+1. Chạy `python -m scripts.build_kaggle_notebooks` để sinh notebook DG và code ZIP mới.
+2. Upload `outputs/kaggle/project-code.zip`; import notebook DG; gắn Cityscapes có cả train/val. Bật GPU/Internet. Không thêm ACDC cho training.
+3. `CODE_INPUT` trỏ tới code mới; `CITYSCAPES_ROOT=None` tự tìm theo cấu trúc, hoặc đặt cụ thể khi có nhiều bản. `RESUME_INPUT=None` là lượt mới.
+4. Chạy setup kiểm tra, rồi Save Version → Save & Run All. Nó chỉ chạy một stage Cityscapes, **không tự học ACDC**.
+5. Giữ ZIP `dg_b2_baseline_seed42.zip` và output. Chỉ sau khi khóa phương pháp/checkpoint mới lập lượt đánh giá ACDC riêng.
 
-Sau những epoch đầu, log và `status.json` cập nhật ETA từ thời gian thực tế của **giai đoạn đang chạy**. Cần cộng thêm thời gian setup, nén ZIP và giai đoạn sau chưa đo. Notebook dùng cửa sổ phiên 10 giờ. B2 đã hoàn thành trong một invocation ở các lượt ghi nhận, nhưng vẫn cần giữ checkpoint để tiếp tục nếu phiên khác chậm hơn; DeepLab có thể cần nhiều phiên. Trainer hiện dùng một GPU, kể cả khi giao diện chọn T4 × 2.
+## Resume
 
-## Bắt đầu một lượt mới
+Sau mỗi epoch hoàn thành, trainer lưu weights/config/optimizer/scheduler/scaler/RNG, best/last và thế hệ previous; launcher cập nhật ZIP. Epoch dở chạy lại. Cửa sổ phiên tối đa10giờ, không tổng cap. Nếu bị Kaggle hard-kill, `finally` không được bảo đảm chạy, nên giữ bản ZIP hoàn chỉnh gần nhất và raw checkpoint nếu có.
 
-1. Tạo bộ code: `python -m scripts.build_kaggle_notebooks`.
-2. Import notebook của model cần chạy; thêm `outputs/kaggle/project-code.zip`, Cityscapes và ACDC làm input. Cập nhật dataset chứa code khi đổi code.
-3. Bật GPU và Internet. Giữ `RESUME_INPUT=None` để bắt đầu mới.
-4. Dataset được tự tìm theo cấu trúc. Nếu gắn nhiều bản code, đặt `CODE_INPUT` đến đúng dataset code. Các biến đường dẫn Cityscapes/ACDC cũng có thể khai báo cụ thể.
-5. Chọn **Save Version → Save & Run All**. Notebook tự chạy source rồi adaptation; không cần thêm checkpoint `best/` của project cũ.
+Phiên mới: cùng dataset/mount, `RESUME_INPUT` trỏ kết quả DG; notebook khôi phục code snapshot và kiểm hash. Không dùng ZIP source→ACDC cũ, không thay recipe giữa lượt. Không mở lại workspace cũ để chạy từ đầu; tạo workspace mới.
 
-## Checkpoint lưu những gì?
+## CLI và chuẩn bị trên CPU
 
-Sau mỗi epoch hoàn thành, `last/` và `best/` lưu weights, config, optimizer, scheduler, AMP scaler, trạng thái ngẫu nhiên và epoch đã chọn. File được ghi vào thư mục tạm, kiểm tra hash rồi mới thay thế bản chính. `last.previous/` và `best.previous/` là bản dự phòng. Khôi phục đối chiếu checkpoint với log; log của epoch chưa ghi xong được loại bỏ.
+```powershell
+python -m scripts.run_dg --city data/raw/cityscapes --root outputs/dg/b2 --archive outputs/dg_b2_seed42.zip --prepare-only
+# Khi có GPU, cùng lệnh bỏ --prepare-only để train/resume:
+python -m scripts.run_dg --city data/raw/cityscapes --root outputs/dg/b2 --archive outputs/dg_b2_seed42.zip
+```
 
-Toàn bộ workspace được nén vào ZIP tạm rồi mới thay ZIP hoàn chỉnh trước đó. Nếu ngắt giữa epoch, resume chạy lại epoch đó. **Cần giữ output của phiên Kaggle hoặc tải ZIP về**: file trong runtime không tự đồng bộ sang Drive và có thể mất nếu runtime bị xóa trước khi lưu output.
+`--prepare-only` chuyển nhãn và tạo manifest/config, không train hoặc mở dữ liệu ACDC. `dg_plan.json` ghi split, source/hash/seed; `frozen_candidate.json` chỉ sinh sau khi đủ20epoch, ghi hash best và quy tắc selection. Launcher không evaluate ACDC tự động.
 
-## Tiếp tục sau khi ngắt
+## Lịch sử
 
-1. Giữ ZIP hoàn chỉnh mới nhất `<model>_seed42.zip` và output của phiên Kaggle.
-2. Mở phiên mới bằng **notebook của cùng model**, cùng phiên bản dataset và đường dẫn mount.
-3. Thêm ZIP kết quả hoặc dataset đã giải nén của model đó; đặt `RESUME_INPUT` đến vị trí tương ứng.
-4. Chạy notebook. Nó khôi phục source, config và trạng thái training ban đầu; tiếp tục phần chưa hoàn thành. Các giai đoạn đã xong được bỏ qua.
-
-ZIP của các model không dùng thay cho nhau. B0 lịch sử cần source/notebook đã đóng băng của lượt cũ. Resume dùng bản source đã đóng băng trong kết quả, không tự áp dụng thay đổi code mới vào thí nghiệm đang chạy.
-
-## Đọc kết quả
-
-`training_complete` nghĩa là cả hai giai đoạn 20 epoch đã hoàn thành cho model đó. Điểm monitor/dev phục vụ chọn checkpoint; đây chưa phải kết quả official-val. Sau khi chốt checkpoint, dùng `scripts.evaluate_research` để đánh giá Cityscapes val 500 và ACDC val 406. Giữ checkpoint và manifest của thí nghiệm để có thể kiểm tra lại.
+Các notebook B2/DeepLab source20→adapt20 đã chuyển sang [archive](../research/archive/notebooks). `scripts.run_research_campaign` và stage adapt yêu cầu `--allow-supervised-acdc`, để người chạy xác nhận đó là supervised ngoài DG. Resume lịch sử phải dùng code snapshot tương ứng, không sửa weights hoặc nhãn protocol của run cũ.
