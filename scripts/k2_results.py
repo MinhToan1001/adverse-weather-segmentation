@@ -96,6 +96,7 @@ def _summary(files):
     resources = ([json.loads(line) for line in files.read('run/resources.jsonl').decode().splitlines() if line.strip()]
                  if 'run/resources.jsonl' in files.names else [])
     return dict(protocol=PROTOCOL, arm=plan['arm'], seed=plan['seed'], complete=complete,
+        recipe=plan.get('recipe', 'legacy_v1'), image_size=cfg['data']['image_size'],
         completed_epochs=len(rows), planned_epochs=plan['epochs'], best_epoch=best['epoch'],
         cityscapes_val_miou=best['val']['miou'], cityscapes_val_miou_percent=100*best['val']['miou'],
         last_train_loss=rows[-1]['train_loss'], best_per_class_iou=best['val']['per_class_iou'],
@@ -103,7 +104,7 @@ def _summary(files):
         parameters=model_report.get('parameters'), conditions=weather['conditions'],
         fog_enabled=weather['fog_enabled'], optimizer_updates=sum(r['optimizer_updates'] for r in resources),
         train_validation_hours=sum(r['epoch_seconds'] for r in resources)/3600,
-        peak_allocated_bytes=max((r.get('max_memory_allocated_bytes', 0) for r in resources), default=0),
+        peak_allocated_bytes=max((r.get('max_memory_allocated_bytes') or 0 for r in resources), default=0),
         checkpoint_sha256=weights_hash, config_sha256=config_hash,
         plan_sha256=_digest(files.read('k2_plan.json')),
         curve=[dict(epoch=r['epoch'], train_loss=r['train_loss'], val_miou=r['val']['miou']) for r in rows],
@@ -131,6 +132,8 @@ def export_share(workspace, destination):
                 'train.yaml', 'k2_plan.json', 'status.json', 'weather_preflight.json',
                 'frozen_candidate.json', 'source.zip', 'result_summary.json',
                 'data/cityscapes_train.csv', 'data/cityscapes_val.csv'}
+        keep.update(p.relative_to(workspace).as_posix() for p in (workspace/'figures').rglob('*')
+                    if p.is_file() and p.suffix in {'.png', '.svg', '.json'})
         destination.parent.mkdir(parents=True, exist_ok=True)
         temporary = destination.with_suffix('.partial.zip')
         with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as archive:
@@ -154,7 +157,8 @@ def _comparison_record(source):
         from scripts.run_k2 import compose
         expected = compose(plan['arm'], dict(source_train_manifest=cfg['data']['train_manifest'],
             source_monitor_manifest=cfg['data']['val_manifest']), cfg['output_dir'],
-            plan['seed'], plan['epochs'], plan['batch_size'], cfg['data']['augment'].get('weather'))
+            plan['seed'], plan['epochs'], plan['batch_size'], cfg['data']['augment'].get('weather'),
+            recipe=plan.get('recipe', 'legacy_v1'))
         # A Kaggle POSIX output path must not become a Windows absolute path
         # during an offline audit. Output locations do not change the recipe.
         expected['output_dir'] = cfg['output_dir']

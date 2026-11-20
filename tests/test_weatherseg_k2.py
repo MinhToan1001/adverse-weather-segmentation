@@ -170,12 +170,13 @@ def test_k2_protocol_blocks_supervised_override_and_target_selection(tmp_path):
         require_training_permission(cfg)
 
 
-def test_shared_trainer_k1_k2_resume_matches_uninterrupted(tmp_path):
+@pytest.mark.parametrize('recipe',['legacy_v1','balanced_v2'])
+def test_shared_trainer_k1_k2_resume_matches_uninterrupted(tmp_path,recipe):
     """Actual CLI, DataLoader, auxiliary loss, optimizer/RNG and checkpoint integration."""
     from safetensors.torch import load_file
     from src.training.checkpoints import verified_state
     paths=make_source(tmp_path/'source')
-    config=compose('k2',paths,tmp_path/'continuous',epochs=2)
+    config=compose('k2',paths,tmp_path/'continuous',epochs=2,recipe=recipe)
     config['experiment_protocol']='k2_tiny_source_qa'  # Deliberately not official-size benchmark evidence.
     config['model']['initialization']='random'
     config['data']['image_size']=[64,96]

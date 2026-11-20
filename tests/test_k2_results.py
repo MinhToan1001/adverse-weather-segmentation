@@ -26,11 +26,11 @@ def write_json(path, value):
 
 
 def make_result(root, arm='k2', changed_core=False, changed_init=False, lr=None, complete=True,
-                foreign_output=False, crlf=False):
+                foreign_output=False, crlf=False, recipe='legacy_v1'):
     root.mkdir(parents=True)
     paths = {key: str(root/'data'/name) for key, name in [
         ('source_train_manifest','cityscapes_train.csv'),('source_monitor_manifest','cityscapes_val.csv')]}
-    cfg = compose(arm, paths, root/'run', epochs=1)
+    cfg = compose(arm, paths, root/'run', epochs=1, recipe=recipe)
     if foreign_output:
         cfg['output_dir']='/kaggle/working/k2_'+arm+'_seed42/run'
     if lr is not None:
@@ -59,6 +59,7 @@ def make_result(root, arm='k2', changed_core=False, changed_init=False, lr=None,
     plan = dict(protocol='weatherseg_k2_source_v1',arm=arm,seed=42,epochs=1,batch_size=2,
         source_hashes={n:digest(b) for n,b in core.items()},
         frozen_files={n:digest((root/n).read_bytes()) for n in frozen_files})
+    if recipe != 'legacy_v1':plan['recipe']=recipe
     write_json(root/'k2_plan.json',plan)
     weights = save({'segformer.weight':torch.ones(2),'decode_head.weight':torch.zeros(2)})
     initial = {'segformer.weight':torch.ones(2)*(2 if changed_init else 1),'decode_head.weight':torch.zeros(2)}

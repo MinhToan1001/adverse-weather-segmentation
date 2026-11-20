@@ -2,6 +2,8 @@
 
 Nhánh Git: **`feat/k1-weather-augmentation`**. K1 và K2 nằm chung nhánh; không cần lấy nhánh K2 WIP cũ.
 
+Notebook04 giữ recipe20epoch cho đối chứng cũ. Có thêm [notebook05: recipe ứng viên + evaluate](../notebooks/05_k2_balanced_train_eval.ipynb) và [notebook06: evaluate checkpoint đã có](../notebooks/06_k2_evaluate_report.ipynb). Xem [hướng dẫn tối ưu/đánh giá/biểu đồ](K2_OPTIMIZATION.md); không trộn recipe mới và cũ trong cùng bảng ablation.
+
 ## Bắt đầu
 
 1. Tải/import [04_k2_weatherseg_b0_train.ipynb](../notebooks/04_k2_weatherseg_b0_train.ipynb) vào Kaggle, bật **GPU + Internet**.

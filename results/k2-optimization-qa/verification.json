@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-20",
+  "scope": "Software QA and measured historical K2 plots; no new accuracy result",
+  "python_suite": {"passed": 220, "skipped": 4, "seconds": 173.83},
+  "node_api": {"passed": 1},
+  "candidate_recipe": {
+    "name": "balanced_v2",
+    "default_epochs": 40,
+    "canvas": [640, 1280],
+    "warmup_optimizer_updates": 500,
+    "class_aware_source_crop": true,
+    "clean_probability": 0.5,
+    "severity_levels": [1, 2, 3],
+    "full_gpu_training_performed": false,
+    "improvement_established": false
+  },
+  "evaluation_qa": {
+    "device": "cpu",
+    "weights": "random initialization, real WeatherSegB0 checkpoint",
+    "images": "2 synthetic Cityscapes-shaped and 4 synthetic ACDC-shaped validation images",
+    "execution": "real shared model loader, native-label inference, confusion/calibration and panels",
+    "trained_weights_changed": false,
+    "partial_run_blocked_before_target_access": true,
+    "official_split_counts_enforced": true,
+    "complete_cityscapes_or_acdc_benchmark_performed": false,
+    "scope": "Test-only small counts; not reported as official validation performance"
+  },
+  "notebooks": {
+    "legacy_01_to_04_preserved": true,
+    "new_05_06_parse_without_outputs": true,
+    "fresh_setup_cells_executed_with_uploaded_bundle": true
+  },
+  "figures": {
+    "formats": ["png", "svg"],
+    "pipeline_architecture_and_curves_visually_inspected": true,
+    "real_historical_k2_archive_plotted": true,
+    "new_acdc_quality_plots_available": false
+  },
+  "limits": [
+    "No guarantee of 80 percent mIoU or improvement over the matched baseline",
+    "Local machine has no CUDA or full ACDC dataset",
+    "ACDC val is public-label exploratory post-training evaluation, not hidden test",
+    "No teacher EMA, K3, K4 or test-time weight adaptation"
+  ]
+}
