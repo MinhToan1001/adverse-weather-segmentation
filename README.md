@@ -8,7 +8,7 @@
 
 Cách làm này gọi là **Domain Generalization (DG)**: học ở điều kiện nguồn, kiểm tra ở điều kiện khác. ACDC không được dùng để train, lấy style hoặc chọn model trong luồng hiện hành.
 
-**Nhánh thử nghiệm K1 + K2:** [notebook04](notebooks/04_k2_weatherseg_b0_train.ipynb) train WeatherSeg-B0 với FiLM và condition head từ ảnh K1, có ZIP/resume. [Hướng dẫn](docs/K2_TRAINING.md). Đây là thí nghiệm riêng; chưa có kết quả full GPU và không thay thế cohort B2/DeepLab dưới đây.
+**Nhánh thử nghiệm K1 + K2:** [notebook04](notebooks/04_k2_weatherseg_b0_train.ipynb) hỗ trợ năm arm đối chứng B0/FiLM/K1/condition head, mỗi phiên một arm, mặc định baseline; có ZIP/resume và ZIP nhẹ. Pilot `k2` seed42 đã đủ20epoch, đạt60,68% Cityscapes val500, chưa đánh giá ACDC hoặc chứng minh cải thiện. [Hướng dẫn](docs/K2_TRAINING.md) · [Kết quả pilot](results/k2-kaggle-seed42/summary.json). Đây là thí nghiệm riêng, không thay thế cohort B2/DeepLab dưới đây.
 
 ## Project hiện làm được gì?
 

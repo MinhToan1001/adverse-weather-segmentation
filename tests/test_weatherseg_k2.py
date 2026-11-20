@@ -149,12 +149,15 @@ def test_weather_preflight_auto_full_and_missing_sidecars(tmp_path):
 
 def test_ablation_configs_share_k1_and_keep_baseline_model_unchanged(tmp_path):
     paths=make_source(tmp_path)
-    configs={arm:compose(arm,paths,tmp_path/arm) for arm in ('baseline','aug','film','k2')}
+    configs={arm:compose(arm,paths,tmp_path/arm) for arm in ('baseline','film_clean','aug','film','k2')}
     assert 'weather' not in configs['baseline']['data']['augment']
     assert configs['aug']['model']['name']=='segformer_b0'
     assert all(configs[arm]['data']==configs['k2']['data'] for arm in ('aug','film'))
     assert configs['film']['model']['condition_loss_weight']==0 and not configs['film']['condition_training']
     assert configs['k2']['condition_training'] and configs['k2']['model']['name']=='weatherseg_b0'
+    assert configs['film_clean']['data'] == configs['baseline']['data']
+    assert configs['film_clean']['model']['condition_loss_weight'] == 0
+    assert not configs['film_clean']['condition_training']
 
 
 def test_k2_protocol_blocks_supervised_override_and_target_selection(tmp_path):

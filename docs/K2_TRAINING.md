@@ -7,7 +7,19 @@ Nhánh Git: **`feat/k1-weather-augmentation`**. K1 và K2 nằm chung nhánh; kh
 1. Tải/import [04_k2_weatherseg_b0_train.ipynb](../notebooks/04_k2_weatherseg_b0_train.ipynb) vào Kaggle, bật **GPU + Internet**.
 2. Gắn Cityscapes gồm `leftImg8bit/train`, `leftImg8bit/val`, `gtFine/train`, `gtFine/val`. Root có bốn thư mục này được tự tìm; điền `CITYSCAPES_ROOT` nếu có nhiều ứng viên.
 3. Run All. Notebook lấy code cùng nhánh, cài dependencies phụ, chạy smoke CUDA/AMP nhỏ, chuẩn bị nhãn trainIds, kiểm dữ liệu rồi train.
-4. Mặc định **một lượt `ARM='k2'`, seed42, 20epoch, batch2/accumulation4**, canvas512×1024. Mỗi epoch lưu checkpoint và xuất ZIP. Model chọn best bằng **Cityscapes val500 mIoU**.
+4. Mặc định **một lượt `ARM='baseline'`, seed42, 20epoch, batch2/accumulation4**, canvas512×1024. Mỗi epoch lưu checkpoint và xuất hai ZIP. Model chọn best bằng **Cityscapes val500 mIoU**. Một notebook chỉ chạy một arm, không tự chạy cả ma trận.
+
+## Hai bộ dữ liệu, hai vai trò
+
+| Dữ liệu | Vai trò trong K2 |
+| --- | --- |
+| Cityscapes train2975 | Học segmentation; K1 tạo ảnh thời tiết và nhãn điều kiện từ các ảnh này |
+| Cityscapes val500 | Chọn checkpoint best, giữ cùng split giữa mọi arm |
+| ACDC val406 | Đánh giá thời tiết thật sau khi chốt các candidate; không dùng trong notebook train |
+
+Vì vậy notebook train chỉ cần dataset **Cityscapes**, nhưng dùng cả thư mục train và val. Không gộp ACDC vào train để tăng điểm: như vậy sẽ đổi bài toán DG thành học có dữ liệu đích. K3/K4 chưa nằm trong bản cập nhật K2 này.
+
+Dataset Kaggle đã dùng cho pilot tự tìm được root `Cityscape` có `leftImg8bit` và `gtFine`; không cần đổi đường dẫn nếu vẫn gắn đúng dataset/phiên bản đó. Giữ cùng mount khi resume.
 
 Không gắn ACDC để train. Các checkpoint supervised lịch sử không được dùng làm khởi tạo. Encoder ImageNet `nvidia/mit-b0` được pin revision và kiểm SHA-256; decoder, FiLM và condition head là phần học cho thí nghiệm này. PyTorch/TorchVision CUDA của Kaggle được giữ nguyên; yêu cầu PyTorch>=2.6 và TorchVision tương thích.
 
@@ -17,9 +29,9 @@ Nếu không muốn clone, upload `outputs/kaggle/project-code.zip` từ `python
 
 | `WEATHER_MODE` | Hành vi |
 | --- | --- |
-| `'auto'` mặc định | Có đầy đủ độ sâu thì dùng năm điều kiện; không có nguồn độ sâu thì dùng clean/night/rain/snow và in rõ fog bị loại |
+| `'auto'` | Có đầy đủ độ sâu thì dùng năm điều kiện; không có nguồn độ sâu thì dùng clean/night/rain/snow và in rõ fog bị loại |
 | `'full'` | Bắt buộc đủ clean/fog/night/rain/snow; thiếu hoặc sai độ sâu thì dừng trước train |
-| `'no-fog'` | Chủ động chỉ train clean/night/rain/snow |
+| `'no-fog'` mặc định | Chủ động chỉ train clean/night/rain/snow, khớp bốn điều kiện của lượt k2 seed42 đã hoàn thành |
 
 Để train đủ năm điều kiện:
 
@@ -59,11 +71,12 @@ Giao diện `model(pixel_values=...).logits`, `save_pretrained` và registry/eva
 
 ## Các nhánh ablation trong cùng notebook
 
-Chọn `ARM` trước khi bắt đầu một workspace mới; notebook không tự chạy cả bốn lượt.
+Chọn `ARM` trước khi bắt đầu một workspace mới; notebook không tự chạy cả năm lượt.
 
 | ARM | Mô hình | Ảnh K1 | Loss điều kiện |
 | --- | --- | --- | --- |
 | `baseline` | B0 thuần | Không | Không |
+| `film_clean` | B0 + FiLM + head5logits | Không | Tắt; kiểm tra FiLM trên ảnh sạch |
 | `aug` | B0 thuần | Có | Không |
 | `film` | B0 + FiLM + head5logits | Có | Tắt; head phụ không được huấn luyện |
 | `k2` | B0 + FiLM + head5logits | Có | CE×0,1 |
@@ -72,9 +85,25 @@ Các arm độc lập bắt đầu từ encoder ImageNet và segmentation head m
 
 Giữ cùng `WEATHER_MODE`/depth/severity giữa `aug`, `film`, `k2`. Điều kiện thời tiết được chọn online bằng RNG theo seed/epoch/index. Bảng này là thiết kế ablation, chưa có bằng chứng tăng mIoU.
 
+`film_clean` không huấn luyện nhánh condition bằng nhãn sạch hằng số; nhánh này chỉ giữ cấu trúc tương ứng với K2. `baseline` và `film_clean` không chạy depth preflight vì không sử dụng K1.
+
+Thứ tự cho người đã hoàn thành `k2` seed42:
+
+1. Import notebook04 mới, giữ `ARM='baseline'`, `WEATHER_MODE='no-fog'`; chạy 20epoch và giữ cả hai ZIP.
+2. Phiên mới: đổi `ARM='film_clean'`, giữ các thông số khác; Run All.
+3. Phiên mới: `ARM='aug'`; sau đó một phiên mới khác `ARM='film'`.
+4. Giữ nguyên ZIP `k2` đã chạy. Công cụ bên dưới kiểm tra recipe, core code, manifest và khởi tạo chung trước khi cho ghép vào bảng. Không sửa hoặc resume run cũ bằng source mới. Nếu kiểm tra không khớp, giữ riêng và chạy lại đối chứng cần thiết.
+
+Mỗi lượt độc lập bắt đầu từ ImageNet encoder. Không nạp best của arm trước để train arm sau. Một seed là bước đầu; chưa chứng minh độ ổn định nhiều seed. Không thay scheduler horizon giữa lúc resume để nâng điểm.
+
+Kaggle T4 của pilot mất khoảng6,3giờ cho một lượt `k2` 20epoch; thời gian các arm khác phải đo thực tế. Không nhận toàn bộ ma trận chắc chắn vừa một phiên/quota. Chọn Save Version / Save & Run All sau khi chuẩn bị input để chạy một lượt và lưu output trong phiên nền.
+
+Trong lúc một epoch chạy, runner mới in `[K2] ... still running` mỗi60giây. Đây là thông báo tiến trình train/validation còn sống, không phải phần trăm hoàn thành hoặc phép đo GPU utilization. Metrics chỉ xuất sau train + validation của epoch. Vòng train, loss, RNG và recipe không đổi. Một cảnh báo đỏ về segmentation head mới khởi tạo là dự kiến; xung đột pip với package ngoài pipeline cần phân biệt với traceback làm subprocess thất bại.
+
 ## ZIP, thời gian phiên và resume
 
-- Tệp tải về: `/kaggle/working/k2_k2_seed42.zip` khi ARM=k2. Checkpoint best/last, optimizer/scheduler/scaler/RNG, config, manifest và source snapshot đều nằm trong ZIP.
+- **ZIP đầy đủ:** `/kaggle/working/k2_<ARM>_seed42.zip`. Chứa best/last, optimizer/scheduler/scaler/RNG, config, manifest và source snapshot; giữ để resume hoặc audit đối chứng.
+- **ZIP nhẹ:** `/kaggle/working/k2_<ARM>_seed42_share.zip`. Chứa best weights, config và log/báo cáo; dùng để gửi review hoặc inference, **không resume được**. Tự cập nhật sau mỗi epoch đã chốt, thường khoảng14MiB cho B0.
 - Trong phiên mới, gắn ZIP cũ làm input, đặt `RESUME_INPUT` tới ZIP hoặc thư mục Kaggle đã giải nén; giữ `ARM`, `SEED`, `EPOCHS`, `BATCH_SIZE` như ban đầu.
 - Notebook tự khôi phục source snapshot và weather settings của run cũ. Gắn Cityscapes/depth ở **cùng đường dẫn mount**; không thay nội dung input giữa phiên.
 - Runner tiếp tục từ epoch đã commit. Epoch dở bị lặp lại; không tự rút20epoch hoặc đổi scheduler để kịp phiên.
@@ -84,6 +113,19 @@ Không resume bằng code ZIP mới hoặc sửa config trong archive. Config/so
 
 Log `history.jsonl` có tổng train loss, Cityscapes val mIoU/CE và `condition_train` gồm CE/accuracy/counts cho năm ID. `status.json` cho biết run đã đủ epoch hay đang chờ phiên tiếp theo. `frozen_candidate.json` xuất khi train hoàn thành; không tự evaluate ACDC hoặc nhập vào cohort sáu lượt B2/DeepLab cũ.
 
+`result_summary.json` ghi epoch best, điểm Cityscapes, điều kiện thực tế, curve, tổng optimizer updates, thời gian train/val và hash checkpoint. Peak VRAM trong đó là số đã ghi ở epoch; timing này không phải FPS inference.
+
+Khi đã Save Version và tắt máy, có thể tải ZIP ở output của phiên đã hoàn thành mà không mở GPU để chạy lệnh mới. Nếu chỉ còn ZIP đầy đủ trên máy, đọc và so sánh trực tiếp bằng CLI:
+
+```powershell
+python -m scripts.k2_results summarize --input outputs/k2_k2_seed42.zip --out outputs/k2_summary.json
+python -m scripts.k2_results compare --inputs outputs/k2_baseline_seed42.zip outputs/k2_film_clean_seed42.zip outputs/k2_aug_seed42.zip outputs/k2_film_seed42.zip outputs/k2_k2_seed42.zip --require-all --out outputs/k2_comparison.json
+```
+
+`compare` nhận ZIP đầy đủ hoặc thư mục đã giải nén. Nó yêu cầu run hoàn thành, cùng recipe/seed, nội dung manifest chuẩn hóa đường dẫn, core `src/`/`configs/`, tensors khởi tạo backbone+decoder, và cùng K1 giữa các arm có weather. Launcher/notebook/report có thể khác phiên bản; snapshot nguồn mỗi run vẫn được kiểm tra và giữ nguyên. Chỉ khác biệt xuống dòng CRLF/LF được chuẩn hóa sau khi xác minh hash gốc. Công cụ không đọc optimizer pickle, không chứng thực nội dung mọi RGB/mask hoặc tính xác định của GPU. ZIP nhẹ thiếu initial weights nên không đủ cho audit đối chứng này.
+
+Kết quả so sánh là delta trên **Cityscapes selection**, chưa phải tăng khả năng tổng quát hóa ACDC. Chỉ khi đã khóa nhóm candidate mới chạy bước đánh giá ACDC cùng evaluator; không dùng điểm ACDC để chọn lại checkpoint hoặc chỉnh K2 của đợt này.
+
 ## Local QA và giới hạn
 
 ```powershell
@@ -92,6 +134,6 @@ python -m pytest tests/test_weatherseg_k2.py tests/test_k2_notebook.py -q
 python -m scripts.build_kaggle_notebooks
 ```
 
-Local chỉ có CPU: đã kiểm identity, gradient, loss, K1 input và checkpoint/resume bằng ảnh nguồn giả lập. CUDA/AMP smoke sẽ chạy trên GPU Kaggle trước lượt chính; full GPU training, hội tụ, VRAM/latency và mIoU chưa được đo ở local.
+Local chỉ có CPU: kiểm identity, gradient, loss, K1 input và checkpoint/resume bằng ảnh nguồn giả lập. Pilot Kaggle thật `k2` seed42 đã qua CUDA/AMP và đủ20epoch, đạt **60,68% Cityscapes val500 mIoU**, best epoch20, bốn điều kiện không fog. Đây chưa phải bằng chứng K2 tốt hơn B0 và chưa có kết quả ACDC. [Số liệu kiểm tra](../results/k2-kaggle-seed42/summary.json).
 
 Tham khảo FiLM: Perez et al., [FiLM: Visual Reasoning with a General Conditioning Layer](https://arxiv.org/abs/1709.07871), AAAI2018. Project dùng self-conditioning từ thống kê ảnh, không phải tái lập bài visual reasoning gốc. [K1 và giới hạn mô phỏng](K1_WEATHER.md).

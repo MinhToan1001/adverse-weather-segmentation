@@ -21,14 +21,15 @@ from src.data.preparation import resolve_data_path
 from src.data.augmentations.weather import CONDITIONS, VERSION
 
 
-ARMS = ('baseline', 'aug', 'film', 'k2')
+ARMS = ('baseline', 'film_clean', 'aug', 'film', 'k2')
+CLEAN_ARMS = ('baseline', 'film_clean')
 PROTOCOL = 'weatherseg_k2_source_v1'
 RECIPE = Path(__file__).resolve().parents[1] / 'configs/proposed/k2_film_b0.yaml'
 
 
 def compose(arm, paths, output, seed=42, epochs=20, batch_size=2, weather=None):
     if arm not in ARMS or min(epochs, batch_size) < 1:
-        raise ValueError('Choose baseline/aug/film/k2 and positive epochs/batch_size')
+        raise ValueError('Choose baseline/film_clean/aug/film/k2 and positive epochs/batch_size')
     cfg = yaml.safe_load(RECIPE.read_text(encoding='utf-8'))
     cfg.update(seed=seed, experiment=f'k2-{arm}-seed{seed}', output_dir=str(Path(output).resolve()))
     cfg['data'].update(train_manifest=paths['source_train_manifest'], val_manifest=paths['source_monitor_manifest'])
@@ -36,9 +37,9 @@ def compose(arm, paths, output, seed=42, epochs=20, batch_size=2, weather=None):
     cfg['condition_training'] = arm == 'k2'
     if arm in ('baseline', 'aug'):
         cfg['model'] = dict(name='segformer_b0', num_labels=19, initialization='imagenet_encoder')
-    elif arm == 'film':
+    elif arm in ('film_clean', 'film'):
         cfg['model']['condition_loss_weight'] = 0.
-    if arm == 'baseline':
+    if arm in CLEAN_ARMS:
         cfg['data']['augment'].pop('weather')
     elif weather is not None:
         cfg['data']['augment']['weather'] = weather
@@ -127,7 +128,7 @@ def prepare(city, root, arm='k2', seed=42, epochs=20, batch_size=2,
         raise ValueError('Preserve existing K2 outputs; choose a fresh workspace')
     root.mkdir(parents=True, exist_ok=True)
     paths = prepare_cityscapes(city, root/'data')
-    if arm != 'baseline':
+    if arm not in CLEAN_ARMS:
         weather, preflight = prepare_weather(city, paths['source_train_manifest'], weather_mode,
                                              depth_root, distance_root, invalid_policy)
     else:
@@ -143,6 +144,37 @@ def prepare(city, root, arm='k2', seed=42, epochs=20, batch_size=2,
         condition_labels='K1 synthetic transform IDs; metric scattering fog only when depth preflight passes',
         selection='Cityscapes val500 mIoU; target evaluation is not run by this launcher'))
     return cfg
+
+
+def train_epoch(command, epoch, epochs, heartbeat_seconds=60.):
+    """Show liveness without touching the trainer, its RNG, or its recipe."""
+    if heartbeat_seconds <= 0:
+        raise ValueError('Heartbeat interval must be positive')
+    started = time.monotonic()
+    print(f'[K2] Starting epoch {epoch}/{epochs}; metrics follow training + validation.', flush=True)
+    with subprocess.Popen(command) as process:
+        while True:
+            try:
+                code = process.wait(timeout=heartbeat_seconds)
+                break
+            except subprocess.TimeoutExpired:
+                elapsed = (time.monotonic() - started) / 60
+                print(f'[K2] Epoch {epoch}/{epochs}: training/validation process is still running '
+                      f'({elapsed:.1f} min elapsed).', flush=True)
+        if code:
+            raise subprocess.CalledProcessError(code, command)
+
+
+def publish_review(root, archive):
+    """Review packaging must never prevent saving a full failure/resume archive."""
+    from scripts.k2_results import export_share
+    try:
+        return export_share(root, archive.with_name(archive.stem + '_share.zip'))
+    except Exception as error:
+        write_json(root/'share_export_error.json', dict(error=str(error), full_archive=str(archive)))
+        print('[K2] Review ZIP could not be updated:', error,
+              '| preserving the full resume archive.', flush=True)
+        return None
 
 
 def run(city, root, archive, arm='k2', seed=42, epochs=20, batch_size=2, session_hours=9., prepare_only=False,
@@ -174,10 +206,11 @@ def run(city, root, archive, arm='k2', seed=42, epochs=20, batch_size=2, session
                        '--stop-after-epoch', str(epoch)]
             if saved:
                 command += ['--resume', str(run_dir/'last')]
-            subprocess.run(command, check=True)
+            train_epoch(command, epoch, epochs)
             committed_state(run_dir, epoch)
             saved = epoch
             write_json(root/'status.json', dict(protocol=PROTOCOL, status='running', completed_epochs=saved))
+            publish_review(root, archive)
             export_workspace(root, archive)
             print('K2 epoch', saved, 'saved to', archive, flush=True)
         else:
@@ -193,6 +226,7 @@ def run(city, root, archive, arm='k2', seed=42, epochs=20, batch_size=2, session
     finally:
         write_json(root/'status.json', dict(protocol=PROTOCOL, status=status, completed_epochs=saved,
                                          elapsed_seconds=time.monotonic()-started))
+        publish_review(root, archive)
         export_workspace(root, archive)
 
 

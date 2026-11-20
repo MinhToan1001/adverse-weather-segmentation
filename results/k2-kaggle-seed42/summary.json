@@ -1,0 +1,170 @@
+{
+  "protocol": "weatherseg_k2_source_v1",
+  "arm": "k2",
+  "seed": 42,
+  "complete": true,
+  "completed_epochs": 20,
+  "planned_epochs": 20,
+  "best_epoch": 20,
+  "cityscapes_val_miou": 0.6067908322686332,
+  "cityscapes_val_miou_percent": 60.67908322686332,
+  "last_train_loss": 0.2458341338702433,
+  "best_per_class_iou": [
+    0.9650189454472554,
+    0.7425544300301666,
+    0.8772977966579307,
+    0.4254795308481781,
+    0.4141093300702781,
+    0.3709201619845731,
+    0.4302936655031241,
+    0.5619578507236758,
+    0.89386848097261,
+    0.5488455203469483,
+    0.9287235373134431,
+    0.6431889519216625,
+    0.3116417924563247,
+    0.8897477355895496,
+    0.6012543576906901,
+    0.5462114601431386,
+    0.41147687730502686,
+    0.34497216001083136,
+    0.6214632280886254
+  ],
+  "last_condition_train": {
+    "cross_entropy": 0.00676065389397555,
+    "accuracy": 0.9973100201748487,
+    "counts": [
+      743,
+      0,
+      732,
+      767,
+      732
+    ],
+    "weight": 0.1,
+    "label_scope": "synthetic transform IDs, not real weather accuracy"
+  },
+  "parameters": {
+    "total": 3817720,
+    "trainable": 3817720
+  },
+  "conditions": [
+    "clean",
+    "night",
+    "rain",
+    "snow"
+  ],
+  "fog_enabled": false,
+  "optimizer_updates": 7436,
+  "train_validation_hours": 6.039880572691667,
+  "peak_allocated_bytes": 2037078528,
+  "checkpoint_sha256": "f9f7cb76ec704b8c05880a652b7cc991a833468ff3385e50522642b7f49d0e59",
+  "config_sha256": "21943a35af5c247181653abfdb81231a6544eda0559e24741d3c044568d7e1e8",
+  "plan_sha256": "aedff46d60123bc6ce6ed0dbc6615a485c58f3413c4711b1d463b761addd7ef6",
+  "curve": [
+    {
+      "epoch": 1,
+      "train_loss": 0.7697914255972107,
+      "val_miou": 0.3562436084425969
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.4571632839934731,
+      "val_miou": 0.4072485272929345
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.4020316353983421,
+      "val_miou": 0.4717819965968592
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.36580336475701003,
+      "val_miou": 0.5015692812365549
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.3450659995932425,
+      "val_miou": 0.5100902307212833
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.33167026151364976,
+      "val_miou": 0.5315740899743487
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.3200598643853429,
+      "val_miou": 0.5451206681988257
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.30478934333900837,
+      "val_miou": 0.5549262764010044
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.29256630717465437,
+      "val_miou": 0.5571958601998999
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.29269653267121265,
+      "val_miou": 0.5713581322603026
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.28402478594606007,
+      "val_miou": 0.573415952706763
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.27523882608928374,
+      "val_miou": 0.5779738609514374
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.27345470452797677,
+      "val_miou": 0.5819846362257922
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.2655062550264232,
+      "val_miou": 0.5914778676140046
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.26214401175411417,
+      "val_miou": 0.596461777804657
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.2626257484982939,
+      "val_miou": 0.5999440782742864
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.25328566973231026,
+      "val_miou": 0.6009092919249995
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.25265653174378044,
+      "val_miou": 0.6027061401991174
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.24743297143457876,
+      "val_miou": 0.6027400783577995
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.2458341338702433,
+      "val_miou": 0.6067908322686332
+    }
+  ],
+  "metric_scope": "Cityscapes val500 checkpoint selection; no ACDC result or improvement claim",
+  "checkpoint_scope": "Best inference weights; share ZIP cannot resume training",
+  "evidence_date": "2026-11-20",
+  "scope": "Single K1+K2 B0 pilot, not the B2/DeepLab cohort; no matched improvement or ACDC claim",
+  "verification": "Inspected original full Kaggle ZIP; verified frozen config/manifests, contiguous history1-20, best checkpoint metadata and frozen candidate hashes"
+}

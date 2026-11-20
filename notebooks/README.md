@@ -5,11 +5,11 @@
 | [01_dg_segformer_b2.ipynb](01_dg_segformer_b2.ipynb) | Profile GPU → baseline20 → aug20 → consistency20 |
 | [02_dg_deeplabv3plus_resnet50.ipynb](02_dg_deeplabv3plus_resnet50.ipynb) | Profile GPU → baseline20 → aug20 → consistency20 |
 | [03_k1_weather_preview.ipynb](03_k1_weather_preview.ipynb) | K1 độc lập: CPU preview thời tiết mức1–5; không train |
-| [04_k2_weatherseg_b0_train.ipynb](04_k2_weatherseg_b0_train.ipynb) | Train K1 + FiLM B0 + condition head; GPU, ZIP/resume |
+| [04_k2_weatherseg_b0_train.ipynb](04_k2_weatherseg_b0_train.ipynb) | Một arm B0/K2 mỗi phiên; mặc định baseline; ZIP đầy đủ + ZIP nhẹ |
 
 K1 là phần mở rộng trên nhánh riêng. Notebook03 chỉ cần CPU + Internet, có demo với khoảng cách tổng hợp đã biết và preview ảnh Cityscapes train nếu được gắn vào input. Fog cần metric distance hoặc disparity/camera; thiếu độ sâu thì bỏ riêng fog. [Cách chạy và giới hạn](../docs/K1_WEATHER.md).
 
-Notebook04 nằm **cùng nhánh K1** và dùng trực tiếp generator K1. Mặc định train một arm `k2` trong20epoch. `WEATHER_MODE=auto` loại fog khi không có độ sâu; đặt `full` và cung cấp depth để train đủ năm nhãn. [Cách chuẩn bị dữ liệu, ablation và resume](../docs/K2_TRAINING.md).
+Notebook04 nằm **cùng nhánh K1** và dùng trực tiếp generator K1. Mặc định train một arm `baseline` trong20epoch; chọn `film_clean`, `aug`, `film`, `k2` trong các phiên độc lập để làm ablation. `WEATHER_MODE=no-fog` giữ bốn điều kiện như pilot đã chạy; đặt `full` và cung cấp depth để train đủ năm nhãn trong một đợt thí nghiệm riêng. Chỉ gắn Cityscapes để train/chọn best; ACDC đánh giá sau khi khóa candidate. K3/K4 chưa nằm trong notebook này. [Cách chuẩn bị dữ liệu, ablation và resume](../docs/K2_TRAINING.md).
 
 DeepLab có đủ aug như B2. Không còn phải đổi ARM hoặc PROFILE_ONLY trong notebook. Chỉ khai báo CODE_INPUT/CITYSCAPES_ROOT khi auto-find không rõ và RESUME_INPUT nếu tiếp tục kết quả trước. Run All sẽ lần lượt chạy ba chiến thuật độc lập của model đó, mỗi chiến thuật20epoch; không dùng weights baseline để học nối proposed.
 

@@ -45,7 +45,8 @@ def test_k2_notebook_fresh_setup_uses_combined_k1_k2_upload_without_network(tmp_
     code=setup_code(tmp_path/'working',inputs)
     code=code.replace('CODE_INPUT = None',f'CODE_INPUT = Path({str(bundle)!r})')
     namespace=execute_setup(code)
-    assert namespace['CITYSCAPES_ROOT']==city and namespace['ARM']=='k2'
+    assert namespace['CITYSCAPES_ROOT']==city and namespace['ARM']=='baseline'
+    assert namespace['WEATHER_MODE']=='no-fog'
     repo=namespace['REPO']
     assert (repo/'src/models/proposed/weatherseg_b0.py').is_file()
     assert (repo/'src/data/augmentations/weather/generator.py').is_file()
@@ -63,6 +64,7 @@ def test_resume_setup_restores_original_weather_settings_and_frozen_code(tmp_pat
     (original/'k2_plan.json').write_text(json.dumps(plan))
     archive=tmp_path/'saved.zip';export_workspace(original,archive)
     code=setup_code(tmp_path/'working',inputs)
+    code=code.replace("ARM = 'baseline'", "ARM = 'k2'")
     code=code.replace('RESUME_INPUT = None',f'RESUME_INPUT = Path({str(original if expanded else archive)!r})')
     namespace=execute_setup(code)
     assert namespace['WEATHER_MODE']=='full' and namespace['INVALID_POLICY']=='error'

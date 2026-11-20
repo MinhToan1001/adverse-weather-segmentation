@@ -11,6 +11,10 @@
 
 Test record ghi rõ phiên bản và thời điểm kiểm tra. Kết quả tests xác nhận phần mềm ở phạm vi đã thử, không thay thế mIoU hay timing GPU. [Kế hoạch còn lại](../research/PROJECT_COMPLETION_PLAN.md).
 
+## Pilot K1 + K2 trên B0 — nhóm thí nghiệm riêng
+
+Một run `k2`, seed42, đã hoàn thành20epoch trên Kaggle T4: **60,68% Cityscapes val500 mIoU**, best epoch20. Chỉ học Cityscapes; K1 bật clean/night/rain/snow, chưa có fog và chưa đánh giá ACDC. [Số liệu và hash](k2-kaggle-seed42/summary.json). Các arm đối chứng còn lại chưa chạy nên chưa kết luận K1/K2 cải thiện. Không gộp vào cohort sáu lượt B2/DeepLab.
+
 ## Kết quả lịch sử — ngoài bảng DG
 
 Các run dưới từng học ảnh và nhãn ACDC. Giữ nguyên báo cáo/weights để truy vết và phục vụ demo; không sử dụng điểm đó để chứng minh DG. B0 đã bỏ khỏi lượt train mới.
