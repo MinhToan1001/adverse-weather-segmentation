@@ -6,6 +6,7 @@ evaluation requested during development is reported as exploratory validation.
 import argparse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import ExitStack
 import hashlib
 import io
 import json
@@ -59,9 +60,16 @@ def _source_compatible(files, plan):
                 'src/models/proposed/weatherseg_b0.py', 'src/data/preprocessing.py',
                 'src/data/dataset.py', 'src/data/labels.py', 'src/evaluation/semantic.py',
                 'src/evaluation/runner.py', 'src/evaluation/metrics.py', 'src/evaluation/calibration.py']
-    with zipfile.ZipFile(io.BytesIO(files.read('source.zip'))) as snapshot:
+    with ExitStack() as stack:
+        if 'source.zip' in files.names:
+            snapshot = stack.enter_context(zipfile.ZipFile(io.BytesIO(files.read('source.zip'))))
+            read_source = snapshot.read
+        else:
+            # Kaggle expands nested ZIP inputs into a directory named "source".
+            # Verify those original bytes against the sealed plan in the same way.
+            read_source = lambda name: files.read('source/' + name)
         for name in required:
-            original = snapshot.read(name)
+            original = read_source(name)
             if hashlib.sha256(original).hexdigest() != plan['source_hashes'].get(name):
                 raise ValueError('Archived inference source is corrupt: ' + name)
             if original.replace(b'\r\n', b'\n') != (REPO/name).read_bytes().replace(b'\r\n', b'\n'):

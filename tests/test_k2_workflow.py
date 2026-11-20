@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import zipfile
 
 import numpy as np
 from PIL import Image
@@ -96,9 +97,14 @@ def test_partial_candidate_is_blocked_before_any_target_access(tmp_path,monkeypa
     assert not (tmp_path/'eval').exists()
 
 
-def test_frozen_evaluation_and_figures_use_actual_shared_model_on_tiny_qa(tmp_path,monkeypatch):
+@pytest.mark.parametrize('expanded_source',[False,True])
+def test_frozen_evaluation_and_figures_use_actual_shared_model_on_tiny_qa(tmp_path,monkeypatch,expanded_source):
     """Six real inference passes + native metrics/panels, not a benchmark result."""
     root=completed_real_checkpoint(tmp_path/'result');city,acdc=tiny_eval_data(tmp_path/'data')
+    if expanded_source:
+        with zipfile.ZipFile(root/'source.zip') as source:
+            source.extractall(root/'source')
+        (root/'source.zip').unlink()  # Kaggle recursively expands uploaded ZIPs.
     monkeypatch.setattr(evaluator,'CITY_COUNT',2)
     monkeypatch.setattr(evaluator,'ACDC_COUNTS',{d:1 for d in ('fog','night','rain','snow')})
     before=(root/'run/best/model.safetensors').read_bytes()
@@ -116,6 +122,21 @@ def test_frozen_evaluation_and_figures_use_actual_shared_model_on_tiny_qa(tmp_pa
     assert (out/'acdc_val/panels/night.png').is_file()
     with pytest.raises(ValueError,match='Preserve previous'):
         evaluator.evaluate_result(root,out,city,acdc,device='cpu')
+
+
+@pytest.mark.parametrize('tamper',['changed','missing'])
+def test_expanded_source_is_verified_before_target_access(tmp_path,monkeypatch,tamper):
+    root=completed_real_checkpoint(tmp_path/'result')
+    with zipfile.ZipFile(root/'source.zip') as source:
+        source.extractall(root/'source')
+    (root/'source.zip').unlink()
+    code=root/'source/src/models/proposed/weatherseg_b0.py'
+    if tamper=='changed':code.write_bytes(code.read_bytes()+b'\n# changed\n')
+    else:code.unlink()
+    monkeypatch.setattr(evaluator,'_tree',lambda *a,**k:pytest.fail('target accessed before source verification'))
+    with pytest.raises(ValueError,match='corrupt|Missing result artifact'):
+        evaluator.evaluate_result(root,tmp_path/'eval',device='cpu')
+    assert not (tmp_path/'eval').exists()
 
 
 def test_eval_rejects_incomplete_official_split_and_preserves_seal(tmp_path):

@@ -48,6 +48,8 @@ Không so K2 recipe40epoch mới với baseline20epoch cũ rồi quy mức tăng
 
 Nếu result share cũ thiếu `run/best/checkpoint.json` hoặc provenance, dùng ZIP đầy đủ; không bỏ qua kiểm tra để chạy cho được.
 
+Kaggle có thể tự giải nén cả `source.zip` bên trong result thành thư mục `source/`. Bộ đánh giá hỗ trợ cả hai dạng và vẫn kiểm tra hash từng file inference với plan đã khóa trước khi đọc dữ liệu đánh giá. Không cần tải lại checkpoint chỉ vì archive bên trong đã được giải nén.
+
 ### Train recipe mới
 
 1. Import notebook05. Gắn Cityscapes và ACDC; ACDC chỉ được đọc sau khi train đủ40epoch và khóa checkpoint.
