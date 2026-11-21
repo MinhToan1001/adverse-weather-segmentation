@@ -3,6 +3,7 @@ from copy import deepcopy
 import ast
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -128,7 +129,8 @@ def test_dg_queue_exports_then_resumes_only_unfinished_epochs(tmp_path,monkeypat
         (run/'initialization.json').write_text('{}')
         with (run/'resources.jsonl').open('a') as f:f.write(json.dumps(dict(epoch=epoch,epoch_seconds=1))+'\n')
     (root/'dg_plan.json').write_text('{}')
-    monkeypatch.setattr(run_dg.subprocess,'run',trainer)
+    # Keep Matplotlib's font discovery on the real subprocess module.
+    monkeypatch.setattr(run_dg,'subprocess',SimpleNamespace(run=trainer))
     monkeypatch.setattr(run_dg,'export_workspace',lambda *args:exports.append(args))
     monkeypatch.setattr(run_dg,'fits_session',lambda *args:len(calls)<2)
     run_dg.run(tmp_path/'city',root,tmp_path/'result.zip')
