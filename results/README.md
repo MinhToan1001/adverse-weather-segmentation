@@ -2,7 +2,7 @@
 
 ## Luồng DG hiện hành
 
-**Chưa có kết quả full GPU cho sáu lượt DG mới.** B2/DeepLab và baseline/aug/consistency đã có code, CPU tests và đường chạy Kaggle/resume. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
+**Đã nghiệm thu hai lượt B2 DG trên GPU:** baseline20 đạt73,98% và aug20 đạt74,37% Cityscapes val500; consistency chưa bắt đầu do dừng an toàn cuối phiên. [Báo cáo B2 và cách resume](dg_segformer_b2_seed42/README.md). DeepLab chưa có kết quả DG; chưa đủ sáu candidate và chưa đánh giá ACDC theo cohort mới. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
 
 | Bằng chứng | Phạm vi |
 | --- | --- |

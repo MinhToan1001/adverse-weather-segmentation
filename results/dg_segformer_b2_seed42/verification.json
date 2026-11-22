@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-22",
+  "status": "PARTIAL_SUITE_VERIFIED",
+  "archive": "E:\\Download\\dg_segformer_b2_suite_seed42.zip",
+  "archive_bytes": 2693594073,
+  "all_entries_crc_pass": true,
+  "entries_checked": 3560,
+  "nested_source_hash_checks": 272,
+  "checkpoint_file_hashes_checked": 24,
+  "same_initial_weights": true,
+  "initialization_sha256": "f9b5af554a725a0864e5dd8788a569655d6faab7625013f3f32ea0efb958406a",
+  "source_only": true,
+  "train_images": 2975,
+  "selection_images": 500,
+  "target_evaluated": false,
+  "summaries": {
+    "baseline": {
+      "epochs": 20,
+      "best_epoch": 18,
+      "cityscapes_val_miou": 0.7397656128523191,
+      "last_cityscapes_val_miou": 0.7393110203742035,
+      "median_epoch_minutes": 9.804608946633335,
+      "train_val_hours": 3.2684053158016666,
+      "peak_allocated_gib": 5.212798595428467,
+      "optimizer_updates": 7438,
+      "paired_batches": 0,
+      "weakest_classes": [
+        [
+          "pole",
+          0.5314128805274103
+        ],
+        [
+          "rider",
+          0.5380591533357337
+        ],
+        [
+          "fence",
+          0.5545004241123456
+        ],
+        [
+          "motorcycle",
+          0.586526092356855
+        ],
+        [
+          "wall",
+          0.6019943780870279
+        ]
+      ]
+    },
+    "aug": {
+      "epochs": 20,
+      "best_epoch": 18,
+      "cityscapes_val_miou": 0.7437070968078258,
+      "last_cityscapes_val_miou": 0.7423481985948804,
+      "median_epoch_minutes": 13.559557768716665,
+      "train_val_hours": 4.515539760790834,
+      "peak_allocated_gib": 5.212798595428467,
+      "optimizer_updates": 7438,
+      "paired_batches": 14832,
+      "weakest_classes": [
+        [
+          "pole",
+          0.5345657556807891
+        ],
+        [
+          "rider",
+          0.5456647993010227
+        ],
+        [
+          "fence",
+          0.5728675484611061
+        ],
+        [
+          "motorcycle",
+          0.5844054190365148
+        ],
+        [
+          "wall",
+          0.6017888313618845
+        ]
+      ]
+    }
+  },
+  "consistency_epochs": 0,
+  "stop_reason": "session_checkpoint_ready before consistency epoch1",
+  "invocation_hours": 9.340181837321666,
+  "consistency_profile_estimate_hours": 5.236953239719045,
+  "estimate_excludes": "setup, checkpoint export, process startup and runtime variation",
+  "safety_fallback_for_unstarted_arm_minutes": 75,
+  "scope": "ZIP/hash/config/log audit; no embedded code execution, training-state deserialization or new GPU inference",
+  "source_hashes_match_current_local": true,
+  "aug_minus_baseline_pp": 0.39414839555066417
+}

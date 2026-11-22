@@ -4,7 +4,7 @@
 
 ## Ranh giới dữ liệu và trạng thái
 
-Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Hiện code cho cả B2 và DeepLab đã có, kiểm thử CPU với dữ liệu thật đã qua; **chưa có full GPU training hoặc bằng chứng tăng mIoU**.
+Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Ngày22/11, [B2 baseline/aug đã đủ20epoch GPU](../results/dg_segformer_b2_seed42/README.md), đạt73,98%/74,37% Cityscapes val500. Consistency và DeepLab chưa có đủ run; **chưa có bằng chứng cải thiện mIoU trên ACDC**. CPU QA của cả hai kiến trúc vẫn chỉ là kiểm tra phần mềm.
 
 ## Recipe train dùng chung
 

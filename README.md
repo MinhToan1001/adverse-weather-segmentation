@@ -21,7 +21,7 @@ Cách làm này gọi là **Domain Generalization (DG)**: học ở điều ki�
 | Demo Node.js | Upload ảnh, xem mask/overlay, tải kết quả; hiện dùng checkpoint B2 **lịch sử** trên CPU |
 | Kết quả DG mới | **Chưa có đủ sáu lượt train GPU; chưa chứng minh phương pháp cải thiện mIoU** |
 
-Code đã qua kiểm thử phần mềm và chạy thử CPU với ít ảnh thật. Điều đó xác nhận pipeline hoạt động ở phạm vi đã thử, chưa xác nhận hội tụ hay chất lượng trên GPU. [Bằng chứng và kết quả](results/README.md).
+Ngày22/11 đã nghiệm thu **B2 baseline20: 73,98% và aug20: 74,37% Cityscapes val500**. Consistency chưa chạy do dừng an toàn cuối phiên; cần resume ZIP B2. [Báo cáo và cách tiếp tục](results/dg_segformer_b2_seed42/README.md). Chưa có kết quả ACDC hoặc đầy đủ sáu lượt; CPU tests không thay thế benchmark. [Bằng chứng và kết quả](results/README.md).
 
 ## Dữ liệu được dùng thế nào?
 
