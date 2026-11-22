@@ -19,9 +19,9 @@ Cách làm này gọi là **Domain Generalization (DG)**: học ở điều ki�
 | Checkpoint và tiếp tục train | Lưu best/last, trạng thái optimizer và RNG; xuất ZIP sau mỗi epoch hoàn thành |
 | Đánh giá và trực quan hóa | mIoU từng lớp/thời tiết, learning curves, ảnh nhãn/dự đoán/lỗi và độ tự tin |
 | Demo Node.js | Upload ảnh, xem mask/overlay, tải kết quả; hiện dùng checkpoint B2 **lịch sử** trên CPU |
-| Kết quả DG mới | **Chưa có đủ sáu lượt train GPU; chưa chứng minh phương pháp cải thiện mIoU** |
+| Kết quả DG mới | **Đã nghiệm thu 4/6 nhánh đủ20epoch; chưa đánh giá ACDC** |
 
-Ngày22/11 đã nghiệm thu **B2 baseline20: 73,98% và aug20: 74,37% Cityscapes val500**. Consistency chưa chạy do dừng an toàn cuối phiên; cần resume ZIP B2. [Báo cáo và cách tiếp tục](results/dg_segformer_b2_seed42/README.md). Chưa có kết quả ACDC hoặc đầy đủ sáu lượt; CPU tests không thay thế benchmark. [Bằng chứng và kết quả](results/README.md).
+Theo các ZIP đã nghiệm thu ngày22/11, **B2 baseline/aug20 đạt73,98%/74,37%; DeepLab baseline/aug20 đạt71,82%/72,08% Cityscapes val500**. Consistency B2 chưa có kết quả; DeepLab có4/20epoch, cần resume từepoch5. [B2](results/dg_segformer_b2_seed42/README.md) · [DeepLab](results/dg_deeplabv3plus_resnet50_seed42/README.md). Chưa đủ sáu candidate hoặc có kết quả ACDC; không dùng điểm selection để nhận là cải thiện thời tiết xấu. [Bằng chứng và kết quả](results/README.md).
 
 ## Dữ liệu được dùng thế nào?
 

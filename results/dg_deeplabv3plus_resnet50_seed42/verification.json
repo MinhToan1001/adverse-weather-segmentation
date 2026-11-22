@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-22",
+  "status": "PARTIAL_SUITE_VERIFIED",
+  "archive": "E:\\Download\\dg_deeplabv3plus_resnet50_suite_seed42.zip",
+  "archive_bytes": 3882008252,
+  "all_entries_crc_pass": true,
+  "entries_checked": 3589,
+  "nested_source_hash_checks": 272,
+  "checkpoint_file_hashes_checked": 36,
+  "same_initial_weights": true,
+  "initialization_sha256": "66ab1aaa9fdb9051cf8b156941827c838272e0990877706fed859218944d66fd",
+  "source_only": true,
+  "train_images": 2975,
+  "selection_images": 500,
+  "target_evaluated": false,
+  "summaries": {
+    "baseline": {
+      "epochs": 20,
+      "best_epoch": 20,
+      "cityscapes_val_miou": 0.7182111496925112,
+      "last_cityscapes_val_miou": 0.7182111496925112,
+      "median_epoch_minutes": 8.660198064525002,
+      "train_val_hours": 2.879117489791944,
+      "peak_allocated_gib": 2.0975265502929688,
+      "optimizer_updates": 7438,
+      "paired_batches": 0,
+      "weakest_classes": [
+        [
+          "pole",
+          0.5142736654154387
+        ],
+        [
+          "rider",
+          0.5292876932630288
+        ],
+        [
+          "traffic_light",
+          0.5434362902997445
+        ],
+        [
+          "fence",
+          0.5510442931307573
+        ],
+        [
+          "wall",
+          0.5735932744991256
+        ]
+      ]
+    },
+    "aug": {
+      "epochs": 20,
+      "best_epoch": 20,
+      "cityscapes_val_miou": 0.7208427946500365,
+      "last_cityscapes_val_miou": 0.7208427946500365,
+      "median_epoch_minutes": 12.182492514533335,
+      "train_val_hours": 4.062419535615276,
+      "peak_allocated_gib": 2.099846839904785,
+      "optimizer_updates": 7438,
+      "paired_batches": 14832,
+      "weakest_classes": [
+        [
+          "pole",
+          0.5151579374517871
+        ],
+        [
+          "rider",
+          0.5268070261457746
+        ],
+        [
+          "traffic_light",
+          0.5480594526694628
+        ],
+        [
+          "fence",
+          0.5591304164645117
+        ],
+        [
+          "motorcycle",
+          0.5699211973519749
+        ]
+      ]
+    },
+    "consistency": {
+      "epochs": 4,
+      "best_epoch": 4,
+      "cityscapes_val_miou": 0.6137788598529467,
+      "last_cityscapes_val_miou": 0.6137788598529467,
+      "median_epoch_minutes": 12.222349770758319,
+      "train_val_hours": 0.8143561916077771,
+      "peak_allocated_gib": 2.4080734252929688,
+      "optimizer_updates": 1488,
+      "paired_batches": 2977,
+      "weakest_classes": [
+        [
+          "train",
+          0.3241368664740717
+        ],
+        [
+          "rider",
+          0.4242591536738257
+        ],
+        [
+          "bus",
+          0.4256521138914331
+        ],
+        [
+          "motorcycle",
+          0.43703716343036547
+        ],
+        [
+          "wall",
+          0.4382465030522028
+        ]
+      ]
+    }
+  },
+  "consistency_epochs": 4,
+  "stop_reason": "session_checkpoint_ready after consistency epoch4",
+  "invocation_hours": 9.547903595123335,
+  "consistency_profile_estimate_hours": 4.391023234215025,
+  "estimate_excludes": "setup, checkpoint export, process startup and runtime variation",
+  "scope": "ZIP/hash/config/log audit; no embedded code execution, training-state deserialization or new GPU inference",
+  "source_hashes_match_current_local": true,
+  "b2_comparability": {
+    "source_code_equal": true,
+    "logical_manifests_equal": true,
+    "converted_masks_byte_equal": 3475,
+    "train_loss_dg_processing_selection_equal": true,
+    "caveat": "Different architecture and encoder initialization; comparison is not a method-only ablation."
+  },
+  "consistency_kl_finite": true,
+  "consistency_pair_schedule_matches_aug_first4": true,
+  "estimated_remaining_consistency_train_val_hours": 3.2592932722022185,
+  "aug_minus_baseline_pp": 0.26316449575253253,
+  "next_epoch_required_budget_minutes": 33.465350894999936,
+  "remaining_estimate_based_on_completed_epochs": 4
+}

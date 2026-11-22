@@ -2,7 +2,14 @@
 
 ## Luồng DG hiện hành
 
-**Đã nghiệm thu hai lượt B2 DG trên GPU:** baseline20 đạt73,98% và aug20 đạt74,37% Cityscapes val500; consistency chưa bắt đầu do dừng an toàn cuối phiên. [Báo cáo B2 và cách resume](dg_segformer_b2_seed42/README.md). DeepLab chưa có kết quả DG; chưa đủ sáu candidate và chưa đánh giá ACDC theo cohort mới. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
+**Đã nghiệm thu bốn lượt đủ20epoch**, theo ZIP nhận ngày22/11; chưa đủ sáu candidate và chưa đánh giá ACDC theo cohort mới.
+
+| Model | baseline20 | aug20 | Consistency trong ZIP đã nhận |
+| --- | ---: | ---: | --- |
+| [B2](dg_segformer_b2_seed42/README.md) | 73,98% | 74,37% | 0/20epoch |
+| [DeepLabV3+R50](dg_deeplabv3plus_resnet50_seed42/README.md) | 71,82% | 72,08% | 4/20epoch; resume từepoch5 |
+
+Các điểm trên là Cityscapes val500 dùng chọn checkpoint; không phải điểm ACDC hoặc test độc lập. Chỉ so hai nhánh đủ20epoch; không dùng điểm consistency epoch4 như kết quả hoàn chỉnh. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
 
 | Bằng chứng | Phạm vi |
 | --- | --- |
