@@ -4,7 +4,7 @@
 
 ## Ranh giới dữ liệu và trạng thái
 
-Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Theo các ZIP nghiệm thu22/11, [B2 baseline/aug20](../results/dg_segformer_b2_seed42/README.md) đạt73,98%/74,37% và [DeepLab baseline/aug20](../results/dg_deeplabv3plus_resnet50_seed42/README.md) đạt71,82%/72,08% Cityscapes val500. Consistency B2 chưa có kết quả; DeepLab đang4/20epoch. **Chưa có bằng chứng cải thiện mIoU trên ACDC**. CPU QA không thay thế benchmark GPU.
+Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Theo các ZIP nghiệm thu22/11, [B2 đủ baseline/aug/consistency20](../results/dg_segformer_b2_seed42/README.md) đạt73,98%/74,37%/74,44% và [DeepLab baseline/aug20](../results/dg_deeplabv3plus_resnet50_seed42/README.md) đạt71,82%/72,08% Cityscapes val500; artifact DeepLab gần nhất có consistency4/20epoch. **Chưa có bằng chứng cải thiện mIoU trên ACDC**. CPU QA không thay thế benchmark GPU.
 
 ## Recipe train dùng chung
 

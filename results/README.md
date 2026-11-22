@@ -2,14 +2,14 @@
 
 ## Luồng DG hiện hành
 
-**Đã nghiệm thu bốn lượt đủ20epoch**, theo ZIP nhận ngày22/11; chưa đủ sáu candidate và chưa đánh giá ACDC theo cohort mới.
+**Đã nghiệm thu năm lượt đủ20epoch**, theo ZIP nhận ngày22/11. B2 đã đủ ba nhánh; còn chờ DeepLab consistency đủ20epoch trước khi khóa sáu candidate và đánh giá ACDC.
 
 | Model | baseline20 | aug20 | Consistency trong ZIP đã nhận |
 | --- | ---: | ---: | --- |
-| [B2](dg_segformer_b2_seed42/README.md) | 73,98% | 74,37% | 0/20epoch |
+| [B2](dg_segformer_b2_seed42/README.md) | 73,98% | 74,37% | 20/20epoch;74,44% |
 | [DeepLabV3+R50](dg_deeplabv3plus_resnet50_seed42/README.md) | 71,82% | 72,08% | 4/20epoch; resume từepoch5 |
 
-Các điểm trên là Cityscapes val500 dùng chọn checkpoint; không phải điểm ACDC hoặc test độc lập. Chỉ so hai nhánh đủ20epoch; không dùng điểm consistency epoch4 như kết quả hoàn chỉnh. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
+Các điểm trên là Cityscapes val500 dùng chọn checkpoint; không phải điểm ACDC hoặc test độc lập. Chỉ so các lượt đủ20epoch; không dùng điểm DeepLab consistency epoch4 như kết quả hoàn chỉnh. B2 consistency hơn aug0,071điểm phần trăm, chênh nhỏ và một seed chưa chứng minh ưu thế. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
 
 | Bằng chứng | Phạm vi |
 | --- | --- |

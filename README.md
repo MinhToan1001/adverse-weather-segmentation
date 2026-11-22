@@ -19,9 +19,9 @@ Cách làm này gọi là **Domain Generalization (DG)**: học ở điều ki�
 | Checkpoint và tiếp tục train | Lưu best/last, trạng thái optimizer và RNG; xuất ZIP sau mỗi epoch hoàn thành |
 | Đánh giá và trực quan hóa | mIoU từng lớp/thời tiết, learning curves, ảnh nhãn/dự đoán/lỗi và độ tự tin |
 | Demo Node.js | Upload ảnh, xem mask/overlay, tải kết quả; hiện dùng checkpoint B2 **lịch sử** trên CPU |
-| Kết quả DG mới | **Đã nghiệm thu 4/6 nhánh đủ20epoch; chưa đánh giá ACDC** |
+| Kết quả DG mới | **B2 đủ3/3 nhánh; đã nhận tổng5/6 nhánh đủ20epoch; chưa đánh giá ACDC** |
 
-Theo các ZIP đã nghiệm thu ngày22/11, **B2 baseline/aug20 đạt73,98%/74,37%; DeepLab baseline/aug20 đạt71,82%/72,08% Cityscapes val500**. Consistency B2 chưa có kết quả; DeepLab có4/20epoch, cần resume từepoch5. [B2](results/dg_segformer_b2_seed42/README.md) · [DeepLab](results/dg_deeplabv3plus_resnet50_seed42/README.md). Chưa đủ sáu candidate hoặc có kết quả ACDC; không dùng điểm selection để nhận là cải thiện thời tiết xấu. [Bằng chứng và kết quả](results/README.md).
+Theo các ZIP đã nghiệm thu ngày22/11, **B2 baseline/aug/consistency20 đạt73,98%/74,37%/74,44%; DeepLab baseline/aug20 đạt71,82%/72,08% Cityscapes val500**. B2 đã hoàn thành; artifact DeepLab gần nhất có consistency4/20epoch. [B2](results/dg_segformer_b2_seed42/README.md) · [DeepLab](results/dg_deeplabv3plus_resnet50_seed42/README.md). Cần DeepLab consistency đủ20epoch để khóa sáu candidate rồi đánh giá ACDC; không dùng điểm selection để nhận là cải thiện thời tiết xấu. [Bằng chứng và kết quả](results/README.md).
 
 ## Dữ liệu được dùng thế nào?
 
