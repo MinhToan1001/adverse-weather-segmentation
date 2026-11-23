@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-23",
+  "status": "PASS",
+  "checks": [
+    "parts assembled with per-part and whole-archive SHA256 checks",
+    "verified local archive reused without redownloading parts",
+    "corrupt part rejected before archive publication",
+    "missing input fetches Release, never fresh training",
+    "B2 input not selected as DeepLab",
+    "existing DeepLab result preferred over Release",
+    "ambiguous DeepLab inputs rejected"
+  ],
+  "scope": "Synthetic HTTP/input fixtures; not a remote Kaggle GPU run",
+  "gpu_training": false,
+  "real_cityscapes_mask_restoration": {
+    "status": "PASS",
+    "count": 3475,
+    "decoded_pixel_hashes_match": true
+  },
+  "existing_launcher_tests": {
+    "passed": 12,
+    "failures": 0,
+    "scope": "DG suite orchestration and fresh Kaggle code input tests"
+  },
+  "prepared_checkpoint": {
+    "copied_entries_verified": 114,
+    "weights_optimizer_logs_configs_preserved": true,
+    "original_completed_epochs": {
+      "baseline": 20,
+      "aug": 20,
+      "consistency": 4
+    },
+    "source_training_changed": false,
+    "dataset_pixels_in_release": false,
+    "part_count": 3
+  },
+  "publication_status": "upload_in_progress",
+  "release_url": "https://github.com/MinhToan1001/adverse-weather-segmentation/releases/tag/deeplab-dg-seed42-resume-e4"
+}

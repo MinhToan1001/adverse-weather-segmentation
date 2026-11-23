@@ -1,0 +1,36 @@
+{
+  "schema": "deeplab_release_parts_v1",
+  "model": "deeplabv3plus_resnet50",
+  "seed": 42,
+  "epochs": {
+    "baseline": 20,
+    "aug": 20,
+    "consistency": 4
+  },
+  "archive": {
+    "name": "deeplab_dg_resume_e4.zip",
+    "bytes": 3837148998,
+    "sha256": "6c5b941d062c0968fc13de8c2a15dfad864b1f5a432677bdbd7c5f41512b8098"
+  },
+  "parts": [
+    {
+      "name": "deeplab_dg_resume_e4.zip.part001",
+      "bytes": 1610612736,
+      "sha256": "5e665ac92e40143d461afab2938358bcd42912ce9ea3ad51039c22f938129be9"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part002",
+      "bytes": 1610612736,
+      "sha256": "1cb8447e71922aadc3ffaa1e18083c8be927189eb144c7615de14d626d978c53"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part003",
+      "bytes": 615923526,
+      "sha256": "e2ccee282621d1c38dab0271e4bd12a70399d2963cd17109221f0a6be21e3ffb"
+    }
+  ],
+  "dataset_pixels_included": false,
+  "omitted_masks": 3475,
+  "copied_entries_sha256_verified": 114,
+  "notebook": "notebooks/03_resume_deeplab_consistency.ipynb"
+}

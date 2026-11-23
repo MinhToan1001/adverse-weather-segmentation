@@ -47,6 +47,8 @@ Cả B2 và DeepLab đều chạy đủ ba chiến thuật, **khởi tạo độ
 
 ## Thành viên mới bắt đầu từ đâu?
 
+**Được giao chạy tiếp DeepLab consistency:** dùng [03_resume_deeplab_consistency.ipynb](notebooks/03_resume_deeplab_consistency.ipynb) và thêm input Cityscapes. Wrapper tự tải checkpoint `20/20/4` từ [GitHub Release](https://github.com/MinhToan1001/adverse-weather-segmentation/releases/tag/deeplab-dg-seed42-resume-e4), kiểm hash, tạo lại mask từ Cityscapes rồi tiếp tục consistency từepoch5. [Hướng dẫn input và Save & Run All](notebooks/README.md#thành-viên-chạy-tiếp-deeplab-consistency). Nếu đã có ZIP kết quả DeepLab trong input, notebook ưu tiên dùng bản đó.
+
 1. Đọc trang này để nắm bài toán, phạm vi dữ liệu và trạng thái thật.
 2. Đọc [luồng code](docs/READING_GUIDE.md), rồi [quy ước dữ liệu](docs/DATA_CONTRACT.md).
 3. Đọc [phương pháp DG](docs/DG_METHOD.md) để hiểu cách train và các phép so sánh.
@@ -63,7 +65,7 @@ src/training/    Trainer, loss, optimizer, DG và checkpoint dùng chung
 src/experiments/ Ghép config, chặn dùng sai dữ liệu, khóa kết quả
 src/evaluation/  Metrics và xuất ảnh đánh giá
 scripts/         Lệnh chuẩn bị, chạy suite, đánh giá và tạo notebook
-notebooks/       Hai notebook hiện hành: một B2, một DeepLab
+notebooks/       Hai notebook train + wrapper resume DeepLab consistency
 web/             Node.js API/giao diện + Python inference
 tests/           Kiểm thử pipeline, checkpoint và protocol
 docs/            Hướng dẫn đọc/chạy/sửa code

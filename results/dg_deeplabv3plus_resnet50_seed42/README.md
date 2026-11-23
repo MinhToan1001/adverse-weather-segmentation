@@ -29,9 +29,9 @@ Source snapshot giống nhau; manifest khớp sau chuẩn hóa prefix workspace 
 
 ## Tiếp tục từ epoch5
 
-1. Import [02_dg_deeplabv3plus_resnet50.ipynb](../../notebooks/02_dg_deeplabv3plus_resnet50.ipynb) vào phiên Kaggle mới.
-2. Thêm chính ZIP DeepLab này và Cityscapes cùng version/mount `kavithak1388/cityscapes/Cityscape`. Không thêm ACDC hay dùng ZIP B2 thay cho DeepLab.
-3. Đặt `RESUME_INPUT=Path('/kaggle/input/<input-ket-qua-DeepLab>')` theo Copy path thực tế; bật GPU/Internet rồi Save & Run All.
+1. Thành viên nhận bàn giao dùng [03_resume_deeplab_consistency.ipynb](../../notebooks/03_resume_deeplab_consistency.ipynb) vào phiên Kaggle mới; wrapper tự tìm input kết quả DeepLab. Notebook02 gốc vẫn hỗ trợ resume thủ công.
+2. Thêm Cityscapes cùng version/mount `kavithak1388/cityscapes/Cityscape`, đủ ảnh và gtFine train/val. Notebook03 có thể tự tải checkpoint từ [Release bàn giao](https://github.com/MinhToan1001/adverse-weather-segmentation/releases/tag/deeplab-dg-seed42-resume-e4); không cần thêm ZIP kết quả nếu dùng cách này. Không thêm ACDC hay dùng ZIP B2 thay cho DeepLab.
+3. Với notebook03, giữ `RESUME_INPUT=None` để tự tìm input kết quả hoặc tải Release nếu không có. Nếu có nhiều bản DeepLab, đặt `RESUME_INPUT=Path('/kaggle/input/<input-ket-qua-DeepLab>')` theo Copy path thực tế. Bật GPU/Internet rồi Save & Run All. Gói Release loại mask GT khỏi phần công khai, notebook dựng lại và kiểm hash từ input Cityscapes; source/config/checkpoint giữ nguyên.
 4. Notebook xác minh/bỏ qua baseline và aug; consistency khôi phục checkpoint epoch4 rồi chạy epoch5–20. Giữ snapshot/config/seed gốc.
 
 Bốn epoch consistency đã chạy có median khoảng12,22phút/epoch trên T4. Ngoại suy16epoch còn lại khoảng3,26giờ train+validation, chưa gồm startup/setup/ZIP/checkpoint hoặc biến động runtime. Khi có `suite_complete` và3/3nhánh20/20, tải ZIP mới để nghiệm thu. Cohort chỉ freeze sau khi cả B2 và DeepLab đủ sáu candidate20epoch.
