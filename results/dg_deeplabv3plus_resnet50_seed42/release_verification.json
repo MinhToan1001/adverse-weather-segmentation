@@ -32,8 +32,9 @@
     },
     "source_training_changed": false,
     "dataset_pixels_in_release": false,
-    "part_count": 3
+    "part_count": 35
   },
   "publication_status": "upload_in_progress",
-  "release_url": "https://github.com/MinhToan1001/adverse-weather-segmentation/releases/tag/deeplab-dg-seed42-resume-e4"
+  "release_url": "https://github.com/MinhToan1001/adverse-weather-segmentation/releases/tag/deeplab-dg-seed42-resume-e4",
+  "transport": "Retained verified first1.5GiB asset; remaining payload uses64MiB chunks with retries after an SSL interruption."
 }

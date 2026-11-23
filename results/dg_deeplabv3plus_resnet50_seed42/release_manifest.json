@@ -20,13 +20,173 @@
     },
     {
       "name": "deeplab_dg_resume_e4.zip.part002",
-      "bytes": 1610612736,
-      "sha256": "1cb8447e71922aadc3ffaa1e18083c8be927189eb144c7615de14d626d978c53"
+      "bytes": 67108864,
+      "sha256": "0a318817e7032429aeb63f841c9a26eb7aee3d7495da45b4a9f287a6b81dc717"
     },
     {
       "name": "deeplab_dg_resume_e4.zip.part003",
-      "bytes": 615923526,
-      "sha256": "e2ccee282621d1c38dab0271e4bd12a70399d2963cd17109221f0a6be21e3ffb"
+      "bytes": 67108864,
+      "sha256": "ab9012cab9f8d98d3bc8a1b803d45f54ad708e2ef927b4c78cb87b8d1323958f"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part004",
+      "bytes": 67108864,
+      "sha256": "f688221bee6bba50c7330a14780afb7e4f7ee486b0f4f68463196bb327d10c1d"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part005",
+      "bytes": 67108864,
+      "sha256": "34d21a191587c0fe9602d2984359aa52ddc060182cc47b019d5adb705bc1d5de"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part006",
+      "bytes": 67108864,
+      "sha256": "bb7a384859c5d83c11b7a5fe83ce2ee9ba1ca2a5aa3f92284a1f234a8a6ff40a"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part007",
+      "bytes": 67108864,
+      "sha256": "55b2cc437c4321812d852996256b4be1391104c424fa1ab15533b760fa2f1e15"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part008",
+      "bytes": 67108864,
+      "sha256": "f515c44fd8e883b6bd81259c92649d13424abd27b87c604113422feec26423d9"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part009",
+      "bytes": 67108864,
+      "sha256": "98e93611955b5153f23444132926376cb7ecced022f7d750682d0586bbc3a727"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part010",
+      "bytes": 67108864,
+      "sha256": "8687d25844875d9da82c924ed598482f2321872fcc7ff1a0c1eeb932a349f27a"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part011",
+      "bytes": 67108864,
+      "sha256": "6cad5476d23f8acbddce49d2322815a81b0626ee4e12677a3a3675798324336c"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part012",
+      "bytes": 67108864,
+      "sha256": "6987db1744ba19fc70903d81385c5c5321ac3ffa4b83ad2f2967681e67a7909c"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part013",
+      "bytes": 67108864,
+      "sha256": "a60b4066288595f8d817fb3b78d68d4cc868bac099c74e1b27b4a60b2e77a558"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part014",
+      "bytes": 67108864,
+      "sha256": "6f7e8fce5e551c2df913dd70be60f427f35542461be32a990ceef8ba53e43532"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part015",
+      "bytes": 67108864,
+      "sha256": "453a53ebbb86b34352e0d28fb9e58b81dd288b468d362b1d450069c31bc23c72"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part016",
+      "bytes": 67108864,
+      "sha256": "10638fb35c5079784d947a5783036b662d9da03995f69448e599289c2ec84b40"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part017",
+      "bytes": 67108864,
+      "sha256": "6185e99f72adc409d271dfcec1cafd3dc54c71f72502d4613b3c9fd141e6d09d"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part018",
+      "bytes": 67108864,
+      "sha256": "d192566ab4f90c279056261b9027ba08c98a49bdeccc2b53dcc3dc7f86922a04"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part019",
+      "bytes": 67108864,
+      "sha256": "4824fc26c0e0ccd34bbc184b90b5cd933797e8995bc211ed620c0d34f4e1f932"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part020",
+      "bytes": 67108864,
+      "sha256": "d96cc5c49f7ef56c780c8effa0877b76444b51d5a8191800b3947fcb2a908f78"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part021",
+      "bytes": 67108864,
+      "sha256": "468a690d3eb7457c41124f4fc5997338289f6c3514e57c5d78560484099f7dc1"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part022",
+      "bytes": 67108864,
+      "sha256": "b9301cae091e4835719b714771d876dffcb729294c3943a3e9799ebca9cc22f5"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part023",
+      "bytes": 67108864,
+      "sha256": "cbeec9e86d6e6bd30c916355ba3dbfbfa70374503eae0767f18d443ce32eee01"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part024",
+      "bytes": 67108864,
+      "sha256": "cd651a69de1d17dc571544965b661cc484c28a1f2f34322a194df263bb92d4b7"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part025",
+      "bytes": 67108864,
+      "sha256": "26a961f3d124ca858da233d2308614aa234a5ecf3f3f9148a7f52537bed094f2"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part026",
+      "bytes": 67108864,
+      "sha256": "d0abebce1ae49d99ad1735c4a2e1781171f2d7ecd85c9d20e358361873ef584a"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part027",
+      "bytes": 67108864,
+      "sha256": "8ab2c2f49ca0e96240352ccf47c010d24935259648298d6e1a78fadc3197e909"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part028",
+      "bytes": 67108864,
+      "sha256": "2adbfad62e54f35812bba3a145d147bb7968dde7445842f2b787a9fa9edf216e"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part029",
+      "bytes": 67108864,
+      "sha256": "ebc9ae4a4e84575352cd003b06d997d2eabf3208f636a0f2036d5a4b6ec4f93b"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part030",
+      "bytes": 67108864,
+      "sha256": "32e6f6328b8e9400692cd7926a0a5a7b0b475117193fadc81fe1d954564bd211"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part031",
+      "bytes": 67108864,
+      "sha256": "15dfacbec1198ed11ccbe1ba520ac7d69b1f7549c0a9c6ae58415e5008cb2612"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part032",
+      "bytes": 67108864,
+      "sha256": "912350a2885207fc99f73bfd2f16326c41f2b9d01ae54a16646908b389e8ebab"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part033",
+      "bytes": 67108864,
+      "sha256": "03a88c170d2305b901363085b2ec415e686ddf6ec303e40e142743c412dbd2cf"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part034",
+      "bytes": 67108864,
+      "sha256": "1db7e893eee7ff4d3b42a8fedb98b347d33c9d7d601a63097823641833e1575d"
+    },
+    {
+      "name": "deeplab_dg_resume_e4.zip.part035",
+      "bytes": 11943750,
+      "sha256": "82ab67ae359db8ddca3a21750df08fb677e974b866d84e3985c412071c62d425"
     }
   ],
   "dataset_pixels_included": false,
