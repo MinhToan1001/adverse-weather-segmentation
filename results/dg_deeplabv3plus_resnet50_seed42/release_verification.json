@@ -34,7 +34,19 @@
     "dataset_pixels_in_release": false,
     "part_count": 35
   },
-  "publication_status": "upload_in_progress",
+  "publication_status": "published_and_publicly_verified",
   "release_url": "https://github.com/MinhToan1001/adverse-weather-segmentation/releases/tag/deeplab-dg-seed42-resume-e4",
-  "transport": "Retained verified first1.5GiB asset; remaining payload uses64MiB chunks with retries after an SSL interruption."
+  "transport": "Retained verified first 1.5 GiB asset; remaining payload uses 64 MiB chunks with retries after an SSL interruption.",
+  "public_verification": {
+    "status": "PASS",
+    "anonymous_manifest_access": true,
+    "anonymous_checkpoint_download_access": true,
+    "manifest_sha256": "484fbb195c6c07accea93abe7734ad9fec3a72ae20b70370b88345f11d363755",
+    "verified_part_count": 35,
+    "asset_count": 36,
+    "all_server_sha256_match": true,
+    "total_part_bytes": 3837148998,
+    "whole_archive_sha256": "6c5b941d062c0968fc13de8c2a15dfad864b1f5a432677bdbd7c5f41512b8098",
+    "scope": "Anonymous manifest download, public API size/digest checks for all assets, and a streamed ZIP prefix; complete artifact verified locally before upload."
+  }
 }
