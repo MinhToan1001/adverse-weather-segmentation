@@ -12,6 +12,8 @@ Cách làm này gọi là **Domain Generalization (DG)**: học ở điều ki�
 
 **Tối ưu và đánh giá K2:** [notebook05](notebooks/05_k2_balanced_train_eval.ipynb) thử recipe40epoch/640×1280/warmup/crop nguồn và K1 nhẹ hơn; [notebook06](notebooks/06_k2_evaluate_report.ipynb) đánh giá checkpoint đã hoàn thành mà không train lại. Xuất Cityscapes/ACDC validation, PNG/SVG và ảnh dự đoán. Recipe mới chưa có bằng chứng cải thiện hoặc bảo đảm80%; không so chéo với baseline20epoch để quy lợi ích cho K2. [Hướng dẫn](docs/K2_OPTIMIZATION.md).
 
+**Đối chứng cho K2 pilot20epoch:** [notebook07: B0+K1](notebooks/07_k2_aug_legacy_train_eval.ipynb) và [notebook08: B0+K1+FiLM](notebooks/08_k2_film_legacy_train_eval.ipynb) cố định legacy_v1/seed42, tắt loss điều kiện; audit với B0 đã hoàn tất rồi tự đánh giá Cityscapes/ACDC và xuất hình. [Input và cách chạy](notebooks/README.md).
+
 ## Project hiện làm được gì?
 
 | Thành phần | Hiện trạng |
