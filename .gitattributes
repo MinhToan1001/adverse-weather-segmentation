@@ -4,6 +4,7 @@
 *.yml text eol=lf
 *.json text eol=lf
 *.ipynb text eol=lf
+configs/dg_v2/splits/*.csv text eol=lf
 *.md text eol=lf
 *.js text eol=lf
 *.mjs text eol=lf

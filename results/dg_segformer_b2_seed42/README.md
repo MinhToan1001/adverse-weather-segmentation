@@ -1,5 +1,8 @@
 # B2 DG · seed42 · đủ ba nhánh20epoch
 
+**Cập nhật 26/11/2026:** đã đánh giá đủ sáu checkpoint trên Cityscapes val500 và ACDC val406. [Kết quả đã nghiệm thu](../dg_evaluation_seed42/README.md). Các bước/chứng cứ bên dưới ghi lại thời điểm trước đánh giá.
+
+
 Nghiệm thu22/11/2026 từ **`dg_segformer_b2_suite_seed42 (1).zip`**, thay cho ZIP B2 trước chỉ đủ baseline/aug. [Record kiểm tra](verification.json) · [CSV đường học](learning_curves.csv) · [IoU từng lớp](per_class_best.csv).
 
 | Nhánh | Epoch hoàn thành | Best epoch | Cityscapes val500 mIoU | Train + validation ghi trong log |
@@ -27,6 +30,6 @@ Dataset/weights/full ZIP vẫn ở local ngoài Git; bảng số, biểu đồ v
 
 ## Bước tiếp theo
 
-**B2 đã xong training; không cần resume B2 thêm.** Theo artifact DeepLab nhận gần nhất, baseline/aug đủ20epoch và consistency4/20. Cần kết quả DeepLab đủ20epoch cho nhánh cuối, rồi khóa cả sáu candidate trước khi evaluate ACDC val406.
+**B2 và DeepLab đã xong training; không cần resume thêm.** DeepLab consistency được nghiệm thu đủ 20 epoch ngày 24/11/2026. [Cả sáu candidate đã khóa](../dg_cohort_seed42/README.md); bước tiếp theo là đánh giá ACDC val406.
 
-Giữ phương pháp/config/checkpoint hiện tại; chưa thay loss, tăng epoch hoặc chọn mô hình bằng ACDC. [DeepLab và cách resume](../dg_deeplabv3plus_resnet50_seed42/README.md) · [Freeze/evaluate](../../docs/TRAINING_GUIDE.md).
+Giữ phương pháp/config/checkpoint hiện tại; chưa thay loss, tăng epoch hoặc chọn mô hình bằng ACDC. [Kết quả DeepLab](../dg_deeplabv3plus_resnet50_seed42/README.md) · [Freeze/evaluate](../../docs/TRAINING_GUIDE.md).

@@ -1,10 +1,10 @@
 {
-  "date": "2026-11-22",
-  "status": "PARTIAL_SUITE_VERIFIED",
-  "archive": "E:\\Download\\dg_deeplabv3plus_resnet50_suite_seed42.zip",
-  "archive_bytes": 3882008252,
+  "date": "2026-11-24",
+  "status": "COMPLETE_DEEPLAB_SUITE_VERIFIED",
+  "archive": "E:\\Download\\dg_deeplabv3plus_resnet50_suite_seed42 (1).zip",
+  "archive_bytes": 3882565258,
   "all_entries_crc_pass": true,
-  "entries_checked": 3589,
+  "entries_checked": 3590,
   "nested_source_hash_checks": 272,
   "checkpoint_file_hashes_checked": 36,
   "same_initial_weights": true,
@@ -81,46 +81,51 @@
       ]
     },
     "consistency": {
-      "epochs": 4,
-      "best_epoch": 4,
-      "cityscapes_val_miou": 0.6137788598529467,
-      "last_cityscapes_val_miou": 0.6137788598529467,
-      "median_epoch_minutes": 12.222349770758319,
-      "train_val_hours": 0.8143561916077771,
+      "epochs": 20,
+      "best_epoch": 20,
+      "cityscapes_val_miou": 0.7157700465373232,
+      "last_cityscapes_val_miou": 0.7157700465373232,
+      "median_epoch_minutes": 12.947926811841656,
+      "train_val_hours": 4.280235975778332,
       "peak_allocated_gib": 2.4080734252929688,
-      "optimizer_updates": 1488,
-      "paired_batches": 2977,
+      "optimizer_updates": 7438,
+      "paired_batches": 14832,
       "weakest_classes": [
         [
-          "train",
-          0.3241368664740717
+          "pole",
+          0.5115558713746912
         ],
         [
           "rider",
-          0.4242591536738257
+          0.5296315005746043
         ],
         [
-          "bus",
-          0.4256521138914331
+          "traffic_light",
+          0.544939390495379
+        ],
+        [
+          "fence",
+          0.5526554731321348
         ],
         [
           "motorcycle",
-          0.43703716343036547
-        ],
-        [
-          "wall",
-          0.4382465030522028
+          0.5546880860468203
         ]
       ]
     }
   },
-  "consistency_epochs": 4,
-  "stop_reason": "session_checkpoint_ready after consistency epoch4",
-  "invocation_hours": 9.547903595123335,
+  "consistency_epochs": 20,
+  "stop_reason": "suite_complete",
+  "invocation_hours": 4.616269466668332,
   "consistency_profile_estimate_hours": 4.391023234215025,
   "estimate_excludes": "setup, checkpoint export, process startup and runtime variation",
   "scope": "ZIP/hash/config/log audit; no embedded code execution, training-state deserialization or new GPU inference",
   "source_hashes_match_current_local": true,
+  "aug_minus_baseline_pp": 0.26316449575253253,
+  "consistency_minus_aug_pp": -0.5072748112713299,
+  "consistency_minus_baseline_pp": -0.24411031551879736,
+  "consistency_pair_schedule_matches_aug": true,
+  "consistency_first4_committed_epochs_preserved": true,
   "b2_comparability": {
     "source_code_equal": true,
     "logical_manifests_equal": true,
@@ -128,10 +133,59 @@
     "train_loss_dg_processing_selection_equal": true,
     "caveat": "Different architecture and encoder initialization; comparison is not a method-only ablation."
   },
-  "consistency_kl_finite": true,
-  "consistency_pair_schedule_matches_aug_first4": true,
-  "estimated_remaining_consistency_train_val_hours": 3.2592932722022185,
-  "aug_minus_baseline_pp": 0.26316449575253253,
-  "next_epoch_required_budget_minutes": 33.465350894999936,
-  "remaining_estimate_based_on_completed_epochs": 4
+  "previous_baseline_aug_run_files_unchanged": 56,
+  "resume_recovery_metadata_updated_as_expected": true,
+  "candidate_inspector_ids": [
+    "deeplabv3plus_resnet50:baseline",
+    "deeplabv3plus_resnet50:aug",
+    "deeplabv3plus_resnet50:consistency"
+  ],
+  "cpu_best_checkpoint_smoke": {
+    "checks": [
+      {
+        "arm": "baseline",
+        "strict_load": true,
+        "shape": [
+          1,
+          19,
+          16,
+          24
+        ],
+        "finite": true,
+        "device": "cpu"
+      },
+      {
+        "arm": "aug",
+        "strict_load": true,
+        "shape": [
+          1,
+          19,
+          16,
+          24
+        ],
+        "finite": true,
+        "device": "cpu"
+      },
+      {
+        "arm": "consistency",
+        "strict_load": true,
+        "shape": [
+          1,
+          19,
+          16,
+          24
+        ],
+        "finite": true,
+        "device": "cpu"
+      }
+    ],
+    "input_shape": [
+      1,
+      3,
+      64,
+      96
+    ],
+    "scope": "Zero-input CPU plumbing check only; not accuracy or new GPU evaluation"
+  },
+  "resume_comparison_reference": "Previously verified epoch4 Release checkpoint; original non-dataset entries retained byte-identically"
 }

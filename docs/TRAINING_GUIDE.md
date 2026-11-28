@@ -1,4 +1,6 @@
-# Chạy DG tự động trên Kaggle
+# Chạy lại DG v1 trên Kaggle
+
+**Đang phát triển B2 DG v2:** dùng [hướng dẫn notebook05/06](DG_V2_GUIDE.md), mỗi notebook hai đối chứng20epoch. Phần dưới giữ recipe DG v1 đã có kết quả.
 
 [Hai notebook](../notebooks/README.md) · [Phương pháp](DG_METHOD.md)
 
@@ -49,6 +51,8 @@ python -m scripts.run_dg_suite --city data/raw/cityscapes --model deeplabv3plus_
 run_dg vẫn là API/CLI từng arm cho phát triển và QA; notebook thông thường không yêu cầu người dùng gọi từng arm.
 
 ## Freeze và evaluate sau cả hai suite
+
+**Cách chạy trên Kaggle bằng một lần Run All:** [notebook04](../notebooks/04_evaluate_dg_cohort.ipynb), thêm hai suite hoàn chỉnh + Cityscapes + ACDC. [Hướng dẫn import/input/kết quả](KAGGLE_EVALUATION.md). Các lệnh CLI dưới đây phục vụ chạy thủ công.
 
 Đưa hai suite hoàn chỉnh vào cùng môi trường. Lệnh tự tìm sáu arm. Những đường dẫn trong dấu `<...>` dưới đây cần thay bằng đường dẫn thực tế:
 

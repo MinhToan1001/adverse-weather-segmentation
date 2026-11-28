@@ -1,15 +1,17 @@
 # Trạng thái kết quả và bằng chứng
 
-## Luồng DG hiện hành
+**Hiện phát triển B2 DG v2:** [hai nhóm notebook05/06](../docs/DG_V2_GUIDE.md), chưa có kết quả GPU. [Bằng chứng triển khai](dg_v2_implementation/README.md). Bảng dưới là DG v1 đã hoàn tất.
 
-**Đã nghiệm thu năm lượt đủ20epoch**, theo ZIP nhận ngày22/11. B2 đã đủ ba nhánh; còn chờ DeepLab consistency đủ20epoch trước khi khóa sáu candidate và đánh giá ACDC.
+## DG v1 đã hoàn thành
+
+**Đã nghiệm thu sáu lượt đủ 20 epoch**, cập nhật ngày 24/11/2026. Cả hai model đủ baseline/aug/consistency. [Biên bản khóa sáu checkpoint](dg_cohort_seed42/README.md); **đã đánh giá đủ 12 job ngày 26/11**. [Kết quả ACDC và kiểm chứng](dg_evaluation_seed42/README.md).
 
 | Model | baseline20 | aug20 | Consistency trong ZIP đã nhận |
 | --- | ---: | ---: | --- |
 | [B2](dg_segformer_b2_seed42/README.md) | 73,98% | 74,37% | 20/20epoch;74,44% |
-| [DeepLabV3+R50](dg_deeplabv3plus_resnet50_seed42/README.md) | 71,82% | 72,08% | 4/20epoch; resume từepoch5 |
+| [DeepLabV3+R50](dg_deeplabv3plus_resnet50_seed42/README.md) | 71,82% | 72,08% | 20/20epoch; 71,58% |
 
-Các điểm trên là Cityscapes val500 dùng chọn checkpoint; không phải điểm ACDC hoặc test độc lập. Chỉ so các lượt đủ20epoch; không dùng điểm DeepLab consistency epoch4 như kết quả hoàn chỉnh. B2 consistency hơn aug0,071điểm phần trăm, chênh nhỏ và một seed chưa chứng minh ưu thế. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
+Các điểm trên là Cityscapes val500 dùng chọn checkpoint; không phải điểm ACDC hoặc test độc lập. B2 consistency hơn aug 0,071 điểm phần trăm, DeepLab consistency thấp hơn aug 0,507 điểm. Một seed chưa chứng minh ổn định hay ưu thế trên thời tiết xấu. ACDC val406 đã nghiệm thu: B2 baseline/aug/consistency đạt **49,02%/52,47%/52,46%**, DeepLab đạt **34,26%/40,35%/42,20%**. Aug giúp cả hai, consistency không tăng mIoU gộp ở B2 nhưng tăng ở DeepLab trong seed này. Điểm tiny CPU probe không được dùng làm độ chính xác của model.
 
 | Bằng chứng | Phạm vi |
 | --- | --- |

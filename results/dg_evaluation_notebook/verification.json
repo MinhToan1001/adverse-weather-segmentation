@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-24",
+  "status": "PASS",
+  "complete_real_zip_inputs": 2,
+  "frozen_candidate_checks": 6,
+  "source_files_verified": 68,
+  "city_val_pairs": 500,
+  "acdc_val_pairs": 406,
+  "files_and_metadata_validated": true,
+  "real_geometry_smoke_domains": [
+    "cityscapes",
+    "fog",
+    "night",
+    "rain",
+    "snow"
+  ],
+  "labels_scope": "Five real samples checked via evaluation dataset; all other label arrays validated during full evaluation, not by the generic target-blocking validator",
+  "training": false,
+  "target_inference": false,
+  "gpu_run": false,
+  "scope": "Actual notebook setup/freeze/manifest cells on real local ZIPs and datasets; pip/GPU availability checks stubbed for CPU smoke. Full Kaggle evaluation pending.",
+  "automated_tests": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0
+  },
+  "notebook_sha256": "e5afd07cd627a0faf4e73d72eb26c4758ce675acd83500b079f87363fcb9cdd6"
+}

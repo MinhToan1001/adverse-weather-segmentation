@@ -1,0 +1,30 @@
+{
+  "fit_images": 2380,
+  "dev_images": 595,
+  "fit_cities": [
+    "aachen",
+    "bremen",
+    "cologne",
+    "darmstadt",
+    "dusseldorf",
+    "hanover",
+    "jena",
+    "krefeld",
+    "monchengladbach",
+    "strasbourg",
+    "stuttgart",
+    "tubingen",
+    "ulm",
+    "zurich"
+  ],
+  "dev_cities": [
+    "bochum",
+    "erfurt",
+    "hamburg",
+    "weimar"
+  ],
+  "seed": 42,
+  "target_data_access": "none",
+  "group": "city",
+  "requested_dev_fraction": 0.2
+}

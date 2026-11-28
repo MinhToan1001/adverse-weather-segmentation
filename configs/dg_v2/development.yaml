@@ -1,0 +1,13 @@
+protocol: cityscapes_groupdev_dg_v2
+model: segformer_b2
+seed: 42
+split_seed: 42
+epochs: 20
+dev_fraction: 0.2
+arms: [baseline, class_weights, weather_aug, weather_aug_class_weights]
+selection: 0.5_clean_plus_0.5_mean_corruptions
+corruptions: [low_light, noise, haze]
+pair_probability: 0.5
+fit_style_mixture: {original: 0.5, low_light: 0.3, haze: 0.2}
+class_weights: {minimum: 0.75, maximum: 2.0, exponent: 0.5}
+target_data_access: none

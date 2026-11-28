@@ -1,0 +1,5 @@
+model,scope,aug_minus_baseline_pp,consistency_minus_aug_pp
+segformer_b2,official-city,0.39414142070686164,0.07094545677156505
+segformer_b2,official-acdc,3.455694877246934,-0.01338237538488496
+deeplabv3plus_resnet50,official-city,0.26315977040897165,-0.5072717913128688
+deeplabv3plus_resnet50,official-acdc,6.094364524744145,1.847905944814443

@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-24",
+  "status": "cohort_frozen_before_target_evaluation",
+  "local_cohort_sha256": "5417e139d7c48f3a7379b5a1c6dbe7e554365b9183c0341a786484c72b47a72c",
+  "target_evaluated": false,
+  "target_feedback_limit": "Prior ACDC development feedback exists; not a pristine independent test",
+  "scope": "All six audited best checkpoints sealed locally before current cohort target evaluation; no target inference performed",
+  "candidates": [
+    {
+      "id": "segformer_b2:baseline",
+      "candidate_sha256": "fefc14610873b6991a769aaf1b9ef853e2efdcc8ab6982cf39d8b7740e41d7c5",
+      "weights_sha256": "2179af05a6cbc898f1bada5a379d11ea2cdb2b16faba826321e2bfb6263fd05b",
+      "initial_sha256": "f9b5af554a725a0864e5dd8788a569655d6faab7625013f3f32ea0efb958406a",
+      "source_ids": {
+        "train": "9e1b2d111b2a0966ea765df7a1d792058cc8e57c827d62791d9f1d702962f26c",
+        "val": "cbc9fc372d49138ad85143ef5a93ad7d506345dcf173c49874027cbd848a8ee8"
+      },
+      "seed": 42,
+      "model": "segformer_b2",
+      "arm": "baseline"
+    },
+    {
+      "id": "segformer_b2:aug",
+      "candidate_sha256": "9468a74618adfb81a35b7ba77cb756357ed783fa143cc8b480427d356984ac6a",
+      "weights_sha256": "1e4cad94d9983038fe9e4a591b85030639b90cba6313c14c63ac41bc99b172cf",
+      "initial_sha256": "f9b5af554a725a0864e5dd8788a569655d6faab7625013f3f32ea0efb958406a",
+      "source_ids": {
+        "train": "9e1b2d111b2a0966ea765df7a1d792058cc8e57c827d62791d9f1d702962f26c",
+        "val": "cbc9fc372d49138ad85143ef5a93ad7d506345dcf173c49874027cbd848a8ee8"
+      },
+      "seed": 42,
+      "model": "segformer_b2",
+      "arm": "aug"
+    },
+    {
+      "id": "segformer_b2:consistency",
+      "candidate_sha256": "695c106b9a4bdf325550f929cc323d5529ac3bc378812e3b1f99993354a38219",
+      "weights_sha256": "f2f72b920cfe7138a916abd08dd2d293c124ecbcaca0f3ed49aa129423a5a6f2",
+      "initial_sha256": "f9b5af554a725a0864e5dd8788a569655d6faab7625013f3f32ea0efb958406a",
+      "source_ids": {
+        "train": "9e1b2d111b2a0966ea765df7a1d792058cc8e57c827d62791d9f1d702962f26c",
+        "val": "cbc9fc372d49138ad85143ef5a93ad7d506345dcf173c49874027cbd848a8ee8"
+      },
+      "seed": 42,
+      "model": "segformer_b2",
+      "arm": "consistency"
+    },
+    {
+      "id": "deeplabv3plus_resnet50:baseline",
+      "candidate_sha256": "60d03ecd2803e1732c813a453db09055314b4e8282aadfe1cf5d258e3603e0fa",
+      "weights_sha256": "ba995063ab20b854e787c3d0e9bda09d002dbdb277e4143f137e204588e8db4b",
+      "initial_sha256": "66ab1aaa9fdb9051cf8b156941827c838272e0990877706fed859218944d66fd",
+      "source_ids": {
+        "train": "9e1b2d111b2a0966ea765df7a1d792058cc8e57c827d62791d9f1d702962f26c",
+        "val": "cbc9fc372d49138ad85143ef5a93ad7d506345dcf173c49874027cbd848a8ee8"
+      },
+      "seed": 42,
+      "model": "deeplabv3plus_resnet50",
+      "arm": "baseline"
+    },
+    {
+      "id": "deeplabv3plus_resnet50:aug",
+      "candidate_sha256": "2c0b462093721b08fece8892e56fbf01a14379fda4e3729800fe10a30c1f8f3a",
+      "weights_sha256": "840c94c40c66c5f14e9d244b7352eeb6410c032cbd5357145940578e6647304f",
+      "initial_sha256": "66ab1aaa9fdb9051cf8b156941827c838272e0990877706fed859218944d66fd",
+      "source_ids": {
+        "train": "9e1b2d111b2a0966ea765df7a1d792058cc8e57c827d62791d9f1d702962f26c",
+        "val": "cbc9fc372d49138ad85143ef5a93ad7d506345dcf173c49874027cbd848a8ee8"
+      },
+      "seed": 42,
+      "model": "deeplabv3plus_resnet50",
+      "arm": "aug"
+    },
+    {
+      "id": "deeplabv3plus_resnet50:consistency",
+      "candidate_sha256": "162b0e9c69b3a3a326be7f02869971595f7293de9f82e720cdcaaa9150a27890",
+      "weights_sha256": "0fc2f2abb91c492c4974af858ebf2854830a46bc3e83d682b8b83dfb07a7a1c0",
+      "initial_sha256": "66ab1aaa9fdb9051cf8b156941827c838272e0990877706fed859218944d66fd",
+      "source_ids": {
+        "train": "9e1b2d111b2a0966ea765df7a1d792058cc8e57c827d62791d9f1d702962f26c",
+        "val": "cbc9fc372d49138ad85143ef5a93ad7d506345dcf173c49874027cbd848a8ee8"
+      },
+      "seed": 42,
+      "model": "deeplabv3plus_resnet50",
+      "arm": "consistency"
+    }
+  ]
+}

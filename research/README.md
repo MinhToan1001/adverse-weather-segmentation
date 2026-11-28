@@ -1,5 +1,7 @@
 # Cơ sở phương pháp và kế hoạch
 
+[Vòng DG v2 ngày 26/11](DG_V2_PLAN.md): ma trận weighting × augmentation trên source-dev đã triển khai riêng; [Kiểm thử và chuẩn bị Cityscapes thật](../results/dg_v2_implementation/README.md) đã qua. [Notebook05/06 và code ZIP mới](../docs/DG_V2_GUIDE.md) sẵn sàng; chưa có kết quả GPU v2, không thay kết quả v1.
+
 Project dùng **kiến trúc đã công bố + pipeline dùng chung + so sánh có đối chứng**. Không nhận là sáng tạo ra SegFormer/DeepLab hay tái lập đầy đủ một bài DG. [Phương pháp đang cài](../docs/DG_METHOD.md) · [Việc còn lại](PROJECT_COMPLETION_PLAN.md).
 
 ## Đọc bài báo để trả lời điều gì?

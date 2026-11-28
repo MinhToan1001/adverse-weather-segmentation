@@ -2,7 +2,7 @@
 
 ## Quy tắc chung
 
-- Giữ DG: học Cityscapes train, chọn best bằng Cityscapes val; chỉ đánh giá ACDC sau khi chốt cohort. Không trộn điểm supervised lịch sử vào DG.
+- Giữ DG: học Cityscapes nguồn; ACDC đánh giá sau khi chốt model. V2 dùng city-disjoint fit/dev và score sạch+corruption; v1 đã hoàn tất chọn bằng official Cityscapes val. [Bản bàn giao v2](DG_V2_HANDOFF.md). Không trộn điểm supervised lịch sử vào DG.
 - Mỗi model có file riêng; data, augmentation, loss, trainer và evaluator dùng chung.
 - Thay chiến thuật ở config/module chung; không copy vòng train vào notebook.
 - Dùng nhánh riêng cho thay đổi của thành viên, mô tả hành vi và cách kiểm tra trong PR; tránh force-push.
@@ -27,7 +27,7 @@ python -m scripts.build_kaggle_notebooks
 npm test
 ```
 
-Sửa notebook qua [generator](../scripts/build_dg_notebook.py), rồi sinh lại hai notebook; không commit output thực thi. `npm test` chạy kiểm thử API, không cần weights. Kiểm thử trình duyệt cần checkpoint/dataset và dev dependencies; xem [web](../web/README.md).
+DG v2 dùng `python -m scripts.build_dg_v2_notebook` sinh notebook05/06 và code ZIP riêng. Sửa notebook qua generator tương ứng; không commit output thực thi. `npm test` chạy kiểm thử API, không cần weights. Kiểm thử trình duyệt cần checkpoint/dataset và dev dependencies; xem [web](../web/README.md).
 
 Test pretrained chỉ chạy khi đặt `RUN_PRETRAINED_TESTS=1`; `HF_HUB_OFFLINE=1` dùng cache, không tải weights. Tiny CPU QA kiểm tra đường đi dữ liệu/gradient/lưu–khôi phục, không phải đánh giá độ chính xác.
 

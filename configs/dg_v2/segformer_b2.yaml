@@ -1,0 +1,7 @@
+# Consumed by src.experiments.dg_v2.compose; full optimizer/geometry remain shared.
+# src/models/registry.py pins nvidia/mit-b2 revision and checkpoint SHA256.
+# ImageNet encoder; a new 19-class segmentation decoder. No Cityscapes/ACDC weights.
+model:
+  name: segformer_b2
+  num_labels: 19
+  initialization: imagenet_encoder

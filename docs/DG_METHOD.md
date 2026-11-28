@@ -1,10 +1,12 @@
-# Phương pháp DG đang triển khai
+# Phương pháp DG v1 đã đánh giá
+
+Vòng hiện tại là **B2 DG v2**, fit2380/dev595 theo thành phố và chọn best bằng clean+corrupted dev. Xem [bản bàn giao v2](DG_V2_HANDOFF.md) và [hai notebook GPU](DG_V2_GUIDE.md). Phần dưới giữ phương pháp v1 để truy vết.
 
 [Training guide](TRAINING_GUIDE.md) · [Cơ sở bài báo](../research/README.md) · [Kế hoạch](../research/PROJECT_COMPLETION_PLAN.md)
 
 ## Ranh giới dữ liệu và trạng thái
 
-Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Theo các ZIP nghiệm thu22/11, [B2 đủ baseline/aug/consistency20](../results/dg_segformer_b2_seed42/README.md) đạt73,98%/74,37%/74,44% và [DeepLab baseline/aug20](../results/dg_deeplabv3plus_resnet50_seed42/README.md) đạt71,82%/72,08% Cityscapes val500; artifact DeepLab gần nhất có consistency4/20epoch. **Chưa có bằng chứng cải thiện mIoU trên ACDC**. CPU QA không thay thế benchmark GPU.
+Chỉ Cityscapes train2975 để học, Cityscapes val500 để chọn best. Không dùng ACDC images/labels/reference/style statistics hoặc target BN. ACDC chỉ evaluate sau khi khóa cohort candidate. Nghiệm thu cập nhật 24/11/2026: [B2 đủ baseline/aug/consistency20](../results/dg_segformer_b2_seed42/README.md) đạt 73,98%/74,37%/74,44% và [DeepLab đủ ba nhánh20](../results/dg_deeplabv3plus_resnet50_seed42/README.md) đạt 71,82%/72,08%/71,58% Cityscapes val500. [Sáu candidate đã khóa](../results/dg_cohort_seed42/README.md). **Đã nghiệm thu ACDC ngày 26/11:** augmentation tăng B2 +3,456 điểm và DeepLab +6,094 điểm; consistency so aug lần lượt −0,013 và +1,848 điểm, trong một seed. [Kết quả và giới hạn](../results/dg_evaluation_seed42/README.md). CPU QA không thay thế benchmark GPU.
 
 ## Recipe train dùng chung
 

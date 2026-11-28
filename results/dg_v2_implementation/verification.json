@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-28",
+  "status": "HANDOFF_AND_TWO_PAIR_CPU_PREFLIGHT_VERIFIED",
+  "tests": {
+    "tests": 207,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 4
+  },
+  "dg_v2_and_protocol_tests": {
+    "tests": 37,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "node_api_test": "PASS (loopback test outside network sandbox)",
+  "fit_images": 2380,
+  "dev_images": 595,
+  "disjoint_city_groups": true,
+  "all19_fit_classes_present": true,
+  "weights_fit_only": true,
+  "weight_bounds": [
+    0.75,
+    2.0
+  ],
+  "groups": {
+    "baseline_weights": {
+      "arms": [
+        "baseline",
+        "class_weights"
+      ],
+      "epochs": [
+        0,
+        0
+      ],
+      "frozen_input_files_verified": 2985,
+      "portable_manifests": {
+        "fit": "f7bbae99c050fb39abee6e3c5ed44d1f3e70d09301921b3ab7e2963329a54346",
+        "dev": "407ad1e15a4c73b5a9f2209c5310ee7eeed33e52988db56d43ebfee9bc561918"
+      }
+    },
+    "weather_weights": {
+      "arms": [
+        "weather_aug",
+        "weather_aug_class_weights"
+      ],
+      "epochs": [
+        0,
+        0
+      ],
+      "frozen_input_files_verified": 2985,
+      "portable_manifests": {
+        "fit": "f7bbae99c050fb39abee6e3c5ed44d1f3e70d09301921b3ab7e2963329a54346",
+        "dev": "407ad1e15a4c73b5a9f2209c5310ee7eeed33e52988db56d43ebfee9bc561918"
+      }
+    }
+  },
+  "source_files_verified": 80,
+  "v1_source_files_unchanged": 68,
+  "notebooks": {
+    "05_dg_v2_segformer_b2.ipynb": "802da5c15196e875431eefb8bef8bd076d55b9195eceb469d8b38f33fd7ac1c5",
+    "06_dg_v2_b2_weather.ipynb": "6cf4117a5abfaf4dccd29818969681a0fb394522018882c37e685fdca36844c7"
+  },
+  "code_zip_sha256": "849e0597c3ce8916c1291b078f06b19c9c16cf73b511232ef1a0bc5cb65194bb",
+  "code_zip_bytes": 178645,
+  "canonical_reference_manifest_line_endings": "LF; pinned by scoped .gitattributes rule",
+  "cpu_interruption_resume": "Actual tiny-model trainer: weighted paired views + dropout, two epochs; resumed and continuous weights/history bitwise equal",
+  "gpu_training": false,
+  "accuracy_result": false,
+  "completed_training_epochs": 0,
+  "scope": "Software/checkpoint/launcher tests and full real Cityscapes preparation for both independent B2 pairs; no GPU accuracy or duration measured."
+}

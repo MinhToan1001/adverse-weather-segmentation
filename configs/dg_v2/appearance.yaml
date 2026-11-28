@@ -1,0 +1,20 @@
+# RGB transforms run after the shared crop/pad/flip; masks are unchanged.
+# Mixture applies only to styled views; paired batches occur with probability 0.5.
+fit_mixture: {original: 0.5, low_light: 0.3, haze: 0.2}
+low_light:
+  fit_exposure: [0.35, 0.65]
+  dev_exposure: [0.25, 0.35]
+  fit_gamma: [1.0, 1.6]
+  dev_gamma: [1.6, 1.8]
+  spatial_base: 0.65
+  spatial_amplitude: 0.35
+  color_cast: [0.8, 1.15]
+  read_noise: 0.006
+  shot_noise: 0.025
+haze:
+  fit_alpha: [0.08, 0.30]
+  dev_alpha: [0.30, 0.40]
+  spatial_base: 0.6
+  spatial_amplitude: 0.4
+  airlight: 0.85
+dev_noise_std: 0.05
